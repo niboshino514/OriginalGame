@@ -1,7 +1,7 @@
 #pragma once
-#include "ObjectBase.h"
+#include "MapChipBase.h"
 
-class NoramalMapChip : public ObjectBase
+class NoramalMapChip : public MapChipBase
 {
 public:
 	NoramalMapChip();
@@ -9,5 +9,4 @@ public:
 
 	void Init()override;
 	void Update()override;
-	void Draw()override;
 };

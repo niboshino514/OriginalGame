@@ -1,13 +1,13 @@
 #pragma once
 #include "MapChipBase.h"
 
-class NoneMapChip : public MapChipBase
+class ObstacleMapChip : public MapChipBase
 {
 public:
-	NoneMapChip();
-	virtual ~NoneMapChip();
+	ObstacleMapChip();
+	virtual ~ObstacleMapChip();
 
 	void Init()override;
 	void Update()override;
-};
 
+};

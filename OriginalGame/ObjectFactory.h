@@ -4,10 +4,25 @@
 #include <vector>
 
 
+
+// マップ
+struct Map
+{
+	// マップ情報
+	std::vector<std::vector<int>> mapInfo;
+
+	
+
+};
+
 class ObjectBase;
 
 class ObjectFactory : public std::enable_shared_from_this<ObjectFactory>
 {
+public:
+
+
+
 public:
 	ObjectFactory();
 	virtual ~ObjectFactory();
@@ -33,6 +48,13 @@ public:
 	/// オブジェクト削除
 	/// </summary>
 	void ObjectErase();
+
+
+	/// <summary>
+	/// 次のステージへ移行
+	/// </summary>
+	void NextStageToMigration();
+
 
 	/// <summary>
 	/// オブジェクト情報を返す

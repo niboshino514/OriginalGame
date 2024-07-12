@@ -144,10 +144,13 @@
     <ClCompile Include="FunctionConclusion.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainScreen.cpp" />
+    <ClCompile Include="MapChipBase.cpp" />
+    <ClCompile Include="NextStageMapChip.cpp" />
     <ClCompile Include="NoneMapChip.cpp" />
     <ClCompile Include="NoramalMapChip.cpp" />
     <ClCompile Include="ObjectBase.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
+    <ClCompile Include="ObstacleMapChip.cpp" />
     <ClCompile Include="Pad.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneBase.cpp" />
@@ -159,10 +162,13 @@
     <ClInclude Include="FunctionConclusion.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="MainScreen.h" />
+    <ClInclude Include="MapChipBase.h" />
+    <ClInclude Include="NextStageMapChip.h" />
     <ClInclude Include="NoneMapChip.h" />
     <ClInclude Include="NoramalMapChip.h" />
     <ClInclude Include="ObjectBase.h" />
     <ClInclude Include="ObjectFactory.h" />
+    <ClInclude Include="ObstacleMapChip.h" />
     <ClInclude Include="Pad.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SceneBase.h" />

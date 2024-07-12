@@ -71,8 +71,10 @@ void Player::Move()
 void Player::Collision()
 {
 
+	Vec2 afterPos = (m_circle.centerPos + m_vec);
 
-
+	Circle afterCircle = m_circle;
+	afterCircle.centerPos = afterPos;
 
 
 
@@ -81,19 +83,22 @@ void Player::Collision()
 		switch (object->GetObjectID())
 		{
 		case ObjectBase::Player:
-
-			// 自身のIDと調べているIDが同じなら、コンティニューする
-			continue;
-
 			break;
-		case ObjectBase::NoramalMapChip:
+		case ObjectBase::NoneMapChip:
 
-			// 当たっていない場合、移動量を0にする
-			if (FunctionConclusion::IsAABBCollisionDetection(m_circle, object->GetSquare()))
+			// 当たっていた場合、移動量を0にする
+			if (FunctionConclusion::IsAABBCollisionDetection(afterCircle, object->GetSquare()))
 			{
-				m_vec += Vec2(-kMoveSpeed, -kMoveSpeed);
+				m_vec = Vec2();
 			}
+			break;
+		case ObjectBase::ObstacleMapChip:
 
+			// 当たっていた場合、移動量を0にする
+			if (FunctionConclusion::IsAABBCollisionDetection(afterCircle, object->GetSquare()))
+			{
+				m_vec = Vec2();
+			}
 			break;
 		default:
 			break;

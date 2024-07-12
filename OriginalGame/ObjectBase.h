@@ -2,6 +2,7 @@
 #include <Vec2.h>
 #include <DxLib.h>
 #include "FunctionConclusion.h"
+#include "ObjectFactory.h"
 #include <memory>
 
 
@@ -20,9 +21,13 @@ public:
 	// オブジェクトID
 	enum ObjectID
 	{
-		Player,			// プレイヤー
+		Player,				// プレイヤー
 
-		NoramalMapChip,	// ノーマルマップチップ
+		NoneMapChip,		// 侵入不可マップチップ
+		NoramalMapChip,		// 通常マップチップ
+		ObstacleMapChip,	// 障害物マップチップ
+		NextStageMapChip,	// 次のステージに進むマップチップ
+
 
 	};
 
@@ -33,6 +38,11 @@ public:
 	/// <param name="objectFactory">オブジェクトファクトリー</param>
 	void SetObjectFactory(std::shared_ptr<ObjectFactory>objectFactory) { m_pObjectFactory = objectFactory; }
 
+	/// <summary>
+	/// 存在フラグ代入
+	/// </summary>
+	/// <param name="isExlist">存在フラグ</param>
+	void SetIsExlist(const bool& isExlist) { m_isExlist = isExlist; }
 
 	/// <summary>
 	/// 存在フラグを返す
@@ -41,11 +51,19 @@ public:
 	bool GetIsExlist() { return m_isExlist; }
 
 	
+
+
 	/// <summary>
 	/// 円情報代入
 	/// </summary>
 	/// <param name="circle">円情報</param>
 	void SetCircle(const Circle& circle) { m_circle = circle; }
+
+	/// <summary>
+	/// 円情報を返す
+	/// </summary>
+	/// <returns>円情報</returns>
+	Circle GetCircle() { return m_circle; }
 
 
 	/// <summary>

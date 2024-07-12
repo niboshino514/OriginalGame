@@ -1,24 +1,56 @@
 #include "ObjectFactory.h"
 #include "FunctionConclusion.h"
 #include "Player.h"
+
 #include "NoramalMapChip.h"
 #include "NoneMapChip.h"
+#include "ObstacleMapChip.h"
+#include "NextStageMapChip.h"
 
 namespace
 {
+
+	
 	// 盤面情報
 	const std::vector<std::vector<int>> kMap_1 =
 	{
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{0, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 3},
+		{0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{0, 1, 1, 1, 1, 1, 2, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 	};
+
+	// 盤面情報
+	const std::vector<std::vector<int>> kMap_2 =
+	{
+		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{0, 1, 1, 1, 1, 2, 1, 1, 1, 1},
+		{0, 1, 1, 1, 1, 2, 1, 1, 1, 2},
+		{0, 1, 1, 1, 1, 1, 1, 1, 1, 2},
+		{0, 1, 1, 1, 1, 1, 2, 1, 2, 2},
+	};
+
+
+	
+
 
 	// チップサイズ
 	constexpr float kChipSize = 64.0f;
+
+	std::vector<Map>kTest
+	{
+		Map(kMap_1),
+		Map(kMap_2)
+	};
+
+	
+	
+
+	Map test = Map(kMap_1);
+
 }
 
 namespace
@@ -109,21 +141,27 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData)
 			switch (mapData[y][x])
 			{
 			case 0:
-				// ノーンマップチップ生成
+				// 侵入不可マップチップ生成
 				m_object.push_back(std::make_shared<NoneMapChip>());
 
 				break;
 			case 1:
-				// ノーマルマップチップ生成
+				// 通常マップチップ生成
 				m_object.push_back(std::make_shared<NoramalMapChip>());
 
 				break;
 
+			case 2:
+				// 障害物マップチップ生成
+				m_object.push_back(std::make_shared<ObstacleMapChip>());
+
+				break;
+			case 3:
+				// 次のステージに進むマップチップ生成
+				m_object.push_back(std::make_shared<NextStageMapChip>());
+
+				break;
 			default:
-
-				int a = 0;
-
-
 				break;
 			}
 		
@@ -153,4 +191,22 @@ void ObjectFactory::ObjectErase()
 
 	// 削除
 	m_object.erase(rmIt, m_object.end());
+}
+
+void ObjectFactory::NextStageToMigration()
+{
+	for (auto& object : m_object)
+	{
+		if (object->GetObjectID() == ObjectBase::ObjectID::Player)
+		{
+			continue;
+		}
+
+
+		object->SetIsExlist(false);
+	}
+
+
+	// 次のステージのマップ
+	MapChipCreate(kMap_2);
 }

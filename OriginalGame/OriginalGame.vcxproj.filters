@@ -76,7 +76,16 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NoneMapChip.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Object\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="MapChipBase.cpp">
+      <Filter>ソース ファイル\Object\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="ObstacleMapChip.cpp">
+      <Filter>ソース ファイル\Object\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="NextStageMapChip.cpp">
+      <Filter>ソース ファイル\Object\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -116,8 +125,17 @@
     <ClInclude Include="FunctionConclusion.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="ObstacleMapChip.h">
+      <Filter>ヘッダー ファイル\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MapChipBase.h">
+      <Filter>ヘッダー ファイル\Map</Filter>
+    </ClInclude>
     <ClInclude Include="NoneMapChip.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="NextStageMapChip.h">
+      <Filter>ヘッダー ファイル\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
