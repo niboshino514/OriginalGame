@@ -36,7 +36,9 @@ void NextStageMapChip::Collision()
 			// 当たっていた場合、次のステージに移行する
 			if (FunctionConclusion::IsAABBCollisionDetection(object->GetCircle(), m_square))
 			{
-				m_pObjectFactory->NextStageToMigration();
+				m_pObjectFactory->StageMove(true);
+			
+				return;
 			}
 
 			break;

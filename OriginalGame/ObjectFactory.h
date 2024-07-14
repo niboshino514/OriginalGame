@@ -47,9 +47,11 @@ public:
 
 
 	/// <summary>
-	/// 次のステージへ移行
+	/// ステージ移動
 	/// </summary>
-	void NextStageToMigration();
+	void StageMove(const bool isNextStage);
+
+
 
 
 	/// <summary>
@@ -79,6 +81,9 @@ private:
 	// オブジェクト
 	std::list<std::shared_ptr<ObjectBase>>m_object;
 
+
+	//std::vector<std::shared_ptr<ObjectBase>>m_object;
+
 	// キャラクター生成座標情報
 	std::vector<Vec2>m_characterPos;
 
@@ -88,7 +93,4 @@ private:
 
 
 	std::vector<Map>m_mapInfo_test;
-
-
-
 };

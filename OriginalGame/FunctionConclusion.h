@@ -1,5 +1,7 @@
 #pragma once
 #include "Vec2.h"
+#include <cassert>
+#include <math.h>
 
 // セル構造体
 struct Cell
@@ -47,5 +49,4 @@ public:
 	/// <param name="square">四角形情報</param>
 	/// <returns>円と四角形が当たったかどうかを返す</returns>
 	static bool IsAABBCollisionDetection(const Circle& circle, const Square& square);
-
 };

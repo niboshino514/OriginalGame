@@ -21,13 +21,13 @@ public:
 	// オブジェクトID
 	enum ObjectID
 	{
-		Player,				// プレイヤー
+		Player,					// プレイヤー
 
-		NoneMapChip,		// 侵入不可マップチップ
-		NoramalMapChip,		// 通常マップチップ
-		ObstacleMapChip,	// 障害物マップチップ
-		NextStageMapChip,	// 次のステージに進むマップチップ
-
+		NoneMapChip,			// 侵入不可マップチップ
+		NoramalMapChip,			// 通常マップチップ
+		ObstacleMapChip,		// 障害物マップチップ
+		NextStageMapChip,		// 次のステージに進むマップチップ
+		PreviousStageMapChip,	// 前のステージに戻るマップチップ
 
 	};
 
@@ -85,6 +85,14 @@ public:
 	/// <returns>オブジェクトID</returns>
 	ObjectID GetObjectID() { return m_objectID; }
 
+
+	/// <summary>
+	/// 描画優先順位取得
+	/// </summary>
+	/// <returns>描画優先順位</returns>
+	int GetDrawRank() { return m_drawRank; }
+
+
 protected:
 
 
@@ -100,6 +108,9 @@ protected:
 
 	// 四角形情報
 	Square m_square;
+
+	// 描画の優先順位
+	int m_drawRank;
 
 	////////////////////
 	// クラスポインタ //

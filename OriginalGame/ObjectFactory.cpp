@@ -6,6 +6,8 @@
 #include "NoneMapChip.h"
 #include "ObstacleMapChip.h"
 #include "NextStageMapChip.h"
+#include "PreviousStageMapChip.h"
+#include <cassert>
 
 namespace
 {
@@ -27,29 +29,22 @@ namespace
 	{
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{0, 1, 1, 1, 1, 2, 1, 1, 1, 1},
-		{0, 1, 1, 1, 1, 2, 1, 1, 1, 2},
-		{0, 1, 1, 1, 1, 1, 1, 1, 1, 2},
-		{0, 1, 1, 1, 1, 1, 2, 1, 2, 2},
-	};
-
-	// 盤面情報1
-	const Map kMapTest_1 =
-	{
-		{
-			{0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-			{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-			{0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-			{0, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 3},
-			{0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-			{0, 1, 1, 1, 1, 1, 2, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-		}
+		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{0, 4, 1, 1, 1, 1, 1, 1, 1, 1},
+		{0, 5, 1, 1, 1, 1, 1, 1, 1, 1},
+		{0, 1, 1, 1, 1, 1, 1, 1, 2, 1},
+		{0, 1, 1, 1, 1, 1, 1, 1, 2, 1},
+		{0, 1, 1, 1, 1, 1, 1, 1, 2, 1},
+		{0, 1, 1, 1, 1, 1, 1, 1, 2, 1},
+		{0, 1, 1, 1, 1, 1, 1, 1, 2, 1},
 	};
 
 
 	// チップサイズ
 	constexpr float kChipSize = 64.0f;
 
+
+	// マップ情報
 	std::vector<Map>kMapInfo
 	{
 		Map(kMap_1),
@@ -77,21 +72,10 @@ ObjectFactory::~ObjectFactory()
 
 void ObjectFactory::Init()
 {
-	m_mapInfo_test.push_back(kMapTest_1);
-
 	
-
-
-
 	// マップ生成
-	MapChipCreate(m_mapInfo_test[m_stageNumber]);
+	MapChipCreate(kMapInfo[m_stageNumber]);
 
-
-	for (auto& character : m_characterPos)
-	{
-		// キャラクター生成
-		CharacterCreate(character);
-	}
 
 }
 
@@ -120,7 +104,6 @@ void ObjectFactory::CharacterCreate(const Vec2& pos)
 {
 	// 円情報代入
 	Circle circle = Circle(pos, kCircleRadius);
-
 
 
 	// キャラクター生成
@@ -187,10 +170,17 @@ void ObjectFactory::MapChipCreate(const Map& mapData)
 				m_object.push_back(std::make_shared<NextStageMapChip>());
 
 				break;
+			case 4:
+				// 前のステージに戻るマップチップ生成
+				m_object.push_back(std::make_shared<PreviousStageMapChip>());
+
+				break;
+
+
 			default:
 
-				// キャラクターの座標を入れる
-				m_characterPos.push_back(MapChipCenterPos(topLeftmapChipPos));
+				// キャラクター生成
+				CharacterCreate(MapChipCenterPos(topLeftmapChipPos));
 
 				// 通常マップチップ生成
 				m_object.push_back(std::make_shared<NoramalMapChip>());
@@ -224,23 +214,43 @@ void ObjectFactory::ObjectErase()
 	m_object.erase(rmIt, m_object.end());
 }
 
-void ObjectFactory::NextStageToMigration()
+void ObjectFactory::StageMove(const bool isNextStage)
 {
+	// 次のステージに移動するかどうかのフラグからステージナンバーを増やすか決める
+	if (isNextStage)
+	{
+		// ステージナンバーの数字を増やす
+		m_stageNumber++;
+
+
+		int test = static_cast<int>(kMapInfo.size());
+
+
+		assert((test > m_stageNumber) &&
+			"ステージナンバーに上限以上の数字が入っているようです。");
+
+	}
+	else
+	{
+		// ステージナンバーの数字を減らす;
+		m_stageNumber--;
+
+		assert((-1 < m_stageNumber) &&
+			"ステージナンバーに0以下の数字が入っているようです。");
+	}
+
+	// 要素削除
 	for (auto& object : m_object)
 	{
-		if (object->GetObjectID() == ObjectBase::ObjectID::Player)
-		{
-			continue;
-		}
 		object->SetIsExlist(false);
 	}
 
-	// ステージナンバーの数字を増やす
-	m_stageNumber++;
 
 	// 次のステージのマップ
 	MapChipCreate(kMapInfo[m_stageNumber]);
 }
+
+
 
 Vec2 ObjectFactory::MapChipCenterPos(const Vec2& topLeftmapChipPos)
 {
