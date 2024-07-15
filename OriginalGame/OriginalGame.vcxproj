@@ -145,6 +145,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainScreen.cpp" />
     <ClCompile Include="MapChipBase.cpp" />
+    <ClCompile Include="MapLoader.cpp" />
     <ClCompile Include="NextStageMapChip.cpp" />
     <ClCompile Include="NoneMapChip.cpp" />
     <ClCompile Include="NoramalMapChip.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="ObstacleMapChip.cpp" />
     <ClCompile Include="Pad.cpp" />
+    <ClCompile Include="PlatinumLoader.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PreviousStageMapChip.cpp" />
     <ClCompile Include="SceneBase.cpp" />
@@ -164,6 +166,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="MainScreen.h" />
     <ClInclude Include="MapChipBase.h" />
+    <ClInclude Include="MapLoader.h" />
     <ClInclude Include="NextStageMapChip.h" />
     <ClInclude Include="NoneMapChip.h" />
     <ClInclude Include="NoramalMapChip.h" />
@@ -171,6 +174,7 @@
     <ClInclude Include="ObjectFactory.h" />
     <ClInclude Include="ObstacleMapChip.h" />
     <ClInclude Include="Pad.h" />
+    <ClInclude Include="PlatinumLoader.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PreviousStageMapChip.h" />
     <ClInclude Include="SceneBase.h" />
