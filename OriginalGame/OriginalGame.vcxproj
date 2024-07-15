@@ -145,7 +145,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainScreen.cpp" />
     <ClCompile Include="MapChipBase.cpp" />
-    <ClCompile Include="MapLoader.cpp" />
     <ClCompile Include="NextStageMapChip.cpp" />
     <ClCompile Include="NoneMapChip.cpp" />
     <ClCompile Include="NoramalMapChip.cpp" />
@@ -166,7 +165,6 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="MainScreen.h" />
     <ClInclude Include="MapChipBase.h" />
-    <ClInclude Include="MapLoader.h" />
     <ClInclude Include="NextStageMapChip.h" />
     <ClInclude Include="NoneMapChip.h" />
     <ClInclude Include="NoramalMapChip.h" />

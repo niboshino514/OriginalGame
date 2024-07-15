@@ -1,5 +1,5 @@
 #pragma once
-#include <Vec2.h>
+#include "Vec2.h"
 #include <DxLib.h>
 #include "FunctionConclusion.h"
 #include "ObjectFactory.h"
