@@ -18,7 +18,13 @@ class ObjectFactory : public std::enable_shared_from_this<ObjectFactory>
 {
 public:
 
-
+	// ステージ移動タイプ
+	enum class MapSwitchType
+	{
+		Spawn,			// スポーン
+		NextStage,		// 次のステージ
+		PreviousStage	// 前のステージ
+	};
 
 public:
 	ObjectFactory();
@@ -37,7 +43,7 @@ public:
 	/// マップ生成
 	/// </summary>
 	/// <param name="マップ情報"></param>
-	void MapChipCreate(const Map& mapData);
+	void MapChipCreate(const Map& mapData, const MapSwitchType& mapSwitchType);
 
 
 	/// <summary>
@@ -49,7 +55,7 @@ public:
 	/// <summary>
 	/// ステージ移動
 	/// </summary>
-	void StageMove(const bool isNextStage);
+	void StageMove(const MapSwitchType& mapSwitchType);
 
 
 
@@ -65,7 +71,7 @@ public:
 	/// <summary>
 	/// マップ切り替え
 	/// </summary>
-	void MapSwitch();
+	void MapSwitch(MapSwitchType mapSwitchType);
 
 
 

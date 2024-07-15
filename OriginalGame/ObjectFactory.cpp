@@ -12,14 +12,23 @@
 namespace
 {
 
+	// 0:何もなし(侵入不可)
+	// 1:通常セル
+	// 2:障害物セル(侵入不可)
+	// 3:次のステージに進む
+	// 4:前のステージに戻る
+	// 5:次のステージに進んだ際のプレイヤーの初期セル
+	// 6:前のステージに戻った際のプレイヤーの初期セル
+	// 7:スポーンセル(ゲームを始めた際の初期セル等)
+	
 	
 	// 盤面情報
 	const std::vector<std::vector<int>> kMap_1 =
 	{
-		{0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-		{0, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 3},
+		{0, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 6, 3},
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{0, 1, 1, 1, 1, 1, 2, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 	};
@@ -30,8 +39,8 @@ namespace
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{0, 4, 1, 1, 1, 1, 1, 1, 1, 1},
-		{0, 5, 1, 1, 1, 1, 1, 1, 1, 1},
+		{4, 5, 1, 1, 1, 1, 1, 1, 1, 1},
+		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{0, 1, 1, 1, 1, 1, 1, 1, 2, 1},
 		{0, 1, 1, 1, 1, 1, 1, 1, 2, 1},
 		{0, 1, 1, 1, 1, 1, 1, 1, 2, 1},
@@ -74,9 +83,7 @@ void ObjectFactory::Init()
 {
 	
 	// マップ生成
-	MapChipCreate(kMapInfo[m_stageNumber]);
-
-
+	StageMove(MapSwitchType::Spawn);
 }
 
 void ObjectFactory::Update()
@@ -119,7 +126,7 @@ void ObjectFactory::CharacterCreate(const Vec2& pos)
 	m_object.back()->Init();
 }
 
-void ObjectFactory::MapChipCreate(const Map& mapData)
+void ObjectFactory::MapChipCreate(const Map& mapData, const MapSwitchType& mapSwitchType)
 {
 	// マップ縦横幅代入
 	const int cellWidth = static_cast<int>(mapData.mapInfo[0].size());
@@ -176,14 +183,32 @@ void ObjectFactory::MapChipCreate(const Map& mapData)
 
 				break;
 
-
 			default:
 
-				// キャラクター生成
-				CharacterCreate(MapChipCenterPos(topLeftmapChipPos));
+				if (mapSwitchType == MapSwitchType::Spawn && mapData.mapInfo[y][x] == 7)
+				{
+					// キャラクター生成
+					CharacterCreate(MapChipCenterPos(topLeftmapChipPos));
 
-				// 通常マップチップ生成
-				m_object.push_back(std::make_shared<NoramalMapChip>());
+					// 通常マップチップ生成
+					m_object.push_back(std::make_shared<NoramalMapChip>());
+				}
+				else if ((mapSwitchType == MapSwitchType::NextStage && mapData.mapInfo[y][x] == 5))
+				{
+					// キャラクター生成
+					CharacterCreate(MapChipCenterPos(topLeftmapChipPos));
+
+					// 通常マップチップ生成
+					m_object.push_back(std::make_shared<NoramalMapChip>());
+				}
+				else if ((mapSwitchType == MapSwitchType::PreviousStage && mapData.mapInfo[y][x] == 6))
+				{
+					// キャラクター生成
+					CharacterCreate(MapChipCenterPos(topLeftmapChipPos));
+
+					// 通常マップチップ生成
+					m_object.push_back(std::make_shared<NoramalMapChip>());
+				}
 
 				break;
 			}
@@ -214,10 +239,10 @@ void ObjectFactory::ObjectErase()
 	m_object.erase(rmIt, m_object.end());
 }
 
-void ObjectFactory::StageMove(const bool isNextStage)
+void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 {
 	// 次のステージに移動するかどうかのフラグからステージナンバーを増やすか決める
-	if (isNextStage)
+	if (mapSwitchType == MapSwitchType::NextStage)
 	{
 		// ステージナンバーの数字を増やす
 		m_stageNumber++;
@@ -230,7 +255,7 @@ void ObjectFactory::StageMove(const bool isNextStage)
 			"ステージナンバーに上限以上の数字が入っているようです。");
 
 	}
-	else
+	else if(mapSwitchType == MapSwitchType::PreviousStage)
 	{
 		// ステージナンバーの数字を減らす;
 		m_stageNumber--;
@@ -247,9 +272,8 @@ void ObjectFactory::StageMove(const bool isNextStage)
 
 
 	// 次のステージのマップ
-	MapChipCreate(kMapInfo[m_stageNumber]);
+	MapChipCreate(kMapInfo[m_stageNumber], mapSwitchType);
 }
-
 
 
 Vec2 ObjectFactory::MapChipCenterPos(const Vec2& topLeftmapChipPos)
@@ -263,8 +287,4 @@ Vec2 ObjectFactory::MapChipCenterPos(const Vec2& topLeftmapChipPos)
 
 	// マップチップの中心座標を返す
 	return centerPos;
-}
-
-void ObjectFactory::MapSwitch()
-{
 }
