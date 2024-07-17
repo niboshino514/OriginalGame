@@ -25,8 +25,8 @@ namespace
 	// î’ñ èÓïÒ
 	const std::vector<std::vector<int>> kMap_1 =
 	{
+		{0, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-		{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 0},
 		{0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{0, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 6, 3},
 		{0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0},
@@ -81,7 +81,6 @@ ObjectFactory::~ObjectFactory()
 
 void ObjectFactory::Init()
 {
-	
 	// É}ÉbÉvê∂ê¨
 	StageMove(MapSwitchType::Spawn);
 }
@@ -153,6 +152,9 @@ void ObjectFactory::MapChipCreate(const Map& mapData, const MapSwitchType& mapSw
 			square.B = Vec2(square.A.x + kChipSize, square.A.y);
 			square.C = Vec2(square.A.x + kChipSize, square.A.y + kChipSize);
 			square.D = Vec2(square.A.x, square.A.y + kChipSize);
+
+
+
 
 			switch (mapData.mapInfo[y][x])
 			{

@@ -146,11 +146,11 @@
     <ClInclude Include="Sort.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="PreviousStageMapChip.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="PlatinumLoader.h">
       <Filter>ヘッダー ファイル\setting</Filter>
+    </ClInclude>
+    <ClInclude Include="PreviousStageMapChip.h">
+      <Filter>ヘッダー ファイル\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

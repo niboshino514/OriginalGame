@@ -4,9 +4,14 @@
 
 #include "SceneManager.h"
 
+#include <crtdbg.h>
+
+
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	// windowモード設定
 	ChangeWindowMode(Game::kWindowMode);
 	// ウインドウ名設定

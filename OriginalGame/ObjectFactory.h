@@ -68,12 +68,6 @@ public:
 	Vec2 MapChipCenterPos(const Vec2& topLeftmapChipPos);
 
 
-	/// <summary>
-	/// マップ切り替え
-	/// </summary>
-	void MapSwitch(MapSwitchType mapSwitchType);
-
-
 
 	/// <summary>
 	/// オブジェクト情報を返す
@@ -88,15 +82,10 @@ private:
 	std::list<std::shared_ptr<ObjectBase>>m_object;
 
 
-	//std::vector<std::shared_ptr<ObjectBase>>m_object;
-
 	// キャラクター生成座標情報
 	std::vector<Vec2>m_characterPos;
 
 	
 	// ステージナンバー
 	int m_stageNumber;
-
-
-	std::vector<Map>m_mapInfo_test;
 };

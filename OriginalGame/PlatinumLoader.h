@@ -13,9 +13,29 @@ using MapData_t = std::vector < std::vector<unsigned char>>;
 class PlatinumLoader
 {
 public:
+	// マップ情報
+	struct MapInfo
+	{
+		// マップの横幅
+		int mapWidth = 0;
+		// マップの縦幅
+		int mapHeight = 0;
+		// チップサイズ
+		int chipSize = 0;
+	};
+
+	// マップデータ
+	struct MapData
+	{
+		// マップデータ
+		std::vector<std::vector<int>> mapData;
+	};
+
+public:
 	PlatinumLoader();
 	virtual ~PlatinumLoader();
 
+public:
 
 	/// <summary>
 	/// fmfファイルを読み込んでmapData_に中身を入れる
@@ -23,53 +43,53 @@ public:
 	/// <param name="filePath">fmfファイルのファイルパス</param>
 	void Load(const TCHAR* filePath);
 	
-	/// <summary>
-	/// mapData_の中身を直接取得する
-	/// </summary>
-	const MapData_t& GetMapData()const;
-	
-	/// <summary>
-	/// そのレイヤーが存在するのか確認
-	/// </summary>
-	/// <param name="layerNum"></param>
-	void LayerCheck(int layerNum);
 
 	/// <summary>
-	/// Loadで読み込んだMapData_tの中身（マップチップのデータ）を個別に取得する
+	/// レイヤーごとのマップデータを取得する
 	/// </summary>
-	/// <param name="layerType">取得するマップチップのレイヤーID</param>
-	/// <param name="chipX">取得するマップチップのX座標</param>
-	/// <param name="chipY">取得するマップチップのY座標</param>
-	/// <returns>引数で指定した場所のマップチップのスプライト番号</returns>
-	const int GetChipSpriteNo(int layerNum,int chipX,int chipY)const;
-	
-	/// <summary>
-	/// マップの縦幅と横幅を取得
-	/// </summary>
-	/// <param name="width">マップ横幅</param>
-	/// <param name="height">マップ縦幅</param>
-	void GetMapSize(int& width,int& height);
+	/// <param name="layerNum">レイヤー番号</param>
+	/// <returns>マップデータを返す</returns>
+	std::vector<std::vector<int>> GetMapLayerData(const int& layerNum);
 
 	/// <summary>
-	/// チップサイズを返す
+	/// すべてのマップデータを取得する
 	/// </summary>
-	/// <returns>チップサイズを返す</returns>
-	const int GetChipSize();
+	/// <returns></returns>
+	std::vector<MapData> GetMapAllData();
+
+	/// <summary>
+	/// マップ情報を返す
+	/// </summary>
+	/// <returns>マップ情報(マップの横幅,　マップの縦幅,　マップチップのサイズ)</returns>
+	MapInfo GetMapInfo() { return m_mapInfo; }
+
+
 
 private:
 
-	// マップデータ
-	MapData_t m_mapData;
+	/// <summary>
+	/// ファイルが存在するかどうかを確認(アサート)
+	/// </summary>
+	/// <param name="filePath">ファイルパス</param>
+	void FileExistsConfirmation(const TCHAR* filePath);
 
-	// マップの横幅
-	int m_mapWidth = 0;
-	// マップの縦幅
-	int m_mapHeight = 0;
 
-	// チップサイズ
-	int m_chipSize = 0;
+	/// <summary>
+	/// そのレイヤーが存在するのか確認
+	/// </summary>
+	/// <param name="layerNum">レイヤー</param>
+	void LayerCheck(const int& layerNum);
+
+
+private:
+
+	// プラチナムデータ
+	MapData_t m_platinumData;
+
+	// マップ情報
+	MapInfo m_mapInfo;
 
 	// レイヤー数
-	int m_layerCount = 0;
+	int m_layerMaxNum = 0;
 };
 
