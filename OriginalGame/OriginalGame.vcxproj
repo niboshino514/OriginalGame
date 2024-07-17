@@ -147,7 +147,6 @@
     <ClCompile Include="MapChipBase.cpp" />
     <ClCompile Include="NextStageMapChip.cpp" />
     <ClCompile Include="NoneMapChip.cpp" />
-    <ClCompile Include="NoramalMapChip.cpp" />
     <ClCompile Include="ObjectBase.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
     <ClCompile Include="ObstacleMapChip.cpp" />
@@ -167,7 +166,6 @@
     <ClInclude Include="MapChipBase.h" />
     <ClInclude Include="NextStageMapChip.h" />
     <ClInclude Include="NoneMapChip.h" />
-    <ClInclude Include="NoramalMapChip.h" />
     <ClInclude Include="ObjectBase.h" />
     <ClInclude Include="ObjectFactory.h" />
     <ClInclude Include="ObstacleMapChip.h" />

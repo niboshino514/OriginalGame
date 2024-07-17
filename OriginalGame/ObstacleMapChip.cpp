@@ -14,7 +14,7 @@ void ObstacleMapChip::Init()
 	m_objectID = ObjectID::ObstacleMapChip;
 
 	// ƒJƒ‰[‘ã“ü
-	m_color = 0xff0000;
+	m_color = 0x00ff00;
 }
 
 void ObstacleMapChip::Update()

@@ -3,16 +3,11 @@
 #include <memory>
 #include <vector>
 #include "Vec2.h"
-
-
-// マップ
-struct Map
-{
-	// マップ情報
-	std::vector<std::vector<int>> mapInfo;
-};
+#include "PlatinumLoader.h"
+#include <string>
 
 class ObjectBase;
+class PlatinumLoader;
 
 class ObjectFactory : public std::enable_shared_from_this<ObjectFactory>
 {
@@ -34,6 +29,7 @@ public:
 	void Update();
 	void Draw();
 
+
 	/// <summary>
 	/// キャラクター生成
 	/// </summary>
@@ -43,7 +39,7 @@ public:
 	/// マップ生成
 	/// </summary>
 	/// <param name="マップ情報"></param>
-	void MapChipCreate(const Map& mapData, const MapSwitchType& mapSwitchType);
+	void MapChipCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType);
 
 
 	/// <summary>
@@ -57,9 +53,6 @@ public:
 	/// </summary>
 	void StageMove(const MapSwitchType& mapSwitchType);
 
-
-
-
 	/// <summary>
 	/// マップチップの中心座標を計算
 	/// </summary>
@@ -68,24 +61,45 @@ public:
 	Vec2 MapChipCenterPos(const Vec2& topLeftmapChipPos);
 
 
-
 	/// <summary>
 	/// オブジェクト情報を返す
 	/// </summary>
 	/// <returns>オブジェクト情報</returns>
 	std::list<std::shared_ptr<ObjectBase>>GetObjectInfo() { return m_object; }
 
+private:
+
+
+	/// <summary>
+	/// マップデータファイルパスの初期設定
+	/// </summary>
+	void InitMapDataFilePath();
+
+
+	void TestMapDraw();
 
 private:
 
 	// オブジェクト
 	std::list<std::shared_ptr<ObjectBase>>m_object;
 
+	// マップ情報
+	PlatinumLoader::MapInfo m_mapInfo;
 
-	// キャラクター生成座標情報
-	std::vector<Vec2>m_characterPos;
-
-	
 	// ステージナンバー
 	int m_stageNumber;
+
+	// マップデータのファイルパス
+	std::vector<std::string> m_mapDataFilePath;
+
+
+	std::vector<std::vector<int>> testMapData;
+
+	////////////////////
+	// クラスポインタ //
+	////////////////////
+
+	// プラチナムローダー
+	std::shared_ptr<PlatinumLoader>m_pPlatinumLoader;
+
 };

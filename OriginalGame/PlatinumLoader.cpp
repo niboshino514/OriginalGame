@@ -110,7 +110,7 @@ std::vector<PlatinumLoader::MapData> PlatinumLoader::GetMapAllData()
 
 void PlatinumLoader::FileExistsConfirmation(const TCHAR* filePath)
 {
-#if DEBUG_
+#if _DEBUG
 
 	if (!std::filesystem::is_regular_file(filePath))
 	{
@@ -136,7 +136,7 @@ void PlatinumLoader::FileExistsConfirmation(const TCHAR* filePath)
 
 void PlatinumLoader::LayerCheck(const int& layerNum)
 {
-#if DEBUG_
+#if _DEBUG
 
 	// レイヤーが存在しない場合エラーメッセージを出す
 	if (m_layerMaxNum == layerNum)
