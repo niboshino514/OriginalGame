@@ -36,6 +36,8 @@ private:
 	/// </summary>
 	void Collision();
 
+
+
 private:
 
 	// ˆÚ“®—Ê

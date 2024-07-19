@@ -20,6 +20,7 @@ namespace
 
 
 Player::Player() :
+	m_pos(),
 	m_vec()
 {
 }
@@ -142,63 +143,64 @@ void Player::Move()
 void Player::Collision()
 {
 
-	const Vec2 afterPos = (m_pos + m_vec);
 
 
-	const Hurtbox afterHurtbox = HurtboxSetting(m_pos);
-
-
-	Vec2 add = Vec2();
+	// ’Ç‰ÁÀ•W
+	Vec2 addPos = Vec2();
 
 
 	if (ObjectFactory::MapChipType::Ground ==
-		m_pObjectFactory->MapChipTypeFromCoordinate(afterHurtbox.topPos))
+		m_pObjectFactory->MapChipTypeFromCoordinate(m_hurtbox.topPos))
 	{
-		add +=
-			m_pObjectFactory->CorrectionCoordinateValue(afterHurtbox.topPos, ObjectFactory::HurtboxDrection::Top);
+		m_pos +=
+			m_pObjectFactory->CorrectionCoordinateValue(m_hurtbox.topPos, ObjectFactory::HurtboxDrection::Top);
 
 		if (FunctionConclusion::IsValueNegativeCount(m_vec.y))
 		{
 			m_vec.y = 0.0f;
 		}
+
 	}
 
 	if (ObjectFactory::MapChipType::Ground ==
-		m_pObjectFactory->MapChipTypeFromCoordinate(afterHurtbox.bottomPos))
+		m_pObjectFactory->MapChipTypeFromCoordinate(m_hurtbox.bottomPos))
 	{
-		add +=
-			m_pObjectFactory->CorrectionCoordinateValue(afterHurtbox.bottomPos, ObjectFactory::HurtboxDrection::Bottom);
+		m_pos +=
+			m_pObjectFactory->CorrectionCoordinateValue(m_hurtbox.bottomPos, ObjectFactory::HurtboxDrection::Bottom);
 
 		if (!FunctionConclusion::IsValueNegativeCount(m_vec.y))
 		{
 			m_vec.y = 0.0f;
 		}
+		
 	}
 	
 	if (ObjectFactory::MapChipType::Ground ==
-		m_pObjectFactory->MapChipTypeFromCoordinate(afterHurtbox.leftPos))
+		m_pObjectFactory->MapChipTypeFromCoordinate(m_hurtbox.leftPos))
 	{
-		add +=
-			m_pObjectFactory->CorrectionCoordinateValue(afterHurtbox.leftPos, ObjectFactory::HurtboxDrection::Left);
+		m_pos +=
+			m_pObjectFactory->CorrectionCoordinateValue(m_hurtbox.leftPos, ObjectFactory::HurtboxDrection::Left);
 
 		if (FunctionConclusion::IsValueNegativeCount(m_vec.x))
 		{
 			m_vec.x = 0.0f;
 		}
+		
 	}
 
 
 	if (ObjectFactory::MapChipType::Ground ==
-		m_pObjectFactory->MapChipTypeFromCoordinate(afterHurtbox.rightPos))
+		m_pObjectFactory->MapChipTypeFromCoordinate(m_hurtbox.rightPos))
 	{
-		add +=
-			m_pObjectFactory->CorrectionCoordinateValue(afterHurtbox.rightPos, ObjectFactory::HurtboxDrection::Right);
+		m_pos +=
+			m_pObjectFactory->CorrectionCoordinateValue(m_hurtbox.rightPos, ObjectFactory::HurtboxDrection::Right);
 
 		if (!FunctionConclusion::IsValueNegativeCount(m_vec.x))
 		{
 			m_vec.x = 0.0f;
 		}
+		return;
 	}
 
-	m_pos += add;
+	m_pos += addPos;
 }
