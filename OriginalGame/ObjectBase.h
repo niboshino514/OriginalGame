@@ -28,8 +28,10 @@ public:
 		ObstacleMapChip,		// 障害物マップチップ
 		NextStageMapChip,		// 次のステージに進むマップチップ
 		PreviousStageMapChip,	// 前のステージに戻るマップチップ
-
 	};
+
+
+	
 
 
 	/// <summary>
@@ -109,6 +111,10 @@ protected:
 	// 四角形情報
 	Square m_square;
 
+	// ハートボックス情報
+	Hurtbox m_hurtbox;
+
+
 	// 描画の優先順位
 	int m_drawRank;
 
@@ -116,6 +122,6 @@ protected:
 	// クラスポインタ //
 	////////////////////
 
-	std::shared_ptr<ObjectFactory>m_pObjectFactory;// オブジェクトファクトリーs
+	std::shared_ptr<ObjectFactory>m_pObjectFactory;// オブジェクトファクトリー
 
 };

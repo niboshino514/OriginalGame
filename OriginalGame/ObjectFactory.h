@@ -5,6 +5,8 @@
 #include "Vec2.h"
 #include "PlatinumLoader.h"
 #include <string>
+#include "FunctionConclusion.h"
+
 
 class ObjectBase;
 class PlatinumLoader;
@@ -19,6 +21,29 @@ public:
 		Spawn,			// スポーン
 		NextStage,		// 次のステージ
 		PreviousStage	// 前のステージ
+	};
+
+
+	// マップチップタイプ
+	enum class MapChipType
+	{
+		None,			// 何もなし
+		Ground,			// 地面
+		NextStage,		// 次のステージ
+		PreviouseStage,	// 前のステージ
+		NextPos,		// 次のステージ座標
+		PreviousePos,	// 前のステージ座標
+		SpawnPos,		// スポーン座標
+		NotExists		// 存在しない
+	};
+
+	// ハートボックスの向き
+	enum class HurtboxDrection
+	{
+		Top,	// 上
+		Bottom,	// 下
+		Left,	// 左
+		Right,	// 右
 	};
 
 public:
@@ -54,18 +79,30 @@ public:
 	void StageMove(const MapSwitchType& mapSwitchType);
 
 	/// <summary>
-	/// マップチップの中心座標を計算
-	/// </summary>
-	/// <param name="topLeftmapChipPos">マップチップの左上座標</param>
-	/// <returns>マップチップの中心座標</returns>
-	Vec2 MapChipCenterPos(const Vec2& topLeftmapChipPos);
-
-
-	/// <summary>
 	/// オブジェクト情報を返す
 	/// </summary>
 	/// <returns>オブジェクト情報</returns>
-	std::list<std::shared_ptr<ObjectBase>>GetObjectInfo() { return m_object; }
+	std::vector<std::shared_ptr<ObjectBase>>GetObjectInfo() { return m_object; }
+
+
+	
+	/// <summary>
+	/// 座標情報からマップチップタイプを返す
+	/// </summary>
+	/// <param name="pos">座標</param>
+	/// <returns>マップチップタイプ</returns>
+	MapChipType MapChipTypeFromCoordinate(const Vec2& pos);
+
+
+	/// <summary>
+	/// ハートボックス方向から、補正した座標を返す
+	/// </summary>
+	/// <param name="pos">座標</param>
+	/// <param name="hurtboxDrection">ハートボックス方向</param>
+	/// <returns>補正座標</returns>
+	Vec2 CorrectionCoordinateValue(const Vec2& pos, const HurtboxDrection& hurtboxDrection);
+
+
 
 private:
 
@@ -76,15 +113,27 @@ private:
 	void InitMapDataFilePath();
 
 
+	/// <summary>
+	/// セルが範囲外かどうかを確認する
+	/// </summary>
+	/// <param name="cell">セル</param>
+	/// <returns>セルが範囲外かどうかのフラグ</returns>
+	bool IsCellCheckOutOfRange(const Cell& cell);
+
+
 	void TestMapDraw();
 
 private:
 
+
+
 	// オブジェクト
-	std::list<std::shared_ptr<ObjectBase>>m_object;
+	std::vector<std::shared_ptr<ObjectBase>>m_object;
 
 	// マップ情報
 	PlatinumLoader::MapInfo m_mapInfo;
+
+
 
 	// ステージナンバー
 	int m_stageNumber;
@@ -93,7 +142,10 @@ private:
 	std::vector<std::string> m_mapDataFilePath;
 
 
-	std::vector<std::vector<int>> testMapData;
+	std::vector<std::vector<int>> m_currentMapData;
+
+	// マップチップのハートボックス
+	std::vector<std::vector<Hurtbox>> m_mapChipHurtbox;
 
 	////////////////////
 	// クラスポインタ //

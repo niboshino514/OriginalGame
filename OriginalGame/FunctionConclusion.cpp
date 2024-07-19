@@ -112,3 +112,28 @@ bool FunctionConclusion::IsAABBCollisionDetection(const Circle& circle, const Sq
 	// どこにも衝突していない
 	return false;
 }
+
+
+Cell FunctionConclusion::CoordinateWithCellToConversion(const Vec2& pos, const float& chipSize)
+{
+	// 座標変数
+	Cell cell = Cell();
+
+	cell.x = pos.x / chipSize;
+	cell.y = pos.y / chipSize;
+
+	// セルを返す
+	return cell;
+}
+
+Vec2 FunctionConclusion::CellWithCoordinateToConversion(const Cell& cell, const float& chipSize)
+{
+	// 座標変数
+	Vec2 pos = Vec2();
+
+	pos.x = (cell.x * chipSize) + (chipSize * 0.5f);
+	pos.y = (cell.y * chipSize) + (chipSize * 0.5f);
+
+	// 座標を返す
+	return pos;
+}

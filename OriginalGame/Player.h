@@ -3,6 +3,8 @@
 
 
 
+
+
 class Player : public ObjectBase
 {
 public:
@@ -17,6 +19,14 @@ public:
 private:
 
 	/// <summary>
+	/// ハートボックス更新処理
+	/// </summary>
+	Hurtbox HurtboxSetting(const Vec2& pos);
+
+	
+
+
+	/// <summary>
 	/// 移動
 	/// </summary>
 	void Move();
@@ -27,7 +37,13 @@ private:
 	void Collision();
 
 private:
+
+	// 移動量
 	Vec2 m_vec;
+
+	// 座標
+	Vec2 m_pos;
+
 
 };
 
