@@ -138,7 +138,7 @@ Vec2 FunctionConclusion::CellWithCoordinateToConversion(const Cell& cell, const 
 	return pos;
 }
 
-int FunctionConclusion::IinearInterpolationCountCalculation(const Vec2& pos, const Vec2& vec, float heghtSize, float widthSize)
+int FunctionConclusion::IinearInterpolationCountCalculation(const Vec2& pos, const Vec2& vec, const Vec2& size)
 {
 
 	// 移動量が0ならば、ここで処理を終了する
@@ -149,11 +149,11 @@ int FunctionConclusion::IinearInterpolationCountCalculation(const Vec2& pos, con
 	}
 
 	// 最小サイズを調べる
-	float minSize = heghtSize;
+	float minSize = size.x;
 
-	if (minSize > widthSize)
+	if (minSize > size.x)
 	{
-		minSize = widthSize;
+		minSize = size.y;
 	}
 
 	// 最大の移動量を求める
@@ -210,9 +210,11 @@ Rect FunctionConclusion::RectangleCalculation(const Vec2& pos, const Vec2& size)
 Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoader::MapInfo& mapInfo, const PlatinumLoader::MapData& mapData)
 {
 	Rect result;
+
+
 	// マップ全体を移動可能な状態で初期化
 	result.top = 0.0f;
-	result.bottom = (mapInfo.mapHeight * mapInfo.chipSize) - (rect.bottom - rect.top);
+	result.bottom = (mapInfo.mapHeight * mapInfo.chipSize) - (rect.bottom - rect.top) / 2.0f;
 	result.left = 0.0f;
 	result.right = (mapInfo.mapWidth * mapInfo.chipSize) - (rect.right - rect.left) / 2.0f;
 
@@ -228,7 +230,12 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	{
 		for (int x = indexMinX; x <= indexMaxX; x++)
 		{
-			if (mapData.mapData[x][y] == 0)	continue;
+			if (mapData.mapData[x][y] == 0 ||
+				mapData.mapData[x][y] != 1)
+			{
+				continue;
+			}
+
 			// 一番最初に見つかったぶつかるマップチップの一番下Y座標を取る
 			float temp = static_cast<float>(y * mapInfo.chipSize + mapInfo.chipSize);
 			if (temp > result.top)
@@ -242,7 +249,13 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	{
 		for (int x = indexMinX; x <= indexMaxX; x++)
 		{
-			if (mapData.mapData[x][y] == 0)	continue;
+
+			if (mapData.mapData[x][y] == 0 ||
+				mapData.mapData[x][y] != 1)
+			{
+				continue;
+			}
+
 			// 一番最初に見つかったぶつかるマップチップの一番上Y座標を取る
 			float temp = static_cast<float>(y * mapInfo.chipSize);
 			if (temp < result.bottom)
@@ -256,7 +269,13 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	{
 		for (int y = indexMinY; y <= indexMaxY; y++)
 		{
-			if (mapData.mapData[x][y] == 0)	continue;
+	
+			if (mapData.mapData[x][y] == 0 ||
+				mapData.mapData[x][y] != 1)
+			{
+				continue;
+			}
+
 			// 一番最初に見つかったぶつかるマップチップの一番右X座標を取る
 			float temp = static_cast<float>(x * mapInfo.chipSize + mapInfo.chipSize);
 			if (temp > result.left)
@@ -270,7 +289,13 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	{
 		for (int y = indexMinY; y <= indexMaxY; y++)
 		{
-			if (mapData.mapData[x][y] == 0)	continue;
+
+			if (mapData.mapData[x][y] == 0 ||
+				mapData.mapData[x][y] != 1)
+			{
+				continue;
+			}
+
 			// 一番最初に見つかったぶつかるマップチップの一番左X座標を取る
 			float temp = static_cast<float>(x * mapInfo.chipSize);
 			if (temp < result.right)
@@ -281,4 +306,27 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	}
 
 	return result;
+}
+
+bool FunctionConclusion::IsCellRange(const Cell& cell, const Cell& maxCell, const Cell& minCell)
+{
+
+	// セルが最大セルを超えているかどうかを確認する
+	if (cell.x >= maxCell.x ||
+		cell.y >= maxCell.y)
+	{
+		// 超えていたらfalseを返す
+		return false;
+	}
+
+	// セルが最小セルを下回っているかどうかを確認する
+	if (cell.x < minCell.x ||
+		cell.y < minCell.y)
+	{
+		// 下回っていたらfalseを返す
+		return false;
+	}
+
+	// trueを返す
+	return true;
 }

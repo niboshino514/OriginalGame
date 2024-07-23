@@ -8,7 +8,7 @@ namespace
 	constexpr float kMoveSpeed = 10.0f;
 
 	// サイズ
-	const Vec2 kSize(20.0f, 30.0f);
+	const Vec2 kSize(20.0f, 32.0f);
 }
 
 namespace
@@ -66,6 +66,9 @@ void Player::Update()
 
 void Player::Draw()
 {
+
+	DrawFormatString(0, 15 * 1, 0xffffff, "座標X:%f,座標Y:%f,", m_pos.x, m_pos.y);
+
 	// プレイヤー描画
 	DrawBoxAA(m_rect.left, m_rect.top, m_rect.right, m_rect.bottom,
 		0xff0000, false);
@@ -142,10 +145,18 @@ void Player::Jump()
 
 void Player::Collision()
 {
+	// 地面の当たり判定
+	GroundCollision();
 
+	// マップ移動チップの当たり判定
+	MapMoveChipCollision();
+}
+
+void Player::GroundCollision()
+{
 	// 中心座標から矩形を求める
 	m_rect = FunctionConclusion::RectangleCalculation(m_pos, kSize);
-	
+
 	// 移動可能範囲の矩形を取得
 	m_moveRect = FunctionConclusion::GetMoveEnableRect
 	(m_rect, m_pObjectFactory->GetMapInfo(), m_pObjectFactory->GetCurrentMapData());
@@ -160,8 +171,8 @@ void Player::Collision()
 
 	// 移動量を座標に代入
 	m_pos += m_vec;
-	
-	
+
+
 	if (m_pos.x < m_moveRect.left)
 	{
 		m_pos.x = m_moveRect.left;
@@ -194,5 +205,51 @@ void Player::Collision()
 
 		m_pos.y = m_moveRect.bottom;
 		m_vec.y = 0.0f;
+	}
+}
+
+void Player::MapMoveChipCollision()
+{
+	// 前の座標
+	const Vec2 beforePos = m_pos - m_vec;
+
+
+	// 線形補間数を計算
+	const int iinearInterpolationCount =
+		FunctionConclusion::IinearInterpolationCountCalculation(beforePos, m_vec, kSize);
+
+	// 線形補間座標を計算
+	std::vector<Vec2> iinearInterpolationPos =
+		FunctionConclusion::IinearInterpolationPos(beforePos, m_vec, iinearInterpolationCount);
+
+	// 線形補間数が0ならば、座標に移動量を足したものを配列に入れる
+	if (iinearInterpolationCount == 0)
+	{
+		// 移動後の座標を代入する
+		iinearInterpolationPos.push_back(m_pos);
+	}
+
+
+	// 線形補正分for分を回す
+	for (int i = 0; i < static_cast<int>(iinearInterpolationPos.size()); i++)
+	{
+		// マップチップタイプを調べる
+		const ObjectFactory::MapChipType mapChipType = m_pObjectFactory->GetMapChipType(iinearInterpolationPos[i]);
+
+		// 次のステージに進む
+		if (mapChipType == ObjectFactory::MapChipType::NextStage)
+		{
+			m_pObjectFactory->StageMove(ObjectFactory::MapSwitchType::NextStage);
+
+			return;
+		}
+
+		// 前のステージに戻る
+		if (mapChipType == ObjectFactory::MapChipType::PreviouseStage)
+		{
+			m_pObjectFactory->StageMove(ObjectFactory::MapSwitchType::PreviouseStage);
+
+			return;
+		}
 	}
 }

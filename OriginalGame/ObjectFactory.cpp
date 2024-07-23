@@ -96,47 +96,39 @@ void ObjectFactory::CharacterCreate(const Vec2& pos)
 
 void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType)
 {
-	// マップデータコピー
-	m_currentMapData = mapData;
-
-	// マップチップのハートボックス格納変数
-	std::vector<std::vector<Hurtbox>> mapChipHurtbox(m_mapInfo.mapWidth, std::vector<Hurtbox>(m_mapInfo.mapHeight));
-
-	// マップチップの左上座標
-	Vec2 topLeftmapChipPos = Vec2();
-
 	// すべてのセルを見る
 	for (int y = 0; y < m_mapInfo.mapHeight; y++)
 	{
 		for (int x = 0; x < m_mapInfo.mapWidth; x++)
 		{
-
 			// マップチップタイプに変換
 			const MapChipType mapChipType = MapChipType(mapData[x][y]);
 
-
-			// ハートボックス
-			{
-				mapChipHurtbox[x][y].centerPos = FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfo.chipSize);
-				mapChipHurtbox[x][y].topPos = Vec2(mapChipHurtbox[x][y].centerPos.x, mapChipHurtbox[x][y].centerPos.y - (m_mapInfo.chipSize * 0.5f));
-				mapChipHurtbox[x][y].bottomPos = Vec2(mapChipHurtbox[x][y].centerPos.x, mapChipHurtbox[x][y].centerPos.y + (m_mapInfo.chipSize * 0.5f));
-				mapChipHurtbox[x][y].leftPos = Vec2(mapChipHurtbox[x][y].centerPos.x - (m_mapInfo.chipSize * 0.5f), mapChipHurtbox[x][y].centerPos.y);
-				mapChipHurtbox[x][y].rightPos = Vec2(mapChipHurtbox[x][y].centerPos.x + (m_mapInfo.chipSize * 0.5f), mapChipHurtbox[x][y].centerPos.y);
-			}
-
-
+			// スポーン
 			if (mapChipType == MapChipType::SpawnPos &&
 				mapSwitchType == MapSwitchType::Spawn)
 			{
 				// キャラクター生成
 				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x,y),m_mapInfo.chipSize));
 			}
+
+			// 次のステージ
+			if (mapChipType == MapChipType::NextPos &&
+				mapSwitchType == MapSwitchType::NextStage)
+			{
+				// キャラクター生成
+				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfo.chipSize));
+			}
+
+			// 前のステージ
+			if (mapChipType == MapChipType::PreviousePos &&
+				mapSwitchType == MapSwitchType::PreviouseStage)
+			{
+				// キャラクター生成
+				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfo.chipSize));
+			}
 		}
 	}
-
-
-	// マップチップハートボックスコビー
-	m_mapChipHurtbox = mapChipHurtbox;
 }
 
 void ObjectFactory::ObjectErase()
@@ -161,7 +153,7 @@ void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 		// ステージナンバーの数字を増やす
 		m_stageNumber++;
 	}
-	else if(mapSwitchType == MapSwitchType::PreviousStage)
+	else if(mapSwitchType == MapSwitchType::PreviouseStage)
 	{
 		// ステージナンバーの数字を減らす;
 		m_stageNumber--;
@@ -188,13 +180,31 @@ void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 	// マップ情報取得
 	m_mapInfo = m_pPlatinumLoader->GetMapInfo();
 
+	// 次のステージのマップデータを代入する
+	m_currentMapData = mapData[mapLayer].mapData;
 
 	// 次のステージのマップ
-	MapChipCreate(mapData[mapLayer].mapData, mapSwitchType);
+	MapChipCreate(m_currentMapData, mapSwitchType);
 }
 
 
+ObjectFactory::MapChipType ObjectFactory::GetMapChipType(const Vec2& pos)
+{
+	// 座標からセルを求める
+	const Cell cell = FunctionConclusion::CoordinateWithCellToConversion(pos, m_mapInfo.chipSize);
 
+	// セルが範囲外ならば、ここで処理を終了する
+	if (!FunctionConclusion::IsCellRange(cell, Cell(m_mapInfo.mapWidth, m_mapInfo.mapHeight), Cell(0, 0)))
+	{
+		return MapChipType::NotExists;
+	}
+
+	// マップチップタイプを格納
+	const MapChipType mapChipType = MapChipType(m_currentMapData[cell.x][cell.y]);
+
+	// マップチップタイプを返す
+	return mapChipType;
+}
 
 void ObjectFactory::InitMapDataFilePath()
 {

@@ -115,10 +115,9 @@ public:
 	/// </summary>
 	/// <param name="pos">座標</param>
 	/// <param name="vec">移動量</param>
-	/// <param name="heghtSize">縦幅</param>
-	/// <param name="widthSize">横幅</param>
+	/// <param name="size">縦横幅</param>
 	/// <returns>線形補間数</returns>
-	static int IinearInterpolationCountCalculation(const Vec2& pos, const Vec2& vec, float heghtSize, float widthSize);
+	static int IinearInterpolationCountCalculation(const Vec2& pos, const Vec2& vec, const Vec2& size);
 
 	/// <summary>
 	/// 線形補間座標を求める
@@ -128,8 +127,6 @@ public:
 	/// <param name="iinearInterpolationCount">線形補間数</param>
 	/// <returns>線形補間座標</returns>
 	static std::vector<Vec2> IinearInterpolationPos(const Vec2& pos, const Vec2& vec, const int& iinearInterpolationCount);
-
-
 
 	/// <summary>
 	/// 受け取った座標を中心とした矩形を計算する
@@ -147,6 +144,17 @@ public:
 	/// <param name="mapData">マップデータ</param>
 	/// <returns>移動範囲</returns>
 	static Rect GetMoveEnableRect(const Rect& rect, const PlatinumLoader::MapInfo& mapInfo, const PlatinumLoader::MapData& mapData);
+
+
+	/// <summary>
+	/// セルが範囲内かどうか
+	/// </summary>
+	/// <param name="cell">セル</param>
+	/// <param name="maxCell">最大セル</param>
+	/// <param name="minCell">最小セル</param>
+	/// <returns>セルが範囲内かどうかを返す</returns>
+	static bool IsCellRange(const Cell& cell, const Cell& maxCell, const Cell& minCell);
+
 
 };
 

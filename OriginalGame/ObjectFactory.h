@@ -20,7 +20,7 @@ public:
 	{
 		Spawn,			// スポーン
 		NextStage,		// 次のステージ
-		PreviousStage	// 前のステージ
+		PreviouseStage	// 前のステージ
 	};
 
 
@@ -100,6 +100,13 @@ public:
 	PlatinumLoader::MapInfo GetMapInfo() { return m_mapInfo; }
 	
 
+	/// <summary>
+	/// マップチップ情報を返す
+	/// </summary>
+	/// <param name="pos">座標</param>
+	/// <returns>マップチップ情報</returns>
+	MapChipType GetMapChipType(const Vec2& pos);
+
 	
 private:
 
@@ -142,8 +149,7 @@ private:
 	// 現在のマップデータ
 	std::vector<std::vector<int>> m_currentMapData;
 
-	// マップチップのハートボックス
-	std::vector<std::vector<Hurtbox>> m_mapChipHurtbox;
+
 
 	////////////////////
 	// クラスポインタ //

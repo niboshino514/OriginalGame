@@ -55,6 +55,19 @@ private:
 
 private:
 
+
+	/// <summary>
+	/// 地面の衝突判定
+	/// </summary>
+	void GroundCollision();
+
+	/// <summary>
+	/// マップ移動チップの当たり判定
+	/// </summary>
+	void MapMoveChipCollision();
+
+private:
+
 	// 移動量
 	Vec2 m_vec;
 
