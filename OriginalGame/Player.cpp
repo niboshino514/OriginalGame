@@ -5,23 +5,36 @@
 namespace
 {
 	// 移動スピード
-	constexpr float kMoveSpeed = 20.0f;
+	constexpr float kMoveSpeed = 10.0f;
 
-	// 縦幅
-	constexpr float kHurtboxHeght = 15.0f;
+	// サイズ
+	const Vec2 kSize(20.0f, 30.0f);
+}
 
-	// 縦幅
-	constexpr float kHurtboxWidth = 10.0f;
+namespace
+{
+	// ジャンプ力
+	constexpr float kJumpPower = 15.0f;
 
-	// 判定半径
-	constexpr float kHurtboxRadius = 2.0f;
+	// ジャンプ回数
+	constexpr int kJumpCountMax = 2;
 
+	// 重力大
+	constexpr float kGravity = 1.5f;
+	// 重力小
+	constexpr float kSmallGravity = 0.8f;
+
+	// 最大移動量
+	constexpr float kMaxDirY = 20.0f;
 }
 
 
 Player::Player() :
 	m_pos(),
-	m_vec()
+	m_vec(),
+	m_moveRect(),
+	m_rect(),
+	m_jumpInfo()
 {
 }
 
@@ -43,75 +56,24 @@ void Player::Update()
 	// 移動処理
 	Move();
 
-	// ハートボックス更新処理
-	m_hurtbox = HurtboxSetting(m_pos);
+	// ジャンプ処理
+	Jump();
 
 	// 当たり判定
 	Collision();
 
-	// 移動量を座標に代入
-	m_pos += m_vec;
 }
 
 void Player::Draw()
 {
-	
+	// プレイヤー描画
+	DrawBoxAA(m_rect.left, m_rect.top, m_rect.right, m_rect.bottom,
+		0xff0000, false);
 
-	// 円描画
-	DrawCircleAA(m_pos.x, m_pos.y, m_circle.radius, 32, 0xffffff, true);
-
-	// 中心座標
-	DrawCircleAA(m_hurtbox.centerPos.x, m_hurtbox.centerPos.y, kHurtboxRadius, 32, 0xffffff, true);
-
-	// 上座標(赤)
-	DrawCircleAA(m_hurtbox.topPos.x, m_hurtbox.topPos.y, kHurtboxRadius, 32, 0xff0000, true);
-
-	// 下座標(緑)
-	DrawCircleAA(m_hurtbox.bottomPos.x, m_hurtbox.bottomPos.y, kHurtboxRadius, 32, 0x00ff00, true);
-
-	// 左座標(青)
-	DrawCircleAA(m_hurtbox.leftPos.x, m_hurtbox.leftPos.y, kHurtboxRadius, 32, 0x0000ff, true);
-
-	// 右座標(紫)
-	DrawCircleAA(m_hurtbox.rightPos.x, m_hurtbox.rightPos.y, kHurtboxRadius, 32, 0xff00ff, true);
-
-
-
-	Vec2 pos1;
-	Vec2 pos2;
-
-	// 座標の代入
-	pos1 = Vec2(m_pos.x - (kHurtboxHeght * 0.5), m_pos.y - (kHurtboxHeght * 0.5));
-	pos2 = Vec2((pos1.x + kHurtboxHeght), (pos1.y + kHurtboxHeght));
-
-	DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, 0x00ff00, false);
-
-
+	// 移動できる場所を描画
+	DrawBoxAA(m_moveRect.left, m_moveRect.top, m_moveRect.right, m_moveRect.bottom,
+		0x0000ff, false);
 }
-
-Hurtbox Player::HurtboxSetting(const Vec2& pos)
-{
-	// ハートボックス
-	Hurtbox hurtbox = Hurtbox();
-
-	// 中心座標
-	hurtbox.centerPos = pos;
-
-	// 上座標
-	hurtbox.topPos = Vec2(hurtbox.centerPos.x, hurtbox.centerPos.y - kHurtboxHeght);
-
-	// 下座標
-	hurtbox.bottomPos = Vec2(hurtbox.centerPos.x, hurtbox.centerPos.y + kHurtboxHeght);
-
-	// 左座標
-	hurtbox.leftPos = Vec2(hurtbox.centerPos.x - kHurtboxWidth, hurtbox.centerPos.y);
-
-	// 右座標
-	hurtbox.rightPos = Vec2(hurtbox.centerPos.x + kHurtboxWidth, hurtbox.centerPos.y);
-
-	return hurtbox;
-}
-
 
 
 void Player::Move()
@@ -127,80 +89,110 @@ void Player::Move()
 	if (Pad::IsPress(PAD_INPUT_LEFT))
 	{
 		m_vec.x -= kMoveSpeed;
-
 	}
-	if (Pad::IsPress(PAD_INPUT_UP))
-	{
-		m_vec.y -= kMoveSpeed;
+}
 
-	}
-	if (Pad::IsPress(PAD_INPUT_DOWN))
+void Player::Jump()
+{
+	// ボタンを押したとき、ジャンプカウントが0以上ならばジャンプ力を与える
+	if (Pad::IsTrigger(PAD_INPUT_10)&&
+		m_jumpInfo.jumpCount > 0)
 	{
-		m_vec.y += kMoveSpeed;
+		// ジャンプフラグをtrueにする
+		m_jumpInfo.isJump = true;
+
+		// ジャンプ力を与える
+		m_jumpInfo.fallSpeed = -kJumpPower;
+
+		// ジャンプカウントを減らす
+		m_jumpInfo.jumpCount--;
+	}
+
+	// 飛んでいた場合はボタンを押しているかどうかで落下スピードが変わる
+	if (m_jumpInfo.isJump)
+	{
+		// ボタンを押しているかどうかで、ジャンプ力が変わる
+		if (Pad::IsPress(PAD_INPUT_10))
+		{
+			// 小さい重力を与える
+			m_jumpInfo.fallSpeed += kSmallGravity;
+		}
+		else
+		{
+			// 大きい重力を与える
+			m_jumpInfo.fallSpeed += kGravity;
+		}
+	}
+	else
+	{
+		// ジャンプしていなかったら通常の重力を与える
+		m_jumpInfo.fallSpeed += kGravity;
+	}
+
+	// 移動量に落下スピードを代入する
+	m_vec.y = m_jumpInfo.fallSpeed;
+
+
+	// 一定以上の速度になったら速度を抑える
+	if (m_vec.y > kMaxDirY)
+	{
+		m_vec.y = kMaxDirY;
 	}
 }
 
 void Player::Collision()
 {
 
-
-
-	// 追加座標
-	Vec2 addPos = Vec2();
-
-
-	if (ObjectFactory::MapChipType::Ground ==
-		m_pObjectFactory->MapChipTypeFromCoordinate(m_hurtbox.topPos))
-	{
-		m_pos +=
-			m_pObjectFactory->CorrectionCoordinateValue(m_hurtbox.topPos, ObjectFactory::HurtboxDrection::Top);
-
-		if (FunctionConclusion::IsValueNegativeCount(m_vec.y))
-		{
-			m_vec.y = 0.0f;
-		}
-
-	}
-
-	if (ObjectFactory::MapChipType::Ground ==
-		m_pObjectFactory->MapChipTypeFromCoordinate(m_hurtbox.bottomPos))
-	{
-		m_pos +=
-			m_pObjectFactory->CorrectionCoordinateValue(m_hurtbox.bottomPos, ObjectFactory::HurtboxDrection::Bottom);
-
-		if (!FunctionConclusion::IsValueNegativeCount(m_vec.y))
-		{
-			m_vec.y = 0.0f;
-		}
-		
-	}
+	// 中心座標から矩形を求める
+	m_rect = FunctionConclusion::RectangleCalculation(m_pos, kSize);
 	
-	if (ObjectFactory::MapChipType::Ground ==
-		m_pObjectFactory->MapChipTypeFromCoordinate(m_hurtbox.leftPos))
+	// 移動可能範囲の矩形を取得
+	m_moveRect = FunctionConclusion::GetMoveEnableRect
+	(m_rect, m_pObjectFactory->GetMapInfo(), m_pObjectFactory->GetCurrentMapData());
+
+	// 取得した矩形をm_posの移動可能範囲に変換
+	m_moveRect.left += kSize.x * 0.5f;
+	m_moveRect.right -= kSize.x * 0.5f;
+	m_moveRect.top += kSize.y * 0.5f;
+	m_moveRect.bottom -= kSize.y * 0.5f;
+
+
+
+	// 移動量を座標に代入
+	m_pos += m_vec;
+	
+	
+	if (m_pos.x < m_moveRect.left)
 	{
-		m_pos +=
-			m_pObjectFactory->CorrectionCoordinateValue(m_hurtbox.leftPos, ObjectFactory::HurtboxDrection::Left);
-
-		if (FunctionConclusion::IsValueNegativeCount(m_vec.x))
-		{
-			m_vec.x = 0.0f;
-		}
-		
+		m_pos.x = m_moveRect.left;
+		m_vec.x = 0.0f;
 	}
-
-
-	if (ObjectFactory::MapChipType::Ground ==
-		m_pObjectFactory->MapChipTypeFromCoordinate(m_hurtbox.rightPos))
+	if (m_pos.x > m_moveRect.right)
 	{
-		m_pos +=
-			m_pObjectFactory->CorrectionCoordinateValue(m_hurtbox.rightPos, ObjectFactory::HurtboxDrection::Right);
-
-		if (!FunctionConclusion::IsValueNegativeCount(m_vec.x))
-		{
-			m_vec.x = 0.0f;
-		}
-		return;
+		m_pos.x = m_moveRect.right;
+		m_vec.x = 0.0f;
 	}
+	if (m_pos.y < m_moveRect.top)
+	{
+		m_pos.y = m_moveRect.top;
 
-	m_pos += addPos;
+		// 落下速度を0.0fにする
+		m_jumpInfo.fallSpeed = 0.0f;
+
+		m_vec.y = 0.0f;
+	}
+	if (m_pos.y > m_moveRect.bottom)
+	{
+		// 地面に着いているので、ジャンプフラグをfalseにする
+		m_jumpInfo.isJump = false;
+
+		// ジャンプカウントの最大値を代入する
+		m_jumpInfo.jumpCount = kJumpCountMax;
+
+		// 落下速度を0.0fにする
+		m_jumpInfo.fallSpeed = 0.0f;
+
+		m_pos.y = m_moveRect.bottom;
+		m_vec.y = 0.0f;
+	}
 }

@@ -8,6 +8,22 @@
 class Player : public ObjectBase
 {
 public:
+
+	// ジャンプ情報
+	struct JumpInfo
+	{
+		// ジャンプしているかどうか
+		bool isJump = false;
+
+		// 落下速度
+		float fallSpeed = 0.0f;
+
+		// ジャンプ回数
+		int jumpCount = 0;
+	};
+
+
+public:
 	Player();
 	virtual ~Player();
 
@@ -18,12 +34,6 @@ public:
 
 private:
 
-	/// <summary>
-	/// ハートボックス更新処理
-	/// </summary>
-	Hurtbox HurtboxSetting(const Vec2& pos);
-
-	
 
 
 	/// <summary>
@@ -31,12 +41,17 @@ private:
 	/// </summary>
 	void Move();
 
+
+	/// <summary>
+	/// ジャンプ処理
+	/// </summary>
+	void Jump();
+
+
 	/// <summary>
 	/// 衝突
 	/// </summary>
 	void Collision();
-
-
 
 private:
 
@@ -46,6 +61,19 @@ private:
 	// 座標
 	Vec2 m_pos;
 
+	// 矩形
+	Rect m_rect;
+
+	// 移動矩形
+	Rect m_moveRect;
+
+
+	////////////////////
+	/// ジャンプ関連 ///
+	////////////////////
+	
+	// ジャンプ情報
+	JumpInfo m_jumpInfo;
 
 };
 

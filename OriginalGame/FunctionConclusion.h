@@ -2,6 +2,9 @@
 #include "Vec2.h"
 #include <cassert>
 #include <math.h>
+#include <vector>
+#include "PlatinumLoader.h"
+
 
 // セル構造体
 struct Cell
@@ -18,6 +21,15 @@ struct Circle
 
 	// 円の半径
 	float radius = 0.0f;
+};
+
+// 矩形
+struct Rect
+{
+	float top = 0.0f;	// 上
+	float bottom = 0.0f;// 下
+	float left = 0.0f;	// 左
+	float right = 0.0f;	// 右
 };
 
 // 四角形
@@ -98,18 +110,55 @@ public:
 	static bool IsValueNegativeCount(T& value);
 
 
+	/// <summary>
+	/// 線形補間数を求める
+	/// </summary>
+	/// <param name="pos">座標</param>
+	/// <param name="vec">移動量</param>
+	/// <param name="heghtSize">縦幅</param>
+	/// <param name="widthSize">横幅</param>
+	/// <returns>線形補間数</returns>
+	static int IinearInterpolationCountCalculation(const Vec2& pos, const Vec2& vec, float heghtSize, float widthSize);
+
+	/// <summary>
+	/// 線形補間座標を求める
+	/// </summary>
+	/// <param name="pos">座標</param>
+	/// <param name="vec">移動量</param>
+	/// <param name="iinearInterpolationCount">線形補間数</param>
+	/// <returns>線形補間座標</returns>
+	static std::vector<Vec2> IinearInterpolationPos(const Vec2& pos, const Vec2& vec, const int& iinearInterpolationCount);
+
+
+
+	/// <summary>
+	/// 受け取った座標を中心とした矩形を計算する
+	/// </summary>
+	/// <param name="pos">座標</param>
+	/// <param name="size">サイズ</param>
+	/// <returns>座標を中心とした矩形</returns>
+	static Rect RectangleCalculation(const Vec2& pos, const Vec2& size);
+
+	/// <summary>
+	/// マップチップの矩形の移動範囲を返す
+	/// </summary>
+	/// <param name="rect">矩形情報</param>
+	/// <param name="mapInfo">マップ情報</param>
+	/// <param name="mapData">マップデータ</param>
+	/// <returns>移動範囲</returns>
+	static Rect GetMoveEnableRect(const Rect& rect, const PlatinumLoader::MapInfo& mapInfo, const PlatinumLoader::MapData& mapData);
 
 };
 
 template<typename T>
 inline bool FunctionConclusion::IsValueNegativeCount(T& value)
 {
-	// 値が0以下ならば、true
-	if (value < 0.0f)
+	// 値が0以下ならば、false
+	if (value > 0.0f)
 	{
-		return true;
+		return false;
 	}
 
 
-	return false;
+	return true;
 }

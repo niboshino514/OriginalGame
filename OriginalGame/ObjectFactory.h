@@ -78,6 +78,7 @@ public:
 	/// </summary>
 	void StageMove(const MapSwitchType& mapSwitchType);
 
+
 	/// <summary>
 	/// オブジェクト情報を返す
 	/// </summary>
@@ -85,25 +86,21 @@ public:
 	std::vector<std::shared_ptr<ObjectBase>>GetObjectInfo() { return m_object; }
 
 
+	/// <summary>
+	/// 現在のマップデータを返す
+	/// </summary>
+	/// <returns></returns>
+	PlatinumLoader::MapData GetCurrentMapData() { return PlatinumLoader::MapData(m_currentMapData); }
+
+
+	/// <summary>
+	/// マップ情報を返す
+	/// </summary>
+	/// <returns>マップ情報</returns>
+	PlatinumLoader::MapInfo GetMapInfo() { return m_mapInfo; }
 	
-	/// <summary>
-	/// 座標情報からマップチップタイプを返す
-	/// </summary>
-	/// <param name="pos">座標</param>
-	/// <returns>マップチップタイプ</returns>
-	MapChipType MapChipTypeFromCoordinate(const Vec2& pos);
 
-
-	/// <summary>
-	/// ハートボックス方向から、補正した座標を返す
-	/// </summary>
-	/// <param name="pos">座標</param>
-	/// <param name="hurtboxDrection">ハートボックス方向</param>
-	/// <returns>補正座標</returns>
-	Vec2 CorrectionCoordinateValue(const Vec2& pos, const HurtboxDrection& hurtboxDrection);
-
-
-
+	
 private:
 
 
@@ -121,6 +118,9 @@ private:
 	bool IsCellCheckOutOfRange(const Cell& cell);
 
 
+	/// <summary>
+	/// マップ描画
+	/// </summary>
 	void TestMapDraw();
 
 private:
@@ -133,15 +133,13 @@ private:
 	// マップ情報
 	PlatinumLoader::MapInfo m_mapInfo;
 
-
-
 	// ステージナンバー
 	int m_stageNumber;
 
 	// マップデータのファイルパス
 	std::vector<std::string> m_mapDataFilePath;
 
-
+	// 現在のマップデータ
 	std::vector<std::vector<int>> m_currentMapData;
 
 	// マップチップのハートボックス

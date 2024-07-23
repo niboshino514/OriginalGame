@@ -194,51 +194,7 @@ void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 }
 
 
-ObjectFactory::MapChipType ObjectFactory::MapChipTypeFromCoordinate(const Vec2& pos)
-{
-	// マップチップ情報からチップタイプを返す
-	const Cell cell = FunctionConclusion::CoordinateWithCellToConversion(pos, m_mapInfo.chipSize);
 
-	// セルが範囲外かどうかを調べ、範囲外ならば処理を終了する
-	if (IsCellCheckOutOfRange(cell))
-	{
-		// 存在しない
-		return MapChipType::NotExists;
-	}
-
-	// チップタイプを返す
-	return MapChipType(m_currentMapData[cell.x][cell.y]);
-}
-
-Vec2 ObjectFactory::CorrectionCoordinateValue(const Vec2& pos, const HurtboxDrection& hurtboxDrection)
-{
-	// 補正座標
-	Vec2 correctionPos;
-
-
-	// マップチップ情報からチップタイプを返す
-	const Cell cell = FunctionConclusion::CoordinateWithCellToConversion(pos, m_mapInfo.chipSize);
-
-	if (hurtboxDrection == HurtboxDrection::Top)
-	{
-		correctionPos.y = ((m_mapChipHurtbox[cell.x][cell.y].bottomPos.y - pos.y) - 1.0f);
-	}
-	else if (hurtboxDrection == HurtboxDrection::Bottom)
-	{
-		correctionPos.y = (m_mapChipHurtbox[cell.x][cell.y].topPos.y - pos.y);
-	}
-	else if (hurtboxDrection == HurtboxDrection::Left)
-	{
-		correctionPos.x = ((m_mapChipHurtbox[cell.x][cell.y].rightPos.x - pos.x) - 1.0f);
-	}
-	else if (hurtboxDrection == HurtboxDrection::Right)
-	{
-		correctionPos.x = (m_mapChipHurtbox[cell.x][cell.y].leftPos.x - pos.x);
-	}
-
-
-	return correctionPos;
-}
 
 void ObjectFactory::InitMapDataFilePath()
 {
