@@ -8,7 +8,7 @@ namespace
 	constexpr float kMoveSpeed = 10.0f;
 
 	// ÉTÉCÉY
-	const Vec2 kSize(20.0f, 32.0f);
+	const Vec2 kSize(20.0f, 30.0f);
 }
 
 namespace
