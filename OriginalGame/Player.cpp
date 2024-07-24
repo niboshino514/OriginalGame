@@ -62,6 +62,8 @@ void Player::Update()
 	// 当たり判定
 	Collision();
 
+	// リスポーン
+	Respawn();
 }
 
 void Player::Draw()
@@ -71,13 +73,22 @@ void Player::Draw()
 
 	// プレイヤー描画
 	DrawBoxAA(m_rect.left, m_rect.top, m_rect.right, m_rect.bottom,
-		0xff0000, false);
+		0xff0000, true);
 
 	// 移動できる場所を描画
 	DrawBoxAA(m_moveRect.left, m_moveRect.top, m_moveRect.right, m_moveRect.bottom,
 		0x0000ff, false);
 }
 
+
+void Player::Respawn()
+{
+	// セーブポイントセルを取得する
+	if (Pad::IsPress(PAD_INPUT_1))
+	{
+		m_pos = m_pObjectFactory->GetSavePointPos();
+	}
+}
 
 void Player::Move()
 {

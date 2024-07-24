@@ -1,11 +1,7 @@
 #include "ObjectFactory.h"
 #include "Player.h"
+#include "GameData.h"
 
-
-#include "NoneMapChip.h"
-#include "ObstacleMapChip.h"
-#include "NextStageMapChip.h"
-#include "PreviousStageMapChip.h"
 #include <cassert>
 #include <string>
 #include <filesystem>
@@ -34,7 +30,8 @@ ObjectFactory::ObjectFactory() :
 	m_object(),
 	m_mapInfo(),
 	m_stageNumber(0),
-	m_pPlatinumLoader(std::make_shared<PlatinumLoader>())
+	m_pPlatinumLoader(std::make_shared<PlatinumLoader>()),
+	m_pGameData(std::make_shared<GameData>())
 {
 }
 
@@ -47,18 +44,16 @@ void ObjectFactory::Init()
 	// マップデータ初期設定
 	InitMapDataFilePath();
 
-
 	// マップ生成
 	StageMove(MapSwitchType::Spawn);
 }
 
 void ObjectFactory::Update()
 {
-	// 更新処理
-	for (auto& object : m_object)
-	{
-		object->Update();
-	}
+	// 更新処理(ラムダ式使用)
+	std::for_each(m_object.begin(), m_object.end(),
+		[](std::shared_ptr<ObjectBase> object) {object->Update(); });
+
 
 	// オブジェクト削除
 	ObjectErase();
@@ -66,12 +61,23 @@ void ObjectFactory::Update()
 
 void ObjectFactory::Draw()
 {
-	// 描画処理
-	for (auto& object : m_object)
-	{
-		object->Draw();
-	}
+	// 描画ランクの逆順にオブジェクトを描画するループ
+	for (int i = static_cast<int>(ObjectBase::DrawRank::RankNum) - 1; i >= 0; --i) {
+		// 描画ランク
+		ObjectBase::DrawRank drawRank = static_cast<ObjectBase::DrawRank>(i);
 
+		// 条件を満たすすべてのオブジェクトを描画する
+		std::for_each(m_object.begin(), m_object.end(),
+			[drawRank](const std::shared_ptr<ObjectBase>& object) {
+				if (object->GetDrawRank() == drawRank) {
+					object->Draw();
+				}
+			});
+	}
+	
+
+
+	// マップ描画
 	TestMapDraw();
 }
 
@@ -86,6 +92,9 @@ void ObjectFactory::CharacterCreate(const Vec2& pos)
 
 	// ポインタを送る
 	m_object.back()->SetObjectFactory(shared_from_this());
+
+	// 描画ランクを代入
+	m_object.back()->SetDrawRank(ObjectBase::DrawRank::Rank_1);
 
 	// 円情報を入れる
 	m_object.back()->SetCircle(circle);
@@ -108,6 +117,9 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 			if (mapChipType == MapChipType::SpawnPos &&
 				mapSwitchType == MapSwitchType::Spawn)
 			{
+				// セーブ情報を送る
+				m_pGameData->SetSavePointData(GameData::SavePointData(m_stageNumber, Cell(x, y)));
+
 				// キャラクター生成
 				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x,y),m_mapInfo.chipSize));
 			}
@@ -128,6 +140,13 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfo.chipSize));
 			}
 		}
+	}
+
+	// リスポーン
+	if (mapSwitchType == MapSwitchType::Respawn)
+	{
+		// キャラクター生成
+		CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(m_pGameData->GetSavePointData().cell, m_mapInfo.chipSize));
 	}
 }
 
@@ -158,6 +177,12 @@ void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 		// ステージナンバーの数字を減らす;
 		m_stageNumber--;
 	}
+	else if (mapSwitchType == MapSwitchType::Respawn)
+	{
+		// セーブポイントデータのステージナンバーをステージナンバーの数字に代入
+		m_stageNumber = m_pGameData->GetSavePointData().stageNumber;
+	}
+
 
 	// 要素削除
 	for (auto& object : m_object)
@@ -202,8 +227,35 @@ ObjectFactory::MapChipType ObjectFactory::GetMapChipType(const Vec2& pos)
 	// マップチップタイプを格納
 	const MapChipType mapChipType = MapChipType(m_currentMapData[cell.x][cell.y]);
 
+
+	// マップチップがセーブだった場合、ゲームデータクラスにセーブ情報を送る
+	if (mapChipType == MapChipType::Save)
+	{
+		// セーブ情報を送る
+		m_pGameData->SetSavePointData(GameData::SavePointData(m_stageNumber, cell));
+	}
+
+
 	// マップチップタイプを返す
 	return mapChipType;
+}
+
+Vec2 ObjectFactory::GetSavePointPos()
+{
+	// セーブポイントデータを取得
+	const GameData::SavePointData savePointData = m_pGameData->GetSavePointData();
+
+	// セーブポイントデータのステージナンバーと現在のステージナンバーが異なる場合、マップ生成を行う
+	if (savePointData.stageNumber != m_stageNumber)
+	{
+		// マップ移動処理
+		StageMove(MapSwitchType::Respawn);
+
+		return Vec2();
+	}
+
+	// セルから変換した座標を返す
+	return FunctionConclusion::CellWithCoordinateToConversion(savePointData.cell, m_mapInfo.chipSize);
 }
 
 void ObjectFactory::InitMapDataFilePath()
@@ -276,13 +328,13 @@ void ObjectFactory::TestMapDraw()
 				color = 0xff0000;
 			}
 
-			Vec2 stringPos = Vec2(pos1.x + m_mapInfo.chipSize * 0.5, pos1.y + m_mapInfo.chipSize * 0.5);
+			Vec2 stringPos = Vec2(pos1.x + m_mapInfo.chipSize * 0.5f, pos1.y + m_mapInfo.chipSize * 0.5f);
 
-			DrawFormatString(stringPos.x, stringPos.y, 0xffffff, "%d", chipNum);
+			DrawFormatString(static_cast<int>(stringPos.x), static_cast<int>(stringPos.y), 0xffffff, "%d", chipNum);
 
 
 			// マップの描画
-			DrawBox(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
+			DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
 		}
 	}
 

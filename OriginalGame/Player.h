@@ -34,7 +34,10 @@ public:
 
 private:
 
-
+	/// <summary>
+	/// ƒŠƒXƒ|[ƒ“
+	/// </summary>
+	void Respawn();
 
 	/// <summary>
 	/// ˆÚ“®

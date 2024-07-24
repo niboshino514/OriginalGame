@@ -31,12 +31,6 @@
     <Filter Include="ヘッダー ファイル\Object">
       <UniqueIdentifier>{183c868f-89f9-476e-8c12-f0142f803762}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Object\Map">
-      <UniqueIdentifier>{9a08f55a-ae51-4900-8479-54c12d5f62f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Map">
-      <UniqueIdentifier>{27e2caad-fa12-4cef-9e2b-3ae2ff8fa2ff}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -72,23 +66,11 @@
     <ClCompile Include="FunctionConclusion.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="NoneMapChip.cpp">
-      <Filter>ソース ファイル\Object\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="MapChipBase.cpp">
-      <Filter>ソース ファイル\Object\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="ObstacleMapChip.cpp">
-      <Filter>ソース ファイル\Object\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="NextStageMapChip.cpp">
-      <Filter>ソース ファイル\Object\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="PreviousStageMapChip.cpp">
-      <Filter>ソース ファイル\Object\Map</Filter>
-    </ClCompile>
     <ClCompile Include="PlatinumLoader.cpp">
       <Filter>ソース ファイル\setting</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,26 +107,14 @@
     <ClInclude Include="FunctionConclusion.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="ObstacleMapChip.h">
-      <Filter>ヘッダー ファイル\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="MapChipBase.h">
-      <Filter>ヘッダー ファイル\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="NoneMapChip.h">
-      <Filter>ヘッダー ファイル\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="NextStageMapChip.h">
-      <Filter>ヘッダー ファイル\Map</Filter>
-    </ClInclude>
     <ClInclude Include="Sort.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="PlatinumLoader.h">
       <Filter>ヘッダー ファイル\setting</Filter>
     </ClInclude>
-    <ClInclude Include="PreviousStageMapChip.h">
-      <Filter>ヘッダー ファイル\Map</Filter>
+    <ClInclude Include="GameData.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

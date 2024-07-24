@@ -53,7 +53,7 @@ void SceneManager::update()
 	}
 
 	// XVˆ—‘¬“xŒvZ
-	m_updateTime = GetNowHiPerformanceCount() - start;
+	m_updateTime = static_cast<int>(GetNowHiPerformanceCount() - start);
 }
 
 void SceneManager::draw()
@@ -67,7 +67,7 @@ void SceneManager::draw()
 	m_pScene->draw();
 
 	// •`‰æˆ—‘¬“xŒvZ
-	m_drawTime = GetNowHiPerformanceCount() - start;
+	m_drawTime = static_cast<int>(GetNowHiPerformanceCount() - start);
 
 	DrawString(0, Game::kScreenHeight - 48, "•`‰æ", 0xffffff, 0x000000);
 	DrawBox(32 + 2, Game::kScreenHeight - 48 + 2, 48 + 16 - 2, Game::kScreenHeight - 32 - 2, 0x0000ff, true);

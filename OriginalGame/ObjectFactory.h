@@ -2,14 +2,15 @@
 #include <list>
 #include <memory>
 #include <vector>
+#include <string>
 #include "Vec2.h"
 #include "PlatinumLoader.h"
-#include <string>
 #include "FunctionConclusion.h"
 
 
 class ObjectBase;
 class PlatinumLoader;
+class GameData;
 
 class ObjectFactory : public std::enable_shared_from_this<ObjectFactory>
 {
@@ -19,6 +20,7 @@ public:
 	enum class MapSwitchType
 	{
 		Spawn,			// スポーン
+		Respawn,		// リスポーン
 		NextStage,		// 次のステージ
 		PreviouseStage	// 前のステージ
 	};
@@ -34,6 +36,7 @@ public:
 		NextPos,		// 次のステージ座標
 		PreviousePos,	// 前のステージ座標
 		SpawnPos,		// スポーン座標
+		Save,			// セーブ
 		NotExists		// 存在しない
 	};
 
@@ -80,13 +83,6 @@ public:
 
 
 	/// <summary>
-	/// オブジェクト情報を返す
-	/// </summary>
-	/// <returns>オブジェクト情報</returns>
-	std::vector<std::shared_ptr<ObjectBase>>GetObjectInfo() { return m_object; }
-
-
-	/// <summary>
 	/// 現在のマップデータを返す
 	/// </summary>
 	/// <returns></returns>
@@ -107,7 +103,12 @@ public:
 	/// <returns>マップチップ情報</returns>
 	MapChipType GetMapChipType(const Vec2& pos);
 
-	
+	/// <summary>
+	/// セーブポイント座標を返す
+	/// </summary>
+	/// <returns>セーブポイントデータを返す</returns>
+	Vec2 GetSavePointPos();
+
 private:
 
 
@@ -135,7 +136,7 @@ private:
 
 
 	// オブジェクト
-	std::vector<std::shared_ptr<ObjectBase>>m_object;
+	std::list<std::shared_ptr<ObjectBase>>m_object;
 
 	// マップ情報
 	PlatinumLoader::MapInfo m_mapInfo;
@@ -157,5 +158,6 @@ private:
 
 	// プラチナムローダー
 	std::shared_ptr<PlatinumLoader>m_pPlatinumLoader;
+	std::shared_ptr<GameData>m_pGameData;
 
 };

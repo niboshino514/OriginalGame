@@ -119,8 +119,8 @@ Cell FunctionConclusion::CoordinateWithCellToConversion(const Vec2& pos, const f
 	// 座標変数
 	Cell cell = Cell();
 
-	cell.x = pos.x / chipSize;
-	cell.y = pos.y / chipSize;
+	cell.x = static_cast<int>(pos.x / chipSize);
+	cell.y = static_cast<int>(pos.y / chipSize);
 
 	// セルを返す
 	return cell;
@@ -185,7 +185,7 @@ std::vector<Vec2> FunctionConclusion::IinearInterpolationPos(const Vec2& pos, co
 	// 線形補間座標を計算
 	for (int i = 1; i < iinearInterpolationCount + 1; i++)
 	{
-		iinearInterpolationPos.push_back(pos + (addVec * i));
+		iinearInterpolationPos.push_back(pos + (addVec * static_cast<float>(i)));
 	}
 
 	// 線形補間座標を返す

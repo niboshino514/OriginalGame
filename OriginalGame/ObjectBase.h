@@ -19,7 +19,7 @@ public:
 	virtual void Draw() = 0;
 
 	// オブジェクトID
-	enum ObjectID
+	enum class ObjectID
 	{
 		Player,					// プレイヤー
 
@@ -31,6 +31,17 @@ public:
 	};
 
 
+	// 描画ランク(ランクの数値が小さい程手前に描画される)
+	enum class DrawRank
+	{
+		Rank_1,
+		Rank_2,
+		Rank_3,
+		Rank_4,
+		Rank_5,
+		Rank_6,
+		RankNum,
+	};
 	
 
 
@@ -87,12 +98,17 @@ public:
 	/// <returns>オブジェクトID</returns>
 	ObjectID GetObjectID() { return m_objectID; }
 
+	/// <summary>
+	/// 描画優先順位を返す
+	/// </summary>
+	/// <returns>描画優先順位</returns>
+	DrawRank GetDrawRank() { return m_drawRank; }
 
 	/// <summary>
 	/// 描画優先順位取得
 	/// </summary>
-	/// <returns>描画優先順位</returns>
-	int GetDrawRank() { return m_drawRank; }
+	/// <param name="drawRank">描画ランク</param>
+	void SetDrawRank(const DrawRank& drawRank) { m_drawRank = drawRank; }
 
 
 protected:
@@ -116,7 +132,7 @@ protected:
 
 
 	// 描画の優先順位
-	int m_drawRank;
+	DrawRank m_drawRank;
 
 	////////////////////
 	// クラスポインタ //

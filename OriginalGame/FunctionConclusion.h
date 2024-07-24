@@ -109,7 +109,6 @@ public:
 	template <typename T>
 	static bool IsValueNegativeCount(T& value);
 
-
 	/// <summary>
 	/// 線形補間数を求める
 	/// </summary>
@@ -145,7 +144,6 @@ public:
 	/// <returns>移動範囲</returns>
 	static Rect GetMoveEnableRect(const Rect& rect, const PlatinumLoader::MapInfo& mapInfo, const PlatinumLoader::MapData& mapData);
 
-
 	/// <summary>
 	/// セルが範囲内かどうか
 	/// </summary>
@@ -154,8 +152,6 @@ public:
 	/// <param name="minCell">最小セル</param>
 	/// <returns>セルが範囲内かどうかを返す</returns>
 	static bool IsCellRange(const Cell& cell, const Cell& maxCell, const Cell& minCell);
-
-
 };
 
 template<typename T>

@@ -142,18 +142,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FunctionConclusion.cpp" />
+    <ClCompile Include="GameData.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainScreen.cpp" />
-    <ClCompile Include="MapChipBase.cpp" />
-    <ClCompile Include="NextStageMapChip.cpp" />
-    <ClCompile Include="NoneMapChip.cpp" />
     <ClCompile Include="ObjectBase.cpp" />
     <ClCompile Include="ObjectFactory.cpp" />
-    <ClCompile Include="ObstacleMapChip.cpp" />
     <ClCompile Include="Pad.cpp" />
     <ClCompile Include="PlatinumLoader.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PreviousStageMapChip.cpp" />
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMain.cpp" />
     <ClCompile Include="SceneManager.cpp" />
@@ -162,17 +158,13 @@
   <ItemGroup>
     <ClInclude Include="FunctionConclusion.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="GameData.h" />
     <ClInclude Include="MainScreen.h" />
-    <ClInclude Include="MapChipBase.h" />
-    <ClInclude Include="NextStageMapChip.h" />
-    <ClInclude Include="NoneMapChip.h" />
     <ClInclude Include="ObjectBase.h" />
     <ClInclude Include="ObjectFactory.h" />
-    <ClInclude Include="ObstacleMapChip.h" />
     <ClInclude Include="Pad.h" />
     <ClInclude Include="PlatinumLoader.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="PreviousStageMapChip.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneMain.h" />
     <ClInclude Include="SceneManager.h" />

@@ -21,7 +21,7 @@ public:
 		// マップの縦幅
 		int mapHeight = 0;
 		// チップサイズ
-		int chipSize = 0;
+		float chipSize = 0;
 	};
 
 	// マップデータ
