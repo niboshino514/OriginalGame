@@ -211,7 +211,6 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 {
 	Rect result;
 
-
 	// マップ全体を移動可能な状態で初期化
 	result.top = 0.0f;
 	result.bottom = (mapInfo.mapHeight * mapInfo.chipSize) - (rect.bottom - rect.top) / 2.0f;
@@ -230,6 +229,11 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	{
 		for (int x = indexMinX; x <= indexMaxX; x++)
 		{
+			if (!IsCellRange(Cell(x, y), Cell(mapInfo.mapWidth, mapInfo.mapWidth), Cell(0, 0)))
+			{
+				return Rect();
+			}
+
 			if (mapData.mapData[x][y] == 0 ||
 				mapData.mapData[x][y] != 1)
 			{
@@ -249,6 +253,10 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	{
 		for (int x = indexMinX; x <= indexMaxX; x++)
 		{
+			if (!IsCellRange(Cell(x, y), Cell(mapInfo.mapWidth, mapInfo.mapWidth), Cell(0, 0)))
+			{
+				return Rect();
+			}
 
 			if (mapData.mapData[x][y] == 0 ||
 				mapData.mapData[x][y] != 1)
@@ -269,7 +277,11 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	{
 		for (int y = indexMinY; y <= indexMaxY; y++)
 		{
-	
+			if (!IsCellRange(Cell(x, y), Cell(mapInfo.mapWidth, mapInfo.mapWidth), Cell(0, 0)))
+			{
+				return Rect();
+			}
+
 			if (mapData.mapData[x][y] == 0 ||
 				mapData.mapData[x][y] != 1)
 			{
@@ -289,6 +301,10 @@ Rect FunctionConclusion::GetMoveEnableRect(const Rect& rect, const PlatinumLoade
 	{
 		for (int y = indexMinY; y <= indexMaxY; y++)
 		{
+			if (!IsCellRange(Cell(x, y), Cell(mapInfo.mapWidth, mapInfo.mapWidth), Cell(0, 0)))
+			{
+				return Rect();
+			}
 
 			if (mapData.mapData[x][y] == 0 ||
 				mapData.mapData[x][y] != 1)

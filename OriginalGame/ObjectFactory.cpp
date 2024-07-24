@@ -304,7 +304,7 @@ bool ObjectFactory::IsCellCheckOutOfRange(const Cell& cell)
 void ObjectFactory::TestMapDraw()
 {
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA,100);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA,200);
 
 	Vec2 pos1;
 	Vec2 pos2;
@@ -323,18 +323,22 @@ void ObjectFactory::TestMapDraw()
 
 			int color = 0x00ff00;
 
-			if (chipNum == 1)
+			if (chipNum == static_cast<int>(MapChipType::Ground))
 			{
 				color = 0xff0000;
 			}
+			if (chipNum == static_cast<int>(MapChipType::Save))
+			{
+				color = 0xffffff;
+			}
+
+			
+			// マップの描画
+			DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
 
 			Vec2 stringPos = Vec2(pos1.x + m_mapInfo.chipSize * 0.5f, pos1.y + m_mapInfo.chipSize * 0.5f);
 
 			DrawFormatString(static_cast<int>(stringPos.x), static_cast<int>(stringPos.y), 0xffffff, "%d", chipNum);
-
-
-			// マップの描画
-			DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
 		}
 	}
 
