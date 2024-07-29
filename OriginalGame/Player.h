@@ -31,6 +31,16 @@ public:
 		Dead,
 	};
 
+	// スポーン地点
+	struct SpawnPoint
+	{
+		// 四角形情報
+		Square square = Square();
+
+		// スポーンセルから離れたかどうか
+		bool isLeave = false;
+	};
+
 public:
 	Player();
 	virtual ~Player();
@@ -54,6 +64,19 @@ private:
 	void StateNormalDraw();
 	void StateNormalExit();
 
+	
+
+	
+	/// <summary>
+	/// スポーン地点初期化
+	/// </summary>
+	void SpawnPointInit();
+
+
+	/// <summary>
+	/// スポーン地点から移動したかどうか
+	/// </summary>
+	void SpawnPointLeave();
 
 	/// <summary>
 	/// リスポーン
@@ -64,7 +87,6 @@ private:
 	/// 移動
 	/// </summary>
 	void Move();
-
 
 	/// <summary>
 	/// ジャンプ処理
@@ -122,6 +144,9 @@ private:
 
 	// 移動矩形
 	Rect m_moveRect;
+
+	// スポーン地点
+	SpawnPoint m_spawnPoint;
 
 	//////////////////
 	// ステート関連 //

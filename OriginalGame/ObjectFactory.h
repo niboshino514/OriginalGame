@@ -123,15 +123,6 @@ public:
 	/// <returns></returns>
 	std::vector<std::vector<int>>GetMapChipNumber();
 
-
-	/// <summary>
-	/// マップチップ情報を返す
-	/// </summary>
-	/// <param name="pos">座標</param>
-	/// <returns>マップチップ情報</returns>
-	ChipType GetMapChipType(const Vec2& pos);
-
-	
 	/// <summary>
 	/// セーブポイントを設定する
 	/// </summary>

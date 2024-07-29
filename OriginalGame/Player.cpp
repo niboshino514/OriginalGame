@@ -36,6 +36,7 @@ Player::Player() :
 	m_vec(),
 	m_moveRect(),
 	m_rect(),
+	m_spawnPoint(),
 	m_pStateMachine(),
 	m_jumpInfo()
 {
@@ -52,6 +53,9 @@ void Player::Init()
 
 	m_pos = m_circle.centerPos;
 
+	// スポーン地点初期化
+	SpawnPointInit();
+	
 	// ステートマシンの初期化
 	StateInit();
 }
@@ -109,6 +113,9 @@ void Player::StateNormalUpdate()
 	// ジャンプ処理
 	Jump();
 
+	// スポーン地点から離れたかどうか
+	SpawnPointLeave();
+
 	// 当たり判定
 	Collision();
 }
@@ -141,6 +148,43 @@ void Player::StateNormalDraw()
 
 void Player::StateNormalExit()
 {
+}
+
+void Player::SpawnPointInit()
+{
+	// マップチップのサイズを取得
+	const float mapChipSize = m_pObjectFactory->GetMapInfoData().mapChip.chipSize;
+
+	// スポーン地点のセル
+	const Cell spawnCell = FunctionConclusion::CoordinateWithCellToConversion(m_pos, mapChipSize);
+
+	// セルの中心座標を取得
+	Vec2 cellCenterPos = FunctionConclusion::CellWithCoordinateToConversion(spawnCell, mapChipSize);
+	cellCenterPos = Vec2(cellCenterPos.x , cellCenterPos.y);
+
+	// スポーン地点の四角形情報を取得する
+	m_spawnPoint.square = FunctionConclusion::RectToSquare(FunctionConclusion::RectangleCalculation(cellCenterPos, Vec2(mapChipSize, mapChipSize)));
+
+	// スポーン地点から離れたかどうかのフラグをfalseにする
+	m_spawnPoint.isLeave = false;
+}
+
+void Player::SpawnPointLeave()
+{
+	// スポーン地点から離れていた場合、ここで処理を終了する
+	if(m_spawnPoint.isLeave)
+	{
+		return;
+	}
+
+	// 現在座標を四角形情報に変換
+	const Square currentSquare = FunctionConclusion::RectToSquare(FunctionConclusion::RectangleCalculation(m_pos, kSize));
+
+	// 現在の座標の四角形情報とスポーン地点の四角形情報が交差していない場合、スポーン地点から離れたと判断する
+	if(!FunctionConclusion::CollisionDetectionOfQuadrangleAndQuadrangle(currentSquare, m_spawnPoint.square))
+	{
+		m_spawnPoint.isLeave = true;
+	}
 }
 
 void Player::Respawn()
@@ -346,6 +390,7 @@ void Player::MapChipCollision(const Vec2& pos)
 
 			// マップ移動フラグを行うかどうか
 			const bool isMapMove =
+				m_spawnPoint.isLeave &&
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::NextStage ||
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::PreviouseStage ||
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::Save;

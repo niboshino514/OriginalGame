@@ -138,6 +138,16 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 		m_mapInfoData.mapChip.mapWidth, 
 		std::vector<MapCollisionData>(m_mapInfoData.mapChip.mapHeight));
 
+	// 次のステージセル
+	Cell nextStageCell = Cell();
+
+	// 前のステージセル
+	Cell previouseStageCell = Cell();
+
+	// プレイヤーが生成されたかどうか
+	bool isPlayerCreate = false;
+
+
 	// すべてのセルを見る
 	for (int y = 0; y < m_mapInfoData.mapChip.mapHeight; y++)
 	{
@@ -145,6 +155,19 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 		{
 			// マップチップタイプに変換
 			const ChipType mapChipType = ChipType(mapData[x][y]);
+
+			// マップチップタイプが次のステージの場合、次のステージセル座標を代入
+			if (mapChipType == ChipType::NextStage)
+			{
+				nextStageCell = Cell(x, y);
+			}
+
+			// マップチップタイプが前のステージの場合、前のステージセル座標を代入
+			if(mapChipType == ChipType::PreviouseStage)
+			{
+				previouseStageCell = Cell(x, y);
+			}
+
 
 			// スポーン
 			if (mapChipType == ChipType::SpawnPos &&
@@ -155,6 +178,9 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 
 				// キャラクター生成
 				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x,y), m_mapInfoData.mapChip.chipSize));
+
+				// プレイヤー生成フラグ
+				isPlayerCreate = true;
 			}
 
 			// 次のステージ
@@ -163,6 +189,9 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 			{
 				// キャラクター生成
 				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfoData.mapChip.chipSize));
+
+				// プレイヤー生成フラグ
+				isPlayerCreate = true;
 			}
 
 			// 前のステージ
@@ -171,6 +200,9 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 			{
 				// キャラクター生成
 				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfoData.mapChip.chipSize));
+
+				// プレイヤー生成フラグ
+				isPlayerCreate = true;
 			}
 
 			// マップ判定データ
@@ -178,13 +210,11 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 				// チップタイプを入れる
 				mapCollisionData[x][y].chipType = ChipType(mapData[x][y]);
 
-
 				// 四角形情報計算
 				mapCollisionData[x][y].square.A = Vec2((m_mapInfoData.mapChip.chipSize * x), (m_mapInfoData.mapChip.chipSize * y));
 				mapCollisionData[x][y].square.B = Vec2((mapCollisionData[x][y].square.A.x + m_mapInfoData.mapChip.chipSize), mapCollisionData[x][y].square.A.y);
 				mapCollisionData[x][y].square.C = Vec2(mapCollisionData[x][y].square.B.x, (mapCollisionData[x][y].square.B.y + m_mapInfoData.mapChip.chipSize));
 				mapCollisionData[x][y].square.D = Vec2(mapCollisionData[x][y].square.A.x, mapCollisionData[x][y].square.C.y);
-
 
 				// 円情報計算
 				mapCollisionData[x][y].circle =
@@ -198,10 +228,36 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 	{
 		// キャラクター生成
 		CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(GameData::GetInstance()->GetSavePointData().cell, m_mapInfoData.mapChip.chipSize));
+
+		// プレイヤー生成フラグ
+		isPlayerCreate = true;
 	}
 
-	// 次のステージのマップデータを代入する
+
+	// ステージのマップデータを代入する
 	m_mapInfoData.mapCollisionData = mapCollisionData;
+
+
+
+	// プレイヤーが生成されていた場合、処理を終了する
+	if (isPlayerCreate)
+	{
+		return;
+	}
+
+	// ステージ変更タイプが次のステージの場合、前のステージセル座標を代入してキャラクター生成
+	if (mapSwitchType == MapSwitchType::NextStage)
+	{
+		// キャラクター生成
+		CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(previouseStageCell, m_mapInfoData.mapChip.chipSize));
+	}
+
+	// ステージ変更タイプが前のステージの場合、次のステージセル座標を代入してキャラクター生成
+	if(mapSwitchType == MapSwitchType::PreviouseStage)
+	{
+		// キャラクター生成
+		CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(nextStageCell, m_mapInfoData.mapChip.chipSize));
+	}
 }
 
 void ObjectFactory::ObjectErase()
@@ -276,28 +332,6 @@ std::vector<std::vector<int>> ObjectFactory::GetMapChipNumber()
 	}
 
 	return mapChipNumber;
-}
-
-ObjectFactory::ChipType ObjectFactory::GetMapChipType(const Vec2& pos)
-{
-	// 座標からセルを求める
-	const Cell cell = FunctionConclusion::CoordinateWithCellToConversion(pos, m_mapInfoData.mapChip.chipSize);
-
-	// セルが範囲外ならば、ここで処理を終了する
-	if (!FunctionConclusion::IsCellRange(cell, Cell(m_mapInfoData.mapChip.mapWidth, m_mapInfoData.mapChip.mapHeight), Cell(0, 0)))
-	{
-		return ChipType::NotExists;
-	}
-
-	// マップチップがセーブだった場合、ゲームデータクラスにセーブ情報を送る
-	if (m_mapInfoData.mapCollisionData[cell.x][cell.y].chipType == ChipType::Save)
-	{
-		// セーブ情報を送る
-		GameData::GetInstance()->SetSavePointData(GameData::SavePointData(m_mapInfoData.stageNumber, cell));
-	}
-
-	// マップチップタイプを返す
-	return m_mapInfoData.mapCollisionData[cell.x][cell.y].chipType;
 }
 
 void ObjectFactory::SetSavePoint(const Vec2& pos)
@@ -466,8 +500,8 @@ void ObjectFactory::TestMapDraw()
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA,200);
 
-	Vec2 pos1;
-	Vec2 pos2;
+	Vec2 pos1 = Vec2();
+	Vec2 pos2 = Vec2();
 
 
 	for (int y = 0; y < m_mapInfoData.mapChip.mapHeight; y++)
