@@ -1,9 +1,4 @@
 #include "GameData.h"
 
-GameData::GameData()
-{
-}
-
-GameData::~GameData()
-{
-}
+// ƒVƒ“ƒOƒ‹ƒgƒ“
+GameData* GameData::m_pInstance = nullptr;

@@ -13,8 +13,8 @@ using MapData_t = std::vector < std::vector<unsigned char>>;
 class PlatinumLoader
 {
 public:
-	// マップ情報
-	struct MapInfo
+	// マップチップ情報
+	struct MapChip
 	{
 		// マップの横幅
 		int mapWidth = 0;
@@ -58,10 +58,10 @@ public:
 	std::vector<MapData> GetMapAllData();
 
 	/// <summary>
-	/// マップ情報を返す
+	/// マップチップ情報を返す
 	/// </summary>
 	/// <returns>マップ情報(マップの横幅,　マップの縦幅,　マップチップのサイズ)</returns>
-	MapInfo GetMapInfo() { return m_mapInfo; }
+	MapChip GetMapChip() { return m_mapChip; }
 
 
 
@@ -86,8 +86,8 @@ private:
 	// プラチナムデータ
 	MapData_t m_platinumData;
 
-	// マップ情報
-	MapInfo m_mapInfo;
+	// マップチップ情報
+	MapChip m_mapChip;
 
 	// レイヤー数
 	int m_layerMaxNum = 0;

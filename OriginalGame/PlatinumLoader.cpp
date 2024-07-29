@@ -5,7 +5,7 @@
 
 PlatinumLoader::PlatinumLoader() :
 	m_platinumData(),
-	m_mapInfo(),
+	m_mapChip(),
 	m_layerMaxNum(0)
 {
 }
@@ -48,15 +48,15 @@ void PlatinumLoader::Load(const TCHAR* filePath)
 	m_layerMaxNum = header.layerCount;
 
 	// マップの縦幅と横幅を代入
-	m_mapInfo.mapHeight = header.mapHeight;
-	m_mapInfo.mapWidth = header.mapWidth;
+	m_mapChip.mapHeight = header.mapHeight;
+	m_mapChip.mapWidth = header.mapWidth;
 
 	//レイヤー1個当たりのサイズを計算する
 	//マップの幅＊マップの高さ*(チップ1個当たりのバイト数)
 	int layerDataSize = header.mapWidth * header.mapHeight * (header.bitCount / 8);
 
 	// チップサイズを代入(チップサイズは縦横同じサイズなのでWidthでもHeightでもどちらでもよい)
-	m_mapInfo.chipSize = header.chiphWidth;
+	m_mapChip.chipSize = header.chiphWidth;
 
 
 	m_platinumData.resize(m_layerMaxNum);
@@ -77,13 +77,13 @@ std::vector<std::vector<int>> PlatinumLoader::GetMapLayerData(const int& layerNu
 
 
 	// 二次元の要素数を持った二次元配列
-	std::vector<std::vector<int>>mapData(m_mapInfo.mapWidth, std::vector<int>(m_mapInfo.mapHeight));
+	std::vector<std::vector<int>>mapData(m_mapChip.mapWidth, std::vector<int>(m_mapChip.mapHeight));
 
-	for (int y = 0; y < m_mapInfo.mapHeight; y++)
+	for (int y = 0; y < m_mapChip.mapHeight; y++)
 	{
-		for (int x = 0; x < m_mapInfo.mapWidth; x++)
+		for (int x = 0; x < m_mapChip.mapWidth; x++)
 		{
-			auto index = x + y * m_mapInfo.mapWidth;
+			auto index = x + y * m_mapChip.mapWidth;
 
 			mapData[x][y] = m_platinumData[layerNum][index];
 		}

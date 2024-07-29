@@ -3,7 +3,7 @@
 
 
 
-
+template <class TState> class StateMachine;
 
 class Player : public ObjectBase
 {
@@ -22,6 +22,14 @@ public:
 		int jumpCount = 0;
 	};
 
+	// 状態
+	enum State
+	{
+		// 通常状態
+		Normal,
+		// 死亡
+		Dead,
+	};
 
 public:
 	Player();
@@ -33,6 +41,19 @@ public:
 	void Draw()override;
 
 private:
+
+	/// <summary>
+	/// ステート初期化
+	/// </summary>
+	void StateInit();
+
+	
+	// ノーマルステート処理
+	void StateNormalEnter();
+	void StateNormalUpdate();
+	void StateNormalDraw();
+	void StateNormalExit();
+
 
 	/// <summary>
 	/// リスポーン
@@ -50,7 +71,6 @@ private:
 	/// </summary>
 	void Jump();
 
-
 	/// <summary>
 	/// 衝突
 	/// </summary>
@@ -65,9 +85,29 @@ private:
 	void GroundCollision();
 
 	/// <summary>
-	/// マップ移動チップの当たり判定
+	/// 座標線形補間
 	/// </summary>
-	void MapMoveChipCollision();
+	void PosLinearInterpolation();
+
+	/// <summary>
+	/// マップチップの当たり判定
+	/// </summary>
+	void MapChipCollision(const Vec2& pos);
+
+	/// <summary>
+	/// 障害物の当たり判定
+	/// </summary>
+	/// <param name="mapCollisionData">マップ判定データ</param>
+	/// <param name="pos">プレイヤーの座標</param>
+	void ObstacleCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+
+	/// <summary>
+	/// マップ移動
+	/// </summary>
+	/// <param name="mapCollisionData">マップ判定データ</param>
+	/// <param name="pos">プレイヤーの座標</param>
+	void MapMove(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+
 
 private:
 
@@ -83,6 +123,12 @@ private:
 	// 移動矩形
 	Rect m_moveRect;
 
+	//////////////////
+	// ステート関連 //
+	//////////////////
+
+	// ステートマシン
+	StateMachine<State>m_pStateMachine;
 
 	////////////////////
 	/// ジャンプ関連 ///

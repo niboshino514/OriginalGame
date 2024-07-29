@@ -34,7 +34,7 @@ public:
 	// 描画ランク(ランクの数値が小さい程手前に描画される)
 	enum class DrawRank
 	{
-		Rank_1,
+		Rank_1 = 1,
 		Rank_2,
 		Rank_3,
 		Rank_4,
@@ -127,10 +127,6 @@ protected:
 	// 四角形情報
 	Square m_square;
 
-	// ハートボックス情報
-	Hurtbox m_hurtbox;
-
-
 	// 描画の優先順位
 	DrawRank m_drawRank;
 
@@ -139,5 +135,4 @@ protected:
 	////////////////////
 
 	std::shared_ptr<ObjectFactory>m_pObjectFactory;// オブジェクトファクトリー
-
 };

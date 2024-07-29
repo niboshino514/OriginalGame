@@ -1,4 +1,6 @@
 #pragma once
+
+#include "StateMachine.h"
 #include <list>
 #include <memory>
 #include <vector>
@@ -6,11 +8,11 @@
 #include "Vec2.h"
 #include "PlatinumLoader.h"
 #include "FunctionConclusion.h"
-
+#include <tuple>
 
 class ObjectBase;
 class PlatinumLoader;
-class GameData;
+class Camera;
 
 class ObjectFactory : public std::enable_shared_from_this<ObjectFactory>
 {
@@ -26,8 +28,8 @@ public:
 	};
 
 
-	// マップチップタイプ
-	enum class MapChipType
+	// チップタイプ
+	enum class ChipType
 	{
 		None,			// 何もなし
 		Ground,			// 地面
@@ -37,17 +39,46 @@ public:
 		PreviousePos,	// 前のステージ座標
 		SpawnPos,		// スポーン座標
 		Save,			// セーブ
+		TopNeedle,		// 上針
+		BottomNeedle,	// 下針
+		LeftNeedle,		// 左針
+		RightNeedle,	// 右針
 		NotExists		// 存在しない
 	};
 
-	// ハートボックスの向き
-	enum class HurtboxDrection
+	// マップ判定データ
+	struct MapCollisionData
 	{
-		Top,	// 上
-		Bottom,	// 下
-		Left,	// 左
-		Right,	// 右
+		// チップタイプ
+		ChipType chipType = ChipType::None;
+
+		// マップ四角形情報
+		Square square = Square();
+
+		// マップ円情報
+		Circle circle = Circle();
+
+		// 画面内フラグ
+		bool screenFlag = false;
 	};
+
+	// マップ情報データ
+	struct MapInfoData
+	{
+		// マップデータのファイルパス
+		std::vector<std::string> filePath;
+
+		// マップ判定データ
+		std::vector<std::vector<MapCollisionData>> mapCollisionData;
+
+		// マップ情報
+		PlatinumLoader::MapChip mapChip;
+		
+		// ステージナンバー
+		int stageNumber = 0;
+	};
+
+
 
 public:
 	ObjectFactory();
@@ -57,6 +88,7 @@ public:
 	void Update();
 	void Draw();
 
+public:
 
 	/// <summary>
 	/// キャラクター生成
@@ -69,54 +101,74 @@ public:
 	/// <param name="マップ情報"></param>
 	void MapChipCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType);
 
-
 	/// <summary>
 	/// オブジェクト削除
 	/// </summary>
 	void ObjectErase();
-
 
 	/// <summary>
 	/// ステージ移動
 	/// </summary>
 	void StageMove(const MapSwitchType& mapSwitchType);
 
-
 	/// <summary>
-	/// 現在のマップデータを返す
+	/// マップ情報データを返す
+	/// </summary>
+	/// <returns>マップ情報データ</returns>
+	MapInfoData GetMapInfoData() { return m_mapInfoData; }
+	
+	/// <summary>
+	/// マップチップ番号を返す
 	/// </summary>
 	/// <returns></returns>
-	PlatinumLoader::MapData GetCurrentMapData() { return PlatinumLoader::MapData(m_currentMapData); }
+	std::vector<std::vector<int>>GetMapChipNumber();
 
-
-	/// <summary>
-	/// マップ情報を返す
-	/// </summary>
-	/// <returns>マップ情報</returns>
-	PlatinumLoader::MapInfo GetMapInfo() { return m_mapInfo; }
-	
 
 	/// <summary>
 	/// マップチップ情報を返す
 	/// </summary>
 	/// <param name="pos">座標</param>
 	/// <returns>マップチップ情報</returns>
-	MapChipType GetMapChipType(const Vec2& pos);
+	ChipType GetMapChipType(const Vec2& pos);
+
+	
+	/// <summary>
+	/// セーブポイントを設定する
+	/// </summary>
+	/// <param name="pos">座標</param>
+	void SetSavePoint(const Vec2& pos);
 
 	/// <summary>
-	/// セーブポイント座標を返す
+	/// セーブポイントの座標を返す
 	/// </summary>
-	/// <returns>セーブポイントデータを返す</returns>
-	Vec2 GetSavePointPos();
+	/// <returns>bool : ステージを変更するかどうか　Vec2 : 座標</returns>
+	std::tuple<bool, Vec2> GetSavePointPos();
+
+	/// <summary>
+	/// ニードル情報を返す
+	/// </summary>
+	/// <param name="needleDirection">ニードルの向き</param>
+	/// <param name="square">四角形情報</param>
+	/// <returns>ニードル情報</returns>
+	Triangle ChipTypeToTriangle(const ChipType& needleDirection, const Square& square);
+
+	/// <summary>
+	/// スクリーン内かどうかを調べる
+	/// </summary>
+	void ScreenCheck();
+
+	/// <summary>
+	/// マップ当たり判定データを返す
+	/// </summary>
+	std::vector<std::vector<MapCollisionData>> GetMapCollisionData() { return m_mapInfoData.mapCollisionData; }
+
 
 private:
-
 
 	/// <summary>
 	/// マップデータファイルパスの初期設定
 	/// </summary>
 	void InitMapDataFilePath();
-
 
 	/// <summary>
 	/// セルが範囲外かどうかを確認する
@@ -124,7 +176,6 @@ private:
 	/// <param name="cell">セル</param>
 	/// <returns>セルが範囲外かどうかのフラグ</returns>
 	bool IsCellCheckOutOfRange(const Cell& cell);
-
 
 	/// <summary>
 	/// マップ描画
@@ -138,19 +189,11 @@ private:
 	// オブジェクト
 	std::list<std::shared_ptr<ObjectBase>>m_object;
 
-	// マップ情報
-	PlatinumLoader::MapInfo m_mapInfo;
+	// マップ情報データ
+	MapInfoData m_mapInfoData;
 
-	// ステージナンバー
-	int m_stageNumber;
-
-	// マップデータのファイルパス
-	std::vector<std::string> m_mapDataFilePath;
-
-	// 現在のマップデータ
-	std::vector<std::vector<int>> m_currentMapData;
-
-
+	// スクリーンサークル
+	Circle m_screenCircle;
 
 	////////////////////
 	// クラスポインタ //
@@ -158,6 +201,7 @@ private:
 
 	// プラチナムローダー
 	std::shared_ptr<PlatinumLoader>m_pPlatinumLoader;
-	std::shared_ptr<GameData>m_pGameData;
 
+	// カメラ
+	std::shared_ptr<Camera>m_pCamera;
 };
