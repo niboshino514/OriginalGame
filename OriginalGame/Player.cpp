@@ -7,7 +7,7 @@
 namespace
 {
 	// 移動スピード
-	constexpr float kMoveSpeed = 2.0f;
+	constexpr float kMoveSpeed = 5.0f;
 
 	// サイズ
 	const Vec2 kSize(20.0f, 30.0f);
@@ -19,7 +19,7 @@ namespace
 	constexpr float kJumpPower = 15.0f;
 
 	// ジャンプ回数
-	constexpr int kJumpCountMax = 2;
+	constexpr int kJumpCountMax = 5;
 
 	// 重力大
 	constexpr float kGravity = 1.5f;
@@ -28,15 +28,17 @@ namespace
 
 	// 最大移動量
 	constexpr float kMaxDirY = 20.0f;
+
+
+	// 重力反転フラグ
+	constexpr bool kGravityReverseFlag = true;
 }
 
 
 Player::Player() :
-	m_pos(),
 	m_vec(),
 	m_moveRect(),
 	m_rect(),
-	m_spawnPoint(),
 	m_pStateMachine(),
 	m_jumpInfo()
 {
@@ -51,11 +53,6 @@ void Player::Init()
 	// オブジェクトID設定
 	m_objectID = ObjectID::Player;
 
-	m_pos = m_circle.centerPos;
-
-	// スポーン地点初期化
-	SpawnPointInit();
-	
 	// ステートマシンの初期化
 	StateInit();
 }
@@ -113,9 +110,6 @@ void Player::StateNormalUpdate()
 	// ジャンプ処理
 	Jump();
 
-	// スポーン地点から離れたかどうか
-	SpawnPointLeave();
-
 	// 当たり判定
 	Collision();
 }
@@ -125,6 +119,9 @@ void Player::StateNormalDraw()
 	// オフセット値を取得
 	const Vec2 offset = GameData::GetInstance()->GetCameraPos();
 
+
+	// デバッグ描画
+#if(true)
 	// 描画座標を計算
 	const Rect drawRect = FunctionConclusion::RectangleCalculation(m_pos + offset, kSize);
 	
@@ -144,48 +141,13 @@ void Player::StateNormalDraw()
 	// 移動できる場所を描画
 	DrawBoxAA(drawMoveRect.left, drawMoveRect.top, drawMoveRect.right, drawMoveRect.bottom,
 		0x0000ff, false);
+#endif
 }
 
 void Player::StateNormalExit()
 {
 }
 
-void Player::SpawnPointInit()
-{
-	// マップチップのサイズを取得
-	const float mapChipSize = m_pObjectFactory->GetMapInfoData().mapChip.chipSize;
-
-	// スポーン地点のセル
-	const Cell spawnCell = FunctionConclusion::CoordinateWithCellToConversion(m_pos, mapChipSize);
-
-	// セルの中心座標を取得
-	Vec2 cellCenterPos = FunctionConclusion::CellWithCoordinateToConversion(spawnCell, mapChipSize);
-	cellCenterPos = Vec2(cellCenterPos.x , cellCenterPos.y);
-
-	// スポーン地点の四角形情報を取得する
-	m_spawnPoint.square = FunctionConclusion::RectToSquare(FunctionConclusion::RectangleCalculation(cellCenterPos, Vec2(mapChipSize, mapChipSize)));
-
-	// スポーン地点から離れたかどうかのフラグをfalseにする
-	m_spawnPoint.isLeave = false;
-}
-
-void Player::SpawnPointLeave()
-{
-	// スポーン地点から離れていた場合、ここで処理を終了する
-	if(m_spawnPoint.isLeave)
-	{
-		return;
-	}
-
-	// 現在座標を四角形情報に変換
-	const Square currentSquare = FunctionConclusion::RectToSquare(FunctionConclusion::RectangleCalculation(m_pos, kSize));
-
-	// 現在の座標の四角形情報とスポーン地点の四角形情報が交差していない場合、スポーン地点から離れたと判断する
-	if(!FunctionConclusion::CollisionDetectionOfQuadrangleAndQuadrangle(currentSquare, m_spawnPoint.square))
-	{
-		m_spawnPoint.isLeave = true;
-	}
-}
 
 void Player::Respawn()
 {
@@ -262,6 +224,11 @@ void Player::Jump()
 	// 移動量に落下スピードを代入する
 	m_vec.y = m_jumpInfo.fallSpeed;
 
+#if(false)
+
+	// 重力反転フラグがtrueならば、落下スピードを反転させる
+	m_vec.y = -m_jumpInfo.fallSpeed;
+#endif
 
 	// 一定以上の速度になったら速度を抑える
 	if (m_vec.y > kMaxDirY)
@@ -309,6 +276,8 @@ void Player::GroundCollision()
 		m_pos.x = m_moveRect.right;
 		m_vec.x = 0.0f;
 	}
+
+
 	if (m_pos.y < m_moveRect.top)
 	{
 		m_pos.y = m_moveRect.top;
@@ -332,6 +301,34 @@ void Player::GroundCollision()
 		m_pos.y = m_moveRect.bottom;
 		m_vec.y = 0.0f;
 	}
+
+#if(false)
+
+	if (m_pos.y < m_moveRect.top)
+	{
+		// 地面に着いているので、ジャンプフラグをfalseにする
+		m_jumpInfo.isJump = false;
+
+		// ジャンプカウントの最大値を代入する
+		m_jumpInfo.jumpCount = kJumpCountMax;
+
+		// 落下速度を0.0fにする
+		m_jumpInfo.fallSpeed = 0.0f;
+
+		m_pos.y = m_moveRect.top;
+		m_vec.y = 0.0f;
+	}
+	if (m_pos.y > m_moveRect.bottom)
+	{
+		// 落下速度を0.0fにする
+		m_jumpInfo.fallSpeed = 0.0f;
+
+		m_pos.y = m_moveRect.bottom;
+		m_vec.y = 0.0f;
+	}
+
+#endif
+
 
 	// 座標をゲームデータに代入
 	GameData::GetInstance()->SetPlayerPos(m_pos);
@@ -377,7 +374,6 @@ void Player::MapChipCollision(const Vec2& pos)
 	const int mapHeight = static_cast<int>(mapCollisionData[0].size());
 
 
-
 	for (int y = 0; y < mapHeight; y++)
 	{
 		for (int x = 0; x < mapWidth; x++)
@@ -390,7 +386,6 @@ void Player::MapChipCollision(const Vec2& pos)
 
 			// マップ移動フラグを行うかどうか
 			const bool isMapMove =
-				m_spawnPoint.isLeave &&
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::NextStage ||
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::PreviouseStage ||
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::Save;
@@ -417,6 +412,12 @@ void Player::MapChipCollision(const Vec2& pos)
 				// 障害物の当たり判定
 				ObstacleCollision(mapCollisionData[x][y], pos);
 			}
+
+			// 存在しない場合、ループを抜ける
+			if (!m_isExlist)
+			{
+				return;
+			}
 		}
 	}
 }
@@ -436,10 +437,8 @@ void Player::ObstacleCollision(const ObjectFactory::MapCollisionData& mapCollisi
 	}
 }
 
-
 void Player::MapMove(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
 {
-
 	// 座標を四角形情報に変換
 	const Square square = FunctionConclusion::RectToSquare(FunctionConclusion::RectangleCalculation(pos, kSize));
 

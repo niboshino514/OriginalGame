@@ -31,16 +31,6 @@ public:
 		Dead,
 	};
 
-	// スポーン地点
-	struct SpawnPoint
-	{
-		// 四角形情報
-		Square square = Square();
-
-		// スポーンセルから離れたかどうか
-		bool isLeave = false;
-	};
-
 public:
 	Player();
 	virtual ~Player();
@@ -66,17 +56,7 @@ private:
 
 	
 
-	
-	/// <summary>
-	/// スポーン地点初期化
-	/// </summary>
-	void SpawnPointInit();
 
-
-	/// <summary>
-	/// スポーン地点から移動したかどうか
-	/// </summary>
-	void SpawnPointLeave();
 
 	/// <summary>
 	/// リスポーン
@@ -136,17 +116,13 @@ private:
 	// 移動量
 	Vec2 m_vec;
 
-	// 座標
-	Vec2 m_pos;
-
 	// 矩形
 	Rect m_rect;
 
 	// 移動矩形
 	Rect m_moveRect;
 
-	// スポーン地点
-	SpawnPoint m_spawnPoint;
+
 
 	//////////////////
 	// ステート関連 //

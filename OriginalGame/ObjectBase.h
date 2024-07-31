@@ -65,12 +65,11 @@ public:
 
 	
 
-
 	/// <summary>
-	/// 円情報代入
+	/// 座標を代入
 	/// </summary>
-	/// <param name="circle">円情報</param>
-	void SetCircle(const Circle& circle) { m_circle = circle; }
+	/// <param name="pos">座標</param>
+	void SetPos(const Vec2& pos) { m_pos = pos; }
 
 	/// <summary>
 	/// 円情報を返す
@@ -123,6 +122,9 @@ protected:
 
 	// 円情報
 	Circle m_circle;
+
+	// 座標
+	Vec2 m_pos;
 
 	// 四角形情報
 	Square m_square;

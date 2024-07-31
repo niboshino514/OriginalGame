@@ -17,20 +17,13 @@ namespace
 
 	// ファイルパス拡張子
 	const std::string kFilePathExtension = ".fmf";
-
-	// 判定半径
-	constexpr float kHurtboxRadius = 2.0f;
-}
-
-namespace
-{
-	// 円の半径
-	constexpr float kCircleRadius = 10.0f;
 }
 
 
 ObjectFactory::ObjectFactory() :
 	m_object(),
+	m_mapInfoData(),
+	m_screenCircle(),
 	m_pPlatinumLoader(std::make_shared<PlatinumLoader>()),
 	m_pCamera(std::make_shared<Camera>())
 {
@@ -43,32 +36,13 @@ ObjectFactory::~ObjectFactory()
 void ObjectFactory::Init()
 {
 	// マップ関連初期設定
-	{
-		// マップデータ初期設定
-		InitMapDataFilePath();
-
-		// マップ生成
-		StageMove(MapSwitchType::Spawn);
-	}
+	InitMap();
 
 	// カメラクラスにオブジェクトファクトリークラスポインタを送る
 	m_pCamera->SetObjectFactoryPointer(shared_from_this());
 
 	// スクリーンサークル初期化
-	{
-		// 画面の四角形情報
-		Square screenSquare = Square();
-
-		// 画面の四角形情報を代入
-		screenSquare.A = Vec2(0, 0);
-		screenSquare.B = Vec2(Game::kScreenWidth, 0);
-		screenSquare.C = Vec2(Game::kScreenWidth, Game::kScreenHeight);
-		screenSquare.D = Vec2(0, Game::kScreenHeight);
-
-		// 画面の中心点および、画面からの各頂点距離の最大値を半径とした円の情報を返す
-		m_screenCircle =
-			FunctionConclusion::CalculateQuadrangularCenter(screenSquare);
-	}
+	InitScreenCircle();
 }
 
 void ObjectFactory::Update()
@@ -80,7 +54,7 @@ void ObjectFactory::Update()
 			object->Update(); 
 		});
 
-	// スクリーンチェック
+	// スクリーン内かどうかを調べる
 	ScreenCheck();
 
 	// カメラ更新
@@ -95,7 +69,7 @@ void ObjectFactory::Draw()
 	// 描画ランクの逆順にオブジェクトを描画するループ
 	for (int i = static_cast<int>(ObjectBase::DrawRank::RankNum) - 1; i >= 0; --i) {
 		// 描画ランク
-		ObjectBase::DrawRank drawRank = static_cast<ObjectBase::DrawRank>(i);
+		const ObjectBase::DrawRank drawRank = static_cast<ObjectBase::DrawRank>(i);
 
 		// 条件を満たすすべてのオブジェクトを描画する
 		std::for_each(m_object.begin(), m_object.end(),
@@ -112,9 +86,6 @@ void ObjectFactory::Draw()
 
 void ObjectFactory::CharacterCreate(const Vec2& pos)
 {
-	// 円情報代入
-	Circle circle = Circle(pos, kCircleRadius);
-
 	// キャラクター生成
 	m_object.push_back(std::make_shared<Player>());
 
@@ -124,10 +95,10 @@ void ObjectFactory::CharacterCreate(const Vec2& pos)
 	// 描画ランクを代入
 	m_object.back()->SetDrawRank(ObjectBase::DrawRank::Rank_1);
 
-	// 円情報を入れる
-	m_object.back()->SetCircle(circle);
+	// 座標を代入
+	m_object.back()->SetPos(pos);
 
-	// 初期設定
+	// 初期化処理
 	m_object.back()->Init();
 }
 
@@ -137,6 +108,7 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 	std::vector<std::vector<MapCollisionData>>mapCollisionData(
 		m_mapInfoData.mapChip.mapWidth, 
 		std::vector<MapCollisionData>(m_mapInfoData.mapChip.mapHeight));
+
 
 	// 次のステージセル
 	Cell nextStageCell = Cell();
@@ -148,6 +120,17 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 	bool isPlayerCreate = false;
 
 
+
+	// スポーンチップ個数
+	int spawnChip = 0;
+
+	// 次のステージ座標チップ個数
+	int nextPosChip = 0;
+
+	// 前のステージ座標チップ個数
+	int previousePosChip = 0;
+
+
 	// すべてのセルを見る
 	for (int y = 0; y < m_mapInfoData.mapChip.mapHeight; y++)
 	{
@@ -156,56 +139,79 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 			// マップチップタイプに変換
 			const ChipType mapChipType = ChipType(mapData[x][y]);
 
-			// マップチップタイプが次のステージの場合、次のステージセル座標を代入
-			if (mapChipType == ChipType::NextStage)
+			// チップの数をカウントする
 			{
-				nextStageCell = Cell(x, y);
+				switch (mapChipType)
+				{
+				case ObjectFactory::ChipType::NextStage:
+
+				
+					// 次のステージ座標セルを代入
+					nextStageCell = Cell(x, y);
+					break;
+				case ObjectFactory::ChipType::PreviouseStage:
+
+					// 前のステージ座標セルを代入
+					previouseStageCell = Cell(x, y);
+					break;
+				case ObjectFactory::ChipType::NextPos:
+
+					// 次のステージ座標チップ個数を増やす
+					nextPosChip++;
+					break;
+				case ObjectFactory::ChipType::PreviousePos:
+
+					// 前のステージ座標チップ個数を増やす
+					previousePosChip++;
+					break;
+				case ObjectFactory::ChipType::SpawnPos:
+
+					// スポーンチップ個数を増やす
+					spawnChip++;
+					break;
+				default:
+					break;
+				}
 			}
 
-			// マップチップタイプが前のステージの場合、前のステージセル座標を代入
-			if(mapChipType == ChipType::PreviouseStage)
+			// プレイヤー生成
 			{
-				previouseStageCell = Cell(x, y);
+				// スポーンするかどうか
+				const bool isSpwan =
+					mapChipType == ChipType::SpawnPos &&
+					mapSwitchType == MapSwitchType::Spawn;
+
+				// 次のステージ座標に移動するかどうか
+				const bool isNextStagePos =
+					mapChipType == ChipType::NextPos &&
+					mapSwitchType == MapSwitchType::NextStage;
+
+				// 前のステージ座標に移動するかどうか
+				const bool isPreviouseStagePos =
+					mapChipType == ChipType::PreviousePos &&
+					mapSwitchType == MapSwitchType::PreviouseStage;
+
+				// スポーン
+				if (isSpwan)
+				{
+					// セーブ情報を送る
+					GameData::GetInstance()->SetSavePointData(GameData::SavePointData(m_mapInfoData.mapNumber, Cell(x, y)));
+				}
+
+				// プレイヤー生成
+				if (isSpwan ||
+					isNextStagePos ||
+					isPreviouseStagePos)
+				{
+					// キャラクター生成
+					CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfoData.mapChip.chipSize));
+
+					// プレイヤー生成フラグ
+					isPlayerCreate = true;
+				}
 			}
 
-
-			// スポーン
-			if (mapChipType == ChipType::SpawnPos &&
-				mapSwitchType == MapSwitchType::Spawn)
-			{
-				// セーブ情報を送る
-				GameData::GetInstance()->SetSavePointData(GameData::SavePointData(m_mapInfoData.stageNumber, Cell(x, y)));
-
-				// キャラクター生成
-				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x,y), m_mapInfoData.mapChip.chipSize));
-
-				// プレイヤー生成フラグ
-				isPlayerCreate = true;
-			}
-
-			// 次のステージ
-			if (mapChipType == ChipType::NextPos &&
-				mapSwitchType == MapSwitchType::NextStage)
-			{
-				// キャラクター生成
-				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfoData.mapChip.chipSize));
-
-				// プレイヤー生成フラグ
-				isPlayerCreate = true;
-			}
-
-			// 前のステージ
-			if (mapChipType == ChipType::PreviousePos &&
-				mapSwitchType == MapSwitchType::PreviouseStage)
-			{
-				// キャラクター生成
-				CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfoData.mapChip.chipSize));
-
-				// プレイヤー生成フラグ
-				isPlayerCreate = true;
-			}
-
-			// マップ判定データ
+			// マップ判定データ設定
 			{
 				// チップタイプを入れる
 				mapCollisionData[x][y].chipType = ChipType(mapData[x][y]);
@@ -233,30 +239,131 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 		isPlayerCreate = true;
 	}
 
+	// プレイヤーが生成されていなかった場合、次のステージか前のステージに移動する
+	if (!isPlayerCreate)
+	{
+		// ステージ変更タイプが次のステージの場合、前のステージセル座標を代入してキャラクター生成
+		if (mapSwitchType == MapSwitchType::NextStage)
+		{
+			// キャラクター生成
+			CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(previouseStageCell, m_mapInfoData.mapChip.chipSize));
+		}
+
+		// ステージ変更タイプが前のステージの場合、次のステージセル座標を代入してキャラクター生成
+		if (mapSwitchType == MapSwitchType::PreviouseStage)
+		{
+			// キャラクター生成
+			CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(nextStageCell, m_mapInfoData.mapChip.chipSize));
+		}
+	}
+
 
 	// ステージのマップデータを代入する
 	m_mapInfoData.mapCollisionData = mapCollisionData;
 
 
-
-	// プレイヤーが生成されていた場合、処理を終了する
-	if (isPlayerCreate)
+	// エラーメッセージ処理
 	{
-		return;
-	}
+		// チップ数が多かった場合のエラーメッセージ
+		const std::string overChip = "Too many ";
 
-	// ステージ変更タイプが次のステージの場合、前のステージセル座標を代入してキャラクター生成
-	if (mapSwitchType == MapSwitchType::NextStage)
-	{
-		// キャラクター生成
-		CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(previouseStageCell, m_mapInfoData.mapChip.chipSize));
-	}
+		// チップ数が無い場合のエラーメッセージ
+		const std::string noChip = "No ";
 
-	// ステージ変更タイプが前のステージの場合、次のステージセル座標を代入してキャラクター生成
-	if(mapSwitchType == MapSwitchType::PreviouseStage)
-	{
-		// キャラクター生成
-		CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(nextStageCell, m_mapInfoData.mapChip.chipSize));
+
+		// チップ名
+		std::string chipName = "";
+
+
+		// 現在のfmfファイル名
+		std::string fmfFileName = m_mapInfoData.filePath[m_mapInfoData.mapNumber];
+		fmfFileName = " in [ " + fmfFileName + " ] file";
+
+		// エラーメッセージ
+		std::string errorMessage = "";
+
+		// エラーメッセージフラグ
+		bool isErrorMessage = false;
+
+
+		// スポーン
+		if (mapSwitchType == MapSwitchType::Spawn)
+		{
+			// チップ名をSpawnChipにする
+			chipName = "SpawnChip";
+
+			if (spawnChip <= 0)
+			{
+				// エラーメッセージ生成
+				errorMessage = noChip + chipName + fmfFileName;
+
+				// エラーメッセージフラグ
+				isErrorMessage = true;
+			}
+			else if (spawnChip > 1)
+			{
+				// エラーメッセージ生成
+				errorMessage = overChip + chipName + fmfFileName;
+
+				// エラーメッセージフラグ
+				isErrorMessage = true;
+			}
+		}
+
+		// 次のステージ
+		if (mapSwitchType == MapSwitchType::NextStage)
+		{
+			// チップ名をNextPosChipにする
+			chipName = "[ NextPosChip ]";
+
+			if (nextPosChip <= 0)
+			{
+				// エラーメッセージ生成
+				errorMessage = noChip + chipName + fmfFileName;
+
+				// エラーメッセージフラグ
+				isErrorMessage = true;
+			}
+			else if (nextPosChip > 1)
+			{
+				// エラーメッセージ生成
+				errorMessage = overChip + chipName + fmfFileName;
+
+				// エラーメッセージフラグ
+				isErrorMessage = true;
+			}
+		}
+
+		// 前のステージ
+		if (mapSwitchType == MapSwitchType::PreviouseStage)
+		{
+			// チップ名をPreviousePosChipにする
+			chipName = "[ PreviousePosChip ]";
+
+			if (previousePosChip <= 0)
+			{
+				// エラーメッセージ生成
+				errorMessage = noChip + chipName + fmfFileName;
+
+				// エラーメッセージフラグ
+				isErrorMessage = true;
+			}
+			else if (previousePosChip > 1)
+			{
+				// エラーメッセージ生成
+				errorMessage = overChip + chipName + fmfFileName;
+
+				// エラーメッセージフラグ
+				isErrorMessage = true;
+			}
+		}
+
+		// エラーメッセージを出すかどうか
+		if (isErrorMessage)
+		{
+			// エラーメッセージを出す
+			FunctionConclusion::ErrorAssertMessage(errorMessage);
+		}
 	}
 }
 
@@ -280,17 +387,17 @@ void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 	if (mapSwitchType == MapSwitchType::NextStage)
 	{
 		// ステージナンバーの数字を増やす
-		m_mapInfoData.stageNumber++;
+		m_mapInfoData.mapNumber++;
 	}
 	else if(mapSwitchType == MapSwitchType::PreviouseStage)
 	{
 		// ステージナンバーの数字を減らす;
-		m_mapInfoData.stageNumber--;
+ 		m_mapInfoData.mapNumber--;
 	}
 	else if (mapSwitchType == MapSwitchType::Respawn)
 	{
 		// セーブポイントデータのステージナンバーをステージナンバーの数字に代入
-		m_mapInfoData.stageNumber = GameData::GetInstance()->GetSavePointData().stageNumber;
+		m_mapInfoData.mapNumber = GameData::GetInstance()->GetSavePointData().stageNumber;
 	}
 
 
@@ -301,7 +408,7 @@ void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 	}
 
 	// プラチナムデータロード
-	m_pPlatinumLoader->Load(m_mapInfoData.filePath[m_mapInfoData.stageNumber].c_str());
+	m_pPlatinumLoader->Load(m_mapInfoData.filePath[m_mapInfoData.mapNumber].c_str());
 	
 	// プラチナムデータ取得
 	const std::vector<PlatinumLoader::MapData>mapData = m_pPlatinumLoader->GetMapAllData();
@@ -341,7 +448,7 @@ void ObjectFactory::SetSavePoint(const Vec2& pos)
 
 	// セーブポイントのセルを設定
 	GameData::GetInstance()->SetSavePointData(
-		GameData::SavePointData(m_mapInfoData.stageNumber, saveCell));
+		GameData::SavePointData(m_mapInfoData.mapNumber, saveCell));
 
 	return;
 }
@@ -352,7 +459,7 @@ std::tuple<bool, Vec2>  ObjectFactory::GetSavePointPos()
 	const GameData::SavePointData savePointData = GameData::GetInstance()->GetSavePointData();
 
 	// セーブポイントデータのステージナンバーと現在のステージナンバーが異なる場合、マップ生成を行う
-	if (savePointData.stageNumber != m_mapInfoData.stageNumber)
+	if (savePointData.stageNumber != m_mapInfoData.mapNumber)
 	{
 		// マップ移動処理
 		StageMove(MapSwitchType::Respawn);
@@ -362,6 +469,34 @@ std::tuple<bool, Vec2>  ObjectFactory::GetSavePointPos()
 
 	// セルから変換した座標を返す
 	return std::tuple<bool, Vec2>(false, FunctionConclusion::CellWithCoordinateToConversion(savePointData.cell, m_mapInfoData.mapChip.chipSize));
+}
+
+void ObjectFactory::InitMap()
+{
+	// マップデータ初期設定
+	InitMapDataFilePath();
+
+	// マップナンバーを初期化
+	m_mapInfoData.mapNumber = 0;
+
+	// マップ生成
+	StageMove(MapSwitchType::Spawn);
+}
+
+void ObjectFactory::InitScreenCircle()
+{
+	// 画面の四角形情報
+	Square screenSquare = Square();
+
+	// 画面の四角形情報を代入
+	screenSquare.A = Vec2(0, 0);
+	screenSquare.B = Vec2(Game::kScreenWidth, 0);
+	screenSquare.C = Vec2(Game::kScreenWidth, Game::kScreenHeight);
+	screenSquare.D = Vec2(0, Game::kScreenHeight);
+
+	// 画面の中心点および、画面からの各頂点距離の最大値を半径とした円の情報を返す
+	m_screenCircle =
+		FunctionConclusion::CalculateQuadrangularCenter(screenSquare);
 }
 
 void ObjectFactory::InitMapDataFilePath()
@@ -408,7 +543,6 @@ bool ObjectFactory::IsCellCheckOutOfRange(const Cell& cell)
 
 Triangle ObjectFactory::ChipTypeToTriangle(const ChipType& needleDirection, const Square& square)
 {
-
 	// 左上
 	const Vec2 leftTopPos = square.A;
 	// 上
@@ -478,7 +612,7 @@ void ObjectFactory::ScreenCheck()
 	// 判定用の円情報
 	Circle collisionMapCircle = Circle();
 
-
+	// マップの範囲内であるかどうかを調べる
 	for (int y = 0; y < m_mapInfoData.mapChip.mapHeight; y++)
 	{
 		for (int x = 0; x < m_mapInfoData.mapChip.mapWidth; x++)

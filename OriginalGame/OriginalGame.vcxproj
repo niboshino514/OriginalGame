@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\nibos\OneDrive - ooharastudent\myLibrary;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;$(ProjectDir);$(ProjectDir)Library</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -144,6 +144,13 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FunctionConclusion.cpp" />
     <ClCompile Include="GameData.cpp" />
+    <ClCompile Include="Library\Calculation.cpp" />
+    <ClCompile Include="Library\Collision.cpp" />
+    <ClCompile Include="Library\Convert.cpp" />
+    <ClCompile Include="Library\Draw.cpp" />
+    <ClCompile Include="Library\File.cpp" />
+    <ClCompile Include="Library\FPS.cpp" />
+    <ClCompile Include="Library\Load.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainScreen.cpp" />
     <ClCompile Include="ObjectBase.cpp" />
@@ -161,6 +168,14 @@
     <ClInclude Include="FunctionConclusion.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameData.h" />
+    <ClInclude Include="Library\Calculation.h" />
+    <ClInclude Include="Library\Collision.h" />
+    <ClInclude Include="Library\Convert.h" />
+    <ClInclude Include="Library\Draw.h" />
+    <ClInclude Include="Library\EvoLib.h" />
+    <ClInclude Include="Library\File.h" />
+    <ClInclude Include="Library\FPS.h" />
+    <ClInclude Include="Library\Load.h" />
     <ClInclude Include="MainScreen.h" />
     <ClInclude Include="ObjectBase.h" />
     <ClInclude Include="ObjectFactory.h" />

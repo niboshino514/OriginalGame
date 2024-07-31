@@ -74,8 +74,8 @@ public:
 		// マップ情報
 		PlatinumLoader::MapChip mapChip;
 		
-		// ステージナンバー
-		int stageNumber = 0;
+		// マップナンバー
+		int mapNumber = 0;
 	};
 
 
@@ -155,6 +155,18 @@ public:
 
 
 private:
+
+	/// <summary>
+	/// マップ関連初期設定
+	/// </summary>
+	void InitMap();
+	
+	/// <summary>
+	/// スクリーンサークル初期化
+	/// </summary>
+	void InitScreenCircle();
+
+
 
 	/// <summary>
 	/// マップデータファイルパスの初期設定

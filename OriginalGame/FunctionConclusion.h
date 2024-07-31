@@ -4,6 +4,7 @@
 #include <math.h>
 #include <vector>
 #include "PlatinumLoader.h"
+#include <string>
 
 
 // セル構造体
@@ -253,6 +254,13 @@ public:
 	/// <param name="rect">矩形情報</param>
 	/// <returns>四角形情報</returns>
 	static Square RectToSquare(const Rect& rect);
+
+
+	/// <summary>
+	/// エラーメッセージ
+	/// </summary>
+	/// <param name="errorMessage">エラーメッセージ</param>
+	static void ErrorAssertMessage(const std::string& errorMessage);
 
 };
 

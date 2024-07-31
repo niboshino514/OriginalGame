@@ -31,6 +31,12 @@
     <Filter Include="ヘッダー ファイル\Object">
       <UniqueIdentifier>{183c868f-89f9-476e-8c12-f0142f803762}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Library">
+      <UniqueIdentifier>{4a903e87-1e5b-4bda-83af-941babdebc30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Library">
+      <UniqueIdentifier>{221649dc-6faa-4341-a1b1-4733a9c501ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -74,6 +80,27 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Calculation.cpp">
+      <Filter>ソース ファイル\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Convert.cpp">
+      <Filter>ソース ファイル\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Draw.cpp">
+      <Filter>ソース ファイル\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\File.cpp">
+      <Filter>ソース ファイル\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\FPS.cpp">
+      <Filter>ソース ファイル\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Load.cpp">
+      <Filter>ソース ファイル\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Collision.cpp">
+      <Filter>ソース ファイル\Library</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,8 +149,32 @@
     <ClInclude Include="StateMachine.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Library\FPS.h">
+      <Filter>ヘッダー ファイル\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Calculation.h">
+      <Filter>ヘッダー ファイル\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Collision.h">
+      <Filter>ヘッダー ファイル\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Convert.h">
+      <Filter>ヘッダー ファイル\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Draw.h">
+      <Filter>ヘッダー ファイル\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\EvoLib.h">
+      <Filter>ヘッダー ファイル\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\File.h">
+      <Filter>ヘッダー ファイル\Library</Filter>
+    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Load.h">
+      <Filter>ヘッダー ファイル\Library</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

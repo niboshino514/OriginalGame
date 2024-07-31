@@ -1,34 +1,10 @@
 #pragma once
-#include "ObjectBase.h"
-#include <list>
 #include <vector>
 
 
 struct Sort
 {
 public:
-
-
-	/// <summary>
-	/// <para>隣り合う2つの値の大小を比較し交換を行う</para>
-	/// <para>要素数の少ない簡単なリストで用いることが望ましい</para>
-	/// </summary>
-	static void BubbleSort(std::vector<std::shared_ptr<ObjectBase>>& data, const int dataSize)
-	{
-		//配列のサイズ - 1回操作
-		for (int i = 0; i < dataSize - 1; i++)
-		{
-			//右からソート（左からやると変数が1つ増える）
-			for (int j = dataSize - 1; i < j; j--)
-			{
-				//左の数値が大きい場合のみ入れ替える
-				if (data[j - 1]->GetDrawRank() < data[j]->GetDrawRank()) continue;
-				Swap(&data[j], &data[j - 1]);
-			}
-		}
-	}
-
-
 
 	/// <summary>
 	/// <para>隣り合う2つの値の大小を比較し交換を行う</para>
