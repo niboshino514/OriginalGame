@@ -7,7 +7,10 @@
 #include <string>
 #include "Vec2.h"
 #include "PlatinumLoader.h"
-#include "FunctionConclusion.h"
+
+
+#include "EvoLib.h"
+
 #include <tuple>
 
 class ObjectBase;
@@ -39,12 +42,23 @@ public:
 		PreviousePos,	// 前のステージ座標
 		SpawnPos,		// スポーン座標
 		Save,			// セーブ
+
 		TopNeedle,		// 上針
 		BottomNeedle,	// 下針
 		LeftNeedle,		// 左針
 		RightNeedle,	// 右針
+		DiedBlock,		// 死亡ブロック
+		
+		BottomGravity,	// 下重力
+		TopGravity,		// 上重力
+		LeftGravity,	// 左重力
+		RightGravity,	// 右重力
+
 		NotExists		// 存在しない
+		
 	};
+
+
 
 	// マップ判定データ
 	struct MapCollisionData
@@ -197,6 +211,9 @@ private:
 
 	// スクリーンサークル
 	Circle m_screenCircle;
+
+	// マップグラフィック
+	std::vector<int>m_testMapGraph;
 
 	////////////////////
 	// クラスポインタ //

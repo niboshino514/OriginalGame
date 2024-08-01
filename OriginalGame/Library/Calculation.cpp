@@ -445,7 +445,7 @@ std::vector<Vec2> EvoLib::Calculation::InearInterpolationPos(const Vec2& pos, co
     return inearInterpolationPos;
 }
 
-Rect EvoLib::Calculation::RectangleCalculation(const Rect& rect, const Cell& maxCell, const float& cellSize, const std::vector<std::vector<int>>& cellData, const std::vector<int> unusedCellNumber)
+Rect EvoLib::Calculation::CalculateRectangleMovementRange(const Rect& rect, const Cell& maxCell, const float& cellSize, const std::vector<std::vector<int>>& cellData, const std::vector<int> groundCellNumber)
 {
     // 結果の矩形
     Rect result = Rect();
@@ -473,14 +473,28 @@ Rect EvoLib::Calculation::RectangleCalculation(const Rect& rect, const Cell& max
 				return Rect();
 			}
 
-            // 使わないセル番号がある場合、そのセル番号は無視する
-            for (auto& unused : unusedCellNumber)
+            if (cellData[x][y] == 0)
+            {
+				continue;
+			}
+
+            bool isContinue = true;
+
+            // 地面セル番号がある場合、そのセル番号は無視する
+            for (auto& unused : groundCellNumber)
             {
 				if (cellData[x][y] == unused)
 				{
-					continue;
+                    isContinue = false;
 				}
             }
+
+            if (isContinue)
+            {
+                continue;
+            }
+
+
 
 			// 一番最初に見つかったぶつかるマップチップの一番下Y座標を取る
 			float temp = static_cast<float>(y * cellSize + cellSize);
@@ -500,14 +514,27 @@ Rect EvoLib::Calculation::RectangleCalculation(const Rect& rect, const Cell& max
 				return Rect();
 			}
 
-            // 使わないセル番号がある場合、そのセル番号は無視する
-            for (auto& unused : unusedCellNumber)
+            if (cellData[x][y] == 0)
+            {
+                continue;
+            }
+
+            bool isContinue = true;
+
+            // 地面セル番号がある場合、そのセル番号は無視する
+            for (auto& unused : groundCellNumber)
             {
                 if (cellData[x][y] == unused)
                 {
-                    continue;
+                    isContinue = false;
                 }
             }
+
+            if (isContinue)
+            {
+                continue;
+            }
+
 
 			// 一番最初に見つかったぶつかるマップチップの一番上Y座標を取る
 			float temp = static_cast<float>(y * cellSize);
@@ -527,14 +554,27 @@ Rect EvoLib::Calculation::RectangleCalculation(const Rect& rect, const Cell& max
 				return Rect();
 			}
 
-            // 使わないセル番号がある場合、そのセル番号は無視する
-            for (auto& unused : unusedCellNumber)
+            if (cellData[x][y] == 0)
+            {
+                continue;
+            }
+
+            bool isContinue = true;
+
+            // 地面セル番号がある場合、そのセル番号は無視する
+            for (auto& unused : groundCellNumber)
             {
                 if (cellData[x][y] == unused)
                 {
-                    continue;
+                    isContinue = false;
                 }
             }
+
+            if (isContinue)
+            {
+                continue;
+            }
+
 
 			// 一番最初に見つかったぶつかるマップチップの一番右X座標を取る
 			float temp = static_cast<float>(x * cellSize + cellSize);
@@ -554,14 +594,28 @@ Rect EvoLib::Calculation::RectangleCalculation(const Rect& rect, const Cell& max
 				return Rect();
 			}
 
-            // 使わないセル番号がある場合、そのセル番号は無視する
-            for (auto& unused : unusedCellNumber)
+
+            if (cellData[x][y] == 0)
+            {
+                continue;
+            }
+
+            bool isContinue = true;
+
+            // 地面セル番号がある場合、そのセル番号は無視する
+            for (auto& unused : groundCellNumber)
             {
                 if (cellData[x][y] == unused)
                 {
-                    continue;
+                    isContinue = false;
                 }
             }
+
+            if (isContinue)
+            {
+                continue;
+            }
+
 
 			// 一番最初に見つかったぶつかるマップチップの一番左X座標を取る
 			float temp = static_cast<float>(x * cellSize);

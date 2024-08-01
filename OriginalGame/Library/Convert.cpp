@@ -1,4 +1,5 @@
 #include "Convert.h"
+#include "Sort.h"
 
 VECTOR EvoLib::Convert::ConvertColorInto255(const VECTOR& color)
 {
@@ -280,13 +281,13 @@ Line EvoLib::Convert::CalculateLine(const Vec2& pos1, const Vec2& pos2)
     // 直線変数
     Line line = Line();
 
-    {
-        // 傾きを求める
-        line.a = (pos1.y - pos1.y) / (pos1.x - pos1.x);
-        // Y軸とこ交点を求める
-        line.b = pos1.y - line.a * pos1.x;
-    }
-
+    
+    // 傾きを求める
+    line.a = (pos2.y - pos1.y) / (pos2.x - pos1.x);
+    // Y軸とこ交点を求める
+    line.b = pos1.y - line.a * pos1.x;
+    
+  
     // 直線情報を返す
     return line;
 }
@@ -340,5 +341,78 @@ Vec2 EvoLib::Convert::QuadrangularCenter(const Square& square)
 
     // 中心座標を返す
     return centerPos;
+}
+
+Circle EvoLib::Convert::SquareToCircle(const Square& square)
+{
+    // 直線を2点から計算
+    const Line line1 = EvoLib::Convert::CalculateLine(square.A, square.C);
+    const Line line2 = EvoLib::Convert::CalculateLine(square.B, square.D);
+
+    // 2つの直線交点情報を取得
+    const Intersection intersection = CalculateIntersection(line1, line2);
+
+    // 円情報
+    Circle circle;
+
+    // 直線が交差してなければ、ここで処理を終了する
+    if (!intersection.isFrag)
+    {
+        return circle;
+    }
+
+    // 距離
+    std::vector<float>range;
+
+    // 値を代入
+    range.push_back(EvoLib::Calculation::ThreeSquareTheorem(square.A, intersection.pos));
+    range.push_back(EvoLib::Calculation::ThreeSquareTheorem(square.B, intersection.pos));
+    range.push_back(EvoLib::Calculation::ThreeSquareTheorem(square.C, intersection.pos));
+    range.push_back(EvoLib::Calculation::ThreeSquareTheorem(square.D, intersection.pos));
+
+    // 数値が小さい順になるよう、ソートを行う
+    Sort::SelectionSort(range, static_cast<int>(range.size()));
+
+
+
+    // 円の中心点を代入
+    circle.centerPos = intersection.pos;
+    // 半径を代入
+    circle.radius = range.back();
+
+    // 円情報を返す
+    return circle;
+}
+
+Square EvoLib::Convert::RectToSquare(const Rect& rect)
+{
+    // 四角形情報
+    Square square = Square();
+
+    // 四角形情報を計算
+    {
+        square.A = Vec2(rect.left, rect.top);
+        square.B = Vec2(rect.right, rect.top);
+        square.C = Vec2(rect.right, rect.bottom);
+        square.D = Vec2(rect.left, rect.bottom);
+    }
+
+    // 四角形情報を返す
+    return square;
+}
+
+Rect EvoLib::Convert::PosToRect(const Vec2& pos, const Vec2& size)
+{
+    // 矩形変数
+    Rect rect = Rect();
+
+    // 矩形情報を計算
+    rect.top = pos.y - (size.y * 0.5f);
+    rect.bottom = pos.y + (size.y * 0.5f);
+    rect.left = pos.x - (size.x * 0.5f);
+    rect.right = pos.x + (size.x * 0.5f);
+
+    // 計算した矩形を返す
+    return rect;
 }
 

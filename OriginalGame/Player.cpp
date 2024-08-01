@@ -27,7 +27,7 @@ namespace
 	constexpr float kSmallGravity = 0.8f;
 
 	// 最大移動量
-	constexpr float kMaxDirY = 20.0f;
+	constexpr float kMaxDir = 20.0f;
 
 
 	// 重力反転フラグ
@@ -39,6 +39,7 @@ Player::Player() :
 	m_vec(),
 	m_moveRect(),
 	m_rect(),
+	m_gravityDirection(),
 	m_pStateMachine(),
 	m_jumpInfo()
 {
@@ -100,6 +101,9 @@ void Player::StateInit()
 
 void Player::StateNormalEnter()
 {
+	// 重力方向変更
+	ChangeGravityDirection(Direction::Bottom);
+
 }
 
 void Player::StateNormalUpdate()
@@ -123,7 +127,7 @@ void Player::StateNormalDraw()
 	// デバッグ描画
 #if(true)
 	// 描画座標を計算
-	const Rect drawRect = FunctionConclusion::RectangleCalculation(m_pos + offset, kSize);
+	const Rect drawRect = EvoLib::Convert::PosToRect(m_pos + offset, m_size);
 	
 	// 移動可能範囲の矩形を取得
 	Rect drawMoveRect = Rect();
@@ -173,14 +177,31 @@ void Player::Move()
 	// 移動量初期化
 	m_vec = Vec2();
 
-	// パッドを使用した移動
-	if (Pad::IsPress(PAD_INPUT_RIGHT))
+
+	if (m_gravityDirection == Direction::Top ||
+		m_gravityDirection == Direction::Bottom)
 	{
-		m_vec.x += kMoveSpeed;
+		// パッドを使用した移動
+		if (Pad::IsPress(PAD_INPUT_RIGHT))
+		{
+			m_vec.x += kMoveSpeed;
+		}
+		if (Pad::IsPress(PAD_INPUT_LEFT))
+		{
+			m_vec.x -= kMoveSpeed;
+		}
 	}
-	if (Pad::IsPress(PAD_INPUT_LEFT))
+	else
 	{
-		m_vec.x -= kMoveSpeed;
+		// パッドを使用した移動
+		if (Pad::IsPress(PAD_INPUT_DOWN))
+		{
+			m_vec.y += kMoveSpeed;
+		}
+		if (Pad::IsPress(PAD_INPUT_UP))
+		{
+			m_vec.y -= kMoveSpeed;
+		}
 	}
 }
 
@@ -221,20 +242,55 @@ void Player::Jump()
 		m_jumpInfo.fallSpeed += kGravity;
 	}
 
-	// 移動量に落下スピードを代入する
-	m_vec.y = m_jumpInfo.fallSpeed;
-
-#if(false)
-
-	// 重力反転フラグがtrueならば、落下スピードを反転させる
-	m_vec.y = -m_jumpInfo.fallSpeed;
-#endif
-
-	// 一定以上の速度になったら速度を抑える
-	if (m_vec.y > kMaxDirY)
+	
+	if (m_gravityDirection == Direction::Top ||
+		m_gravityDirection == Direction::Bottom)
 	{
-		m_vec.y = kMaxDirY;
+		// 移動量に落下スピードを代入する
+		m_vec.y = m_jumpInfo.fallSpeed;
+
+
+		if (m_gravityDirection == Direction::Top)
+		{
+			// 移動量に落下スピードを代入する
+			m_vec.y = -m_jumpInfo.fallSpeed;
+		}
+		else
+		{
+			// 移動量に落下スピードを代入する
+			m_vec.y = m_jumpInfo.fallSpeed;
+		}
+
+		// 一定以上の速度になったら速度を抑える
+		if (m_vec.y > kMaxDir)
+		{
+			m_vec.y = kMaxDir;
+		}
 	}
+	else
+	{
+		// 移動量に落下スピードを代入する
+		m_vec.x = m_jumpInfo.fallSpeed;
+
+
+		if (m_gravityDirection == Direction::Left)
+		{
+			// 移動量に落下スピードを代入する
+			m_vec.x = -m_jumpInfo.fallSpeed;
+		}
+		else
+		{
+			// 移動量に落下スピードを代入する
+			m_vec.x = m_jumpInfo.fallSpeed;
+		}
+
+		// 一定以上の速度になったら速度を抑える
+		if (m_vec.x > kMaxDir)
+		{
+			m_vec.x = kMaxDir;
+		}
+	}
+
 }
 
 void Player::Collision()
@@ -249,85 +305,181 @@ void Player::Collision()
 void Player::GroundCollision()
 {
 	// 中心座標から矩形を求める
-	m_rect = FunctionConclusion::RectangleCalculation(m_pos, kSize);
+	m_rect = EvoLib::Convert::PosToRect(m_pos, m_size);
+
+	// マップチップのサイズを取得
+	const float mapChipSize = m_pObjectFactory->GetMapInfoData().mapChip.chipSize;
+
+	// マップチップの最大セルを取得
+	const Cell maxCell = Cell(m_pObjectFactory->GetMapInfoData().mapChip.mapWidth, m_pObjectFactory->GetMapInfoData().mapChip.mapHeight);
+
+	// 地面セル番号
+	std::vector<int>groundCellNumber;
+	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::Ground));
+
 
 	// 移動可能範囲の矩形を取得
-	m_moveRect = FunctionConclusion::GetMoveEnableRect
-	(m_rect, m_pObjectFactory->GetMapInfoData().mapChip, m_pObjectFactory->GetMapChipNumber());
+	m_moveRect = EvoLib::Calculation::CalculateRectangleMovementRange
+	(m_rect, maxCell, mapChipSize, m_pObjectFactory->GetMapChipNumber(), groundCellNumber);
+
+
 
 	// 取得した矩形をm_posの移動可能範囲に変換
-	m_moveRect.left += kSize.x * 0.5f;
-	m_moveRect.right -= kSize.x * 0.5f;
-	m_moveRect.top += kSize.y * 0.5f;
-	m_moveRect.bottom -= kSize.y * 0.5f;
+	m_moveRect.left += m_size.x * 0.5f;
+	m_moveRect.right -= m_size.x * 0.5f;
+	m_moveRect.top += m_size.y * 0.5f;
+	m_moveRect.bottom -= m_size.y * 0.5f;
 
 
 	// 移動量を座標に代入
 	m_pos += m_vec;
 
 
-	if (m_pos.x < m_moveRect.left)
+
+
+
+
+
+
+	if (m_gravityDirection == Direction::Top ||
+		m_gravityDirection == Direction::Bottom)
 	{
-		m_pos.x = m_moveRect.left;
-		m_vec.x = 0.0f;
+		if (m_pos.x < m_moveRect.left)
+		{
+			m_pos.x = m_moveRect.left;
+			m_vec.x = 0.0f;
+		}
+		if (m_pos.x > m_moveRect.right)
+		{
+			m_pos.x = m_moveRect.right;
+			m_vec.x = 0.0f;
+		}
+
+		if (m_gravityDirection == Direction::Bottom)
+		{
+
+			if (m_pos.y < m_moveRect.top)
+			{
+				m_pos.y = m_moveRect.top;
+
+				// 落下速度を0.0fにする
+				m_jumpInfo.fallSpeed = 0.0f;
+
+				m_vec.y = 0.0f;
+			}
+			if (m_pos.y > m_moveRect.bottom)
+			{
+				// 地面に着いているので、ジャンプフラグをfalseにする
+				m_jumpInfo.isJump = false;
+
+				// ジャンプカウントの最大値を代入する
+				m_jumpInfo.jumpCount = kJumpCountMax;
+
+				// 落下速度を0.0fにする
+				m_jumpInfo.fallSpeed = 0.0f;
+
+				m_pos.y = m_moveRect.bottom;
+				m_vec.y = 0.0f;
+			}
+		}
+		else
+		{
+			if (m_pos.y < m_moveRect.top)
+			{
+				// 地面に着いているので、ジャンプフラグをfalseにする
+				m_jumpInfo.isJump = false;
+
+				// ジャンプカウントの最大値を代入する
+				m_jumpInfo.jumpCount = kJumpCountMax;
+
+				// 落下速度を0.0fにする
+				m_jumpInfo.fallSpeed = 0.0f;
+
+				m_pos.y = m_moveRect.top;
+				m_vec.y = 0.0f;
+			}
+			if (m_pos.y > m_moveRect.bottom)
+			{
+				// 落下速度を0.0fにする
+				m_jumpInfo.fallSpeed = 0.0f;
+
+				m_pos.y = m_moveRect.bottom;
+				m_vec.y = 0.0f;
+			}
+		}
 	}
-	if (m_pos.x > m_moveRect.right)
+	else
 	{
-		m_pos.x = m_moveRect.right;
-		m_vec.x = 0.0f;
+	
+		if (m_pos.y < m_moveRect.top)
+		{
+			m_pos.y = m_moveRect.top;
+			m_vec.y = 0.0f;
+		}
+		if (m_pos.y > m_moveRect.bottom)
+		{
+			m_pos.y = m_moveRect.bottom;
+			m_vec.y = 0.0f;
+		}
+
+
+
+
+		if (m_gravityDirection == Direction::Left)
+		{
+
+			if (m_pos.x < m_moveRect.left)
+			{
+				// 地面に着いているので、ジャンプフラグをfalseにする
+				m_jumpInfo.isJump = false;
+
+				// ジャンプカウントの最大値を代入する
+				m_jumpInfo.jumpCount = kJumpCountMax;
+
+				// 落下速度を0.0fにする
+				m_jumpInfo.fallSpeed = 0.0f;
+
+				m_pos.x = m_moveRect.left;
+				m_vec.x = 0.0f;
+			}
+			if (m_pos.x > m_moveRect.right)
+			{
+				// 落下速度を0.0fにする
+				m_jumpInfo.fallSpeed = 0.0f;
+
+				m_pos.x = m_moveRect.right;
+				m_vec.x = 0.0f;
+			}
+		}
+		else
+		{
+			if (m_pos.x < m_moveRect.left)
+			{
+				// 落下速度を0.0fにする
+				m_jumpInfo.fallSpeed = 0.0f;
+
+				m_pos.x = m_moveRect.left;
+				m_vec.x = 0.0f;
+			}
+			if (m_pos.x > m_moveRect.right)
+			{
+				// 地面に着いているので、ジャンプフラグをfalseにする
+				m_jumpInfo.isJump = false;
+
+				// ジャンプカウントの最大値を代入する
+				m_jumpInfo.jumpCount = kJumpCountMax;
+
+
+				// 落下速度を0.0fにする
+				m_jumpInfo.fallSpeed = 0.0f;
+
+				m_pos.x = m_moveRect.right;
+				m_vec.x = 0.0f;
+			}
+		}
 	}
 
 
-	if (m_pos.y < m_moveRect.top)
-	{
-		m_pos.y = m_moveRect.top;
-
-		// 落下速度を0.0fにする
-		m_jumpInfo.fallSpeed = 0.0f;
-
-		m_vec.y = 0.0f;
-	}
-	if (m_pos.y > m_moveRect.bottom)
-	{
-		// 地面に着いているので、ジャンプフラグをfalseにする
-		m_jumpInfo.isJump = false;
-
-		// ジャンプカウントの最大値を代入する
-		m_jumpInfo.jumpCount = kJumpCountMax;
-
-		// 落下速度を0.0fにする
-		m_jumpInfo.fallSpeed = 0.0f;
-
-		m_pos.y = m_moveRect.bottom;
-		m_vec.y = 0.0f;
-	}
-
-#if(false)
-
-	if (m_pos.y < m_moveRect.top)
-	{
-		// 地面に着いているので、ジャンプフラグをfalseにする
-		m_jumpInfo.isJump = false;
-
-		// ジャンプカウントの最大値を代入する
-		m_jumpInfo.jumpCount = kJumpCountMax;
-
-		// 落下速度を0.0fにする
-		m_jumpInfo.fallSpeed = 0.0f;
-
-		m_pos.y = m_moveRect.top;
-		m_vec.y = 0.0f;
-	}
-	if (m_pos.y > m_moveRect.bottom)
-	{
-		// 落下速度を0.0fにする
-		m_jumpInfo.fallSpeed = 0.0f;
-
-		m_pos.y = m_moveRect.bottom;
-		m_vec.y = 0.0f;
-	}
-
-#endif
 
 
 	// 座標をゲームデータに代入
@@ -341,11 +493,15 @@ void Player::PosLinearInterpolation()
 
 	// 線形補間数を計算
 	const int iinearInterpolationCount =
-		FunctionConclusion::IinearInterpolationCountCalculation(beforePos, m_vec, kSize);
+		EvoLib::Calculation::InearInterpolationCount(beforePos, m_vec, m_size);
+
+	
 
 	// 線形補間座標を計算
 	std::vector<Vec2> iinearInterpolationPos =
-		FunctionConclusion::IinearInterpolationPos(beforePos, m_vec, iinearInterpolationCount);
+		EvoLib::Calculation::InearInterpolationPos(beforePos, m_vec, iinearInterpolationCount);
+
+	
 
 	// 線形補間数が0ならば、座標に移動量を足したものを配列に入れる
 	if (iinearInterpolationCount == 0)
@@ -396,7 +552,17 @@ void Player::MapChipCollision(const Vec2& pos)
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::TopNeedle ||
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::BottomNeedle ||
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::LeftNeedle ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::RightNeedle;
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::RightNeedle ||
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::DiedBlock;
+
+
+			// 重力方向を変更するかどうか
+			const bool isGravity =
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::TopGravity ||
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::BottomGravity ||
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::LeftGravity ||
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::RightGravity;
+				
 
 
 			// マップ移動の当たり判定を行うかどうか
@@ -413,6 +579,14 @@ void Player::MapChipCollision(const Vec2& pos)
 				ObstacleCollision(mapCollisionData[x][y], pos);
 			}
 
+			// 重力方向を変更するかどうか
+			if(isGravity)
+			{
+				// 重力方向を変更する
+				Gravity(mapCollisionData[x][y], pos);
+			}
+			
+
 			// 存在しない場合、ループを抜ける
 			if (!m_isExlist)
 			{
@@ -425,12 +599,27 @@ void Player::MapChipCollision(const Vec2& pos)
 void Player::ObstacleCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
 {
 	// 座標を四角形情報に変換
-	const Square square = FunctionConclusion::RectToSquare(FunctionConclusion::RectangleCalculation(pos, kSize));
+	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
+
+	// 四角形と四角形の当たり判定
+	if (mapCollisionData.chipType == ObjectFactory::ChipType::DiedBlock)
+	{
+		// 四角形同士の当たり判定
+		if (EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
+		{
+			// ステートをデッドにする
+			m_pStateMachine.SetState(State::Dead);
+		}
+
+		return;
+	}
+
 
 	// 三角形の情報を取得
 	const Triangle needle = m_pObjectFactory->ChipTypeToTriangle(mapCollisionData.chipType, mapCollisionData.square);
 
-	if (FunctionConclusion::CollisionDetectionOfQuadrangleAndTriangle(square, needle))
+	// 三角形と四角形の当たり判定
+	if (EvoLib::Collision::IsTriangleToSquare(needle, square))
 	{
 		// ステートをデッドにする
 		m_pStateMachine.SetState(State::Dead);
@@ -440,10 +629,11 @@ void Player::ObstacleCollision(const ObjectFactory::MapCollisionData& mapCollisi
 void Player::MapMove(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
 {
 	// 座標を四角形情報に変換
-	const Square square = FunctionConclusion::RectToSquare(FunctionConclusion::RectangleCalculation(pos, kSize));
+	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
+
 
 	// 四角形同士の当たり判定
-	if (!FunctionConclusion::CollisionDetectionOfQuadrangleAndQuadrangle(mapCollisionData.square, square))
+	if (!EvoLib::Collision::IsSquareToSquare(mapCollisionData.square, square))
 	{
 		return;
 	}
@@ -469,4 +659,57 @@ void Player::MapMove(const ObjectFactory::MapCollisionData& mapCollisionData, co
 
 		return;
 	}
+}
+
+void Player::Gravity(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
+{
+	// 座標を四角形情報に変換
+	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
+
+	
+	// 四角形同士の当たり判定
+	if (!EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
+	{
+		return;
+	}
+
+
+	Direction gravityDirection = Direction();
+
+	// 重力方向を変更する
+	if (mapCollisionData.chipType == ObjectFactory::ChipType::TopGravity)
+	{
+		gravityDirection = Direction::Top;
+	}
+	else if (mapCollisionData.chipType == ObjectFactory::ChipType::BottomGravity)
+	{
+		gravityDirection = Direction::Bottom;
+	}
+	else if(mapCollisionData.chipType == ObjectFactory::ChipType::LeftGravity)
+	{
+		gravityDirection = Direction::Left;
+	}
+	else if (mapCollisionData.chipType == ObjectFactory::ChipType::RightGravity)
+	{
+		gravityDirection = Direction::Right;
+	}
+
+	ChangeGravityDirection(gravityDirection);
+
+}
+
+void Player::ChangeGravityDirection(const Direction& gravityDirection)
+{
+	if (gravityDirection == Direction::Top ||
+		gravityDirection == Direction::Bottom)
+	{
+		m_size = kSize;
+	}
+	else
+	{
+		m_size = Vec2(kSize.y, kSize.x);
+	}
+
+	// 重力方向を変更する
+	m_gravityDirection = gravityDirection;
 }

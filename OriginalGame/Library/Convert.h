@@ -172,6 +172,28 @@ namespace EvoLib
 		/// <returns>四角形情報</returns>
 		static Vec2 QuadrangularCenter(const Square& square);
 
+		/// <summary>
+		/// 四角形の中心点および、中心点からの各頂点距離の最大値を半径とした円の情報を返す
+		/// </summary>
+		/// <param name="square">四角形情報</param>
+		/// <returns>円情報</returns>
+		static Circle SquareToCircle(const Square& square);
+
+		/// <summary>
+		/// 矩形情報を四角形情報に変換する
+		/// </summary>
+		/// <param name="rect">矩形情報</param>
+		/// <returns>四角形情報</returns>
+		static Square RectToSquare(const Rect& rect);
+
+
+		/// <summary>
+		/// 座標を中心とした矩形情報に変換
+		/// </summary>
+		/// <param name="pos">中心座標</param>
+		/// <param name="size">サイズ</param>
+		/// <returns>矩形情報</returns>
+		static Rect PosToRect(const Vec2& pos, const Vec2& size);
 	};
 }
 

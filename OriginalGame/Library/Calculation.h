@@ -139,9 +139,10 @@ namespace EvoLib
 		/// <param name="maxCell">セルの最大数</param>
 		/// <param name="cellSize">セルサイズ</param>
 		/// <param name="cellData">二次元セルデータ</param>
-		/// <param name="unusedCellNumber">使わないセル番号</param>
+		/// <param name="unusedCellNumber">地面セル番号</param>
 		/// <returns>移動範囲</returns>
-		static Rect RectangleCalculation(const Rect& rect, const Cell& maxCell, const float& cellSize, const std::vector<std::vector<int>>& cellData, const std::vector<int> unusedCellNumber);
+		static Rect CalculateRectangleMovementRange(const Rect& rect, const Cell& maxCell, const float& cellSize, const std::vector<std::vector<int>>& cellData, const std::vector<int> groundCellNumber);
+
 
 		/// <summary>
 		/// セルが範囲内かどうか
@@ -151,7 +152,6 @@ namespace EvoLib
 		/// <param name="minCell">最小セル</param>
 		/// <returns>セルが範囲内かどうかを返す</returns>
 		static bool IsCellRange(const Cell& cell, const Cell& maxCell, const Cell& minCell);
-
 
 	};
 	template<typename T>

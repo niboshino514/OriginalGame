@@ -24,6 +24,7 @@ ObjectFactory::ObjectFactory() :
 	m_object(),
 	m_mapInfoData(),
 	m_screenCircle(),
+	m_testMapGraph(),
 	m_pPlatinumLoader(std::make_shared<PlatinumLoader>()),
 	m_pCamera(std::make_shared<Camera>())
 {
@@ -31,6 +32,11 @@ ObjectFactory::ObjectFactory() :
 
 ObjectFactory::~ObjectFactory()
 {
+	for (auto& graph : m_testMapGraph)
+	{
+		DeleteGraph(graph);
+	}
+
 }
 
 void ObjectFactory::Init()
@@ -43,6 +49,19 @@ void ObjectFactory::Init()
 
 	// スクリーンサークル初期化
 	InitScreenCircle();
+
+
+
+	// マップグラフィック代入
+	{
+
+		EvoLib::Load::DivNum divNum = EvoLib::Load::DivNum(16, 16);
+
+		m_testMapGraph = EvoLib::Load::LoadDivGraph_EvoLib_Revision("Data/mapSetting.png", divNum);
+	
+	}
+
+
 }
 
 void ObjectFactory::Update()
@@ -204,7 +223,9 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 					isPreviouseStagePos)
 				{
 					// キャラクター生成
-					CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(Cell(x, y), m_mapInfoData.mapChip.chipSize));
+					CharacterCreate(EvoLib::Convert::CellToPos(Cell(x, y), m_mapInfoData.mapChip.chipSize));
+
+					
 
 					// プレイヤー生成フラグ
 					isPlayerCreate = true;
@@ -224,7 +245,9 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 
 				// 円情報計算
 				mapCollisionData[x][y].circle =
-					FunctionConclusion::CalculateQuadrangularCenter(mapCollisionData[x][y].square);
+					EvoLib::Convert::SquareToCircle(mapCollisionData[x][y].square);
+
+				
 			}
 		}
 	}
@@ -233,7 +256,7 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 	if (mapSwitchType == MapSwitchType::Respawn)
 	{
 		// キャラクター生成
-		CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(GameData::GetInstance()->GetSavePointData().cell, m_mapInfoData.mapChip.chipSize));
+		CharacterCreate(EvoLib::Convert::CellToPos(GameData::GetInstance()->GetSavePointData().cell, m_mapInfoData.mapChip.chipSize));
 
 		// プレイヤー生成フラグ
 		isPlayerCreate = true;
@@ -246,14 +269,14 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 		if (mapSwitchType == MapSwitchType::NextStage)
 		{
 			// キャラクター生成
-			CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(previouseStageCell, m_mapInfoData.mapChip.chipSize));
+			CharacterCreate(EvoLib::Convert::CellToPos(previouseStageCell, m_mapInfoData.mapChip.chipSize));
 		}
 
 		// ステージ変更タイプが前のステージの場合、次のステージセル座標を代入してキャラクター生成
 		if (mapSwitchType == MapSwitchType::PreviouseStage)
 		{
 			// キャラクター生成
-			CharacterCreate(FunctionConclusion::CellWithCoordinateToConversion(nextStageCell, m_mapInfoData.mapChip.chipSize));
+			CharacterCreate(EvoLib::Convert::CellToPos(nextStageCell, m_mapInfoData.mapChip.chipSize));
 		}
 	}
 
@@ -362,7 +385,7 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 		if (isErrorMessage)
 		{
 			// エラーメッセージを出す
-			FunctionConclusion::ErrorAssertMessage(errorMessage);
+			EvoLib::Assert::ErrorMessage(errorMessage);
 		}
 	}
 }
@@ -444,7 +467,9 @@ std::vector<std::vector<int>> ObjectFactory::GetMapChipNumber()
 void ObjectFactory::SetSavePoint(const Vec2& pos)
 {
 	// 座標からセルを求める
-	const Cell saveCell = FunctionConclusion::CoordinateWithCellToConversion(pos, m_mapInfoData.mapChip.chipSize);
+	const Cell saveCell = EvoLib::Convert::PosToCell(pos, m_mapInfoData.mapChip.chipSize);
+
+	
 
 	// セーブポイントのセルを設定
 	GameData::GetInstance()->SetSavePointData(
@@ -468,7 +493,7 @@ std::tuple<bool, Vec2>  ObjectFactory::GetSavePointPos()
 	}
 
 	// セルから変換した座標を返す
-	return std::tuple<bool, Vec2>(false, FunctionConclusion::CellWithCoordinateToConversion(savePointData.cell, m_mapInfoData.mapChip.chipSize));
+	return std::tuple<bool, Vec2>(false, EvoLib::Convert::CellToPos(savePointData.cell, m_mapInfoData.mapChip.chipSize));
 }
 
 void ObjectFactory::InitMap()
@@ -496,7 +521,7 @@ void ObjectFactory::InitScreenCircle()
 
 	// 画面の中心点および、画面からの各頂点距離の最大値を半径とした円の情報を返す
 	m_screenCircle =
-		FunctionConclusion::CalculateQuadrangularCenter(screenSquare);
+		EvoLib::Convert::SquareToCircle(screenSquare);
 }
 
 void ObjectFactory::InitMapDataFilePath()
@@ -624,7 +649,7 @@ void ObjectFactory::ScreenCheck()
 			collisionMapCircle.centerPos += GameData::GetInstance()->GetCameraPos();
 
 			// 円の判定
-			m_mapInfoData.mapCollisionData[x][y].screenFlag = FunctionConclusion::CircleCollision(collisionMapCircle, m_screenCircle);
+			m_mapInfoData.mapCollisionData[x][y].screenFlag = EvoLib::Collision::IsCircleToCircle(collisionMapCircle, m_screenCircle);
 		}
 	}
 }
@@ -658,6 +683,9 @@ void ObjectFactory::TestMapDraw()
 			pos1 += GameData::GetInstance()->GetCameraPos();
 			pos2 += GameData::GetInstance()->GetCameraPos();
 
+
+			// マップの描画
+			DrawGraph(pos1.x, pos1.y, m_testMapGraph[static_cast<int>(m_mapInfoData.mapCollisionData[x][y].chipType)], true);
 
 			int color = 0x00ff00;
 

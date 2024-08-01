@@ -42,14 +42,29 @@ namespace EvoLib
 		static bool IsTriangleToSquare(const Triangle& triangle, const Square& square);
 
 		/// <summary>
+		/// 四角形同士の当たり判定
+		/// </summary>
+		/// <param name="square1">四角形1</param>
+		/// <param name="square2">四角形2</param>
+		/// <returns>四角形同士の衝突判定フラグ</returns>
+		static bool IsSquareToSquare(const Square& square1, const Square& square2);
+
+		/// <summary>
 		/// 線分同士が当たっているかどうかを調べる
 		/// </summary>
-		/// <param name="start1">スタート座標１</param>
-		/// <param name="end1">ゴール座標１</param>
-		/// <param name="start2">スタート座標２</param>
-		/// <param name="end2">ゴール座標２</param>
-		/// <returns>線分同士が当たっているかどうかを調べる</returns>
-		static bool IsLein(const Vec2& start1, const Vec2& end1, const Vec2& start2, const Vec2& end2);
+		/// <param name="line1">線分1</param>
+		/// <param name="line2">線分２</param>
+		/// <returns>線分同士の衝突判定フラグ</returns>
+		static bool IsLineToLine(const Line& line1, const Line& line2);
+
+		/// <summary>
+		/// ポリゴンの中にポイント座標が入っているかどうかを調べる
+		/// </summary>
+		/// <param name="point">座標</param>
+		/// <param name="polygon">ポリゴン</param>
+		/// <returns>ポリゴンの中にポイント座標が入っているかどうか</returns>
+		static bool PointInPolygon(const Vec2& point, const std::vector<Vec2>& polygon);
+
 
 	};
 }

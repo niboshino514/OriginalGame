@@ -142,12 +142,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="FunctionConclusion.cpp" />
     <ClCompile Include="GameData.cpp" />
     <ClCompile Include="Library\Calculation.cpp" />
     <ClCompile Include="Library\Collision.cpp" />
     <ClCompile Include="Library\Convert.cpp" />
     <ClCompile Include="Library\Draw.cpp" />
+    <ClCompile Include="Library\EvoLib.cpp" />
     <ClCompile Include="Library\File.cpp" />
     <ClCompile Include="Library\FPS.cpp" />
     <ClCompile Include="Library\Load.cpp" />
@@ -165,7 +165,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="FunctionConclusion.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameData.h" />
     <ClInclude Include="Library\Calculation.h" />

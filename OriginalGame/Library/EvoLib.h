@@ -94,8 +94,15 @@ struct Intersection
 /// </summary>
 struct Line
 {
-	float a; // 傾き
-	float b; // y軸との交点
+	// 傾き
+	float a = 0.0f; 
+	// y軸との交点
+	float b = 0.0f; 
+
+	// 始点
+	Vec2 start = Vec2();
+	// 終点
+	Vec2 end = Vec2();
 };
 
 /// <summary>
@@ -112,6 +119,30 @@ struct Triangle
 	// 座標3
 	Vec2 pos_3 = Vec2();
 };
+
+namespace EvoLib
+{
+
+	// アサートクラス
+	class Assert
+	{
+	public:
+
+		/// <summary>
+		/// エラーメッセージ
+		/// </summary>
+		/// <param name="errorMessage">エラーメッセージ</param>
+		static void ErrorMessage(const std::string& errorMessage);
+	};
+
+	
+
+
+	
+
+}
+
+
 
 #include "FPS.h"
 #include "Convert.h"

@@ -110,8 +110,24 @@ private:
 	/// <param name="pos">プレイヤーの座標</param>
 	void MapMove(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
 
+	/// <summary>
+	/// 重力処理
+	/// </summary>
+	/// <param name="mapCollisionData">マップ判定データ</param>
+	/// <param name="pos">プレイヤーの座標</param>
+	void Gravity(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+
+	/// <summary>
+	/// 重力変更
+	/// </summary>
+	/// <param name="gravityDirection">重力変更処理</param>
+	void ChangeGravityDirection(const Direction& gravityDirection);
 
 private:
+
+	//////////////
+	// 移動関連 //
+	//////////////
 
 	// 移動量
 	Vec2 m_vec;
@@ -122,7 +138,11 @@ private:
 	// 移動矩形
 	Rect m_moveRect;
 
+	// 重力方向
+	Direction m_gravityDirection;
 
+	// サイズ
+	Vec2 m_size;
 
 	//////////////////
 	// ステート関連 //
