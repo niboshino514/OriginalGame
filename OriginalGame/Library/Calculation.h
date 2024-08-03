@@ -153,6 +153,16 @@ namespace EvoLib
 		/// <returns>ƒZƒ‹‚ª”ÍˆÍ“à‚©‚Ç‚¤‚©‚ğ•Ô‚·</returns>
 		static bool IsCellRange(const Cell& cell, const Cell& maxCell, const Cell& minCell);
 
+		/// <summary>
+		/// ãŒÀ‰ºŒÀ’l‚ğİ’è
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="x">”’l</param>
+		/// <param name="low">‰ºŒÀ</param>
+		/// <param name="high">ãŒÀ</param>
+		/// <returns></returns>
+		template<typename T>
+		static T Clamp(T x, T low, T high);
 	};
 	template<typename T>
 	inline bool Calculation::IsValueNegativeCount(T& value)
@@ -164,5 +174,19 @@ namespace EvoLib
 		}
 
 		return true;
+	}
+	template<typename T>
+	inline T Calculation::Clamp(T x, T low, T high)
+	{
+		if (low >= x)
+		{
+			return low;
+		}
+		else if (x >= high)
+		{
+			return high;
+		}
+
+		return x;
 	}
 }

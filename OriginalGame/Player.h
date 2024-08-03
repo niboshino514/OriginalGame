@@ -31,6 +31,20 @@ public:
 		Dead,
 	};
 
+	// コンベア
+	struct Conveyor
+	{
+		// コンベアに乗っているかどうか
+		bool isFrag = false;
+
+		// コンベアの速度
+		float speed = 0.0f;
+
+		// コンベアの方向
+		Direction direction = Direction();
+	};
+	
+
 public:
 	Player();
 	virtual ~Player();
@@ -123,6 +137,21 @@ private:
 	/// <param name="gravityDirection">重力変更処理</param>
 	void ChangeGravityDirection(const Direction& gravityDirection);
 
+	/// <summary>
+	/// アイスブロックの衝突処理
+	/// </summary>
+	/// <param name="mapCollisionData">マップ判定データ</param>
+	/// <param name="pos">プレイヤーの座標</param>
+	void IceBlockCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+
+	/// <summary>
+	/// コンベアの衝突処理
+	/// </summary>
+	/// <param name="mapCollisionData">マップ判定データ</param>
+	/// <param name="pos">プレイヤーの座標</param>
+	void ConveyorCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+
+
 private:
 
 	//////////////
@@ -143,6 +172,16 @@ private:
 
 	// サイズ
 	Vec2 m_size;
+
+
+	// 地面にいるかどうか
+	bool m_isGround;
+
+	// アイスブロックの上にいるかどうか
+	bool m_isIceBlock;
+	
+	// コンベア
+	Conveyor m_conveyor;
 
 	//////////////////
 	// ステート関連 //

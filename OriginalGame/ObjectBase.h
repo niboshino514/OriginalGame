@@ -4,7 +4,7 @@
 #include "EvoLib.h"
 #include "ObjectFactory.h"
 #include <memory>
-
+#include "GameData.h"
 
 class ObjectFactory;
 
@@ -23,11 +23,7 @@ public:
 	{
 		Player,					// プレイヤー
 
-		NoneMapChip,			// 侵入不可マップチップ
-		NoramalMapChip,			// 通常マップチップ
-		ObstacleMapChip,		// 障害物マップチップ
-		NextStageMapChip,		// 次のステージに進むマップチップ
-		PreviousStageMapChip,	// 前のステージに戻るマップチップ
+		TransparentBlockChip,	// 透明ブロックチップ
 	};
 
 
@@ -109,6 +105,11 @@ public:
 	/// <param name="drawRank">描画ランク</param>
 	void SetDrawRank(const DrawRank& drawRank) { m_drawRank = drawRank; }
 
+	/// <summary>
+	/// ギミックフラグを取得
+	/// </summary>
+	/// <param name="isGimmick">ギミックフラグ</param>
+	void SetGimiickFlag(const bool& isGimmick) { m_isGimmick = isGimmick; }
 
 protected:
 
@@ -116,6 +117,8 @@ protected:
 	// オブジェクトの種類
 	ObjectID m_objectID;
 
+	// ギミックフラグ
+	bool m_isGimmick;
 
 	// 存在フラグ
 	bool m_isExlist;

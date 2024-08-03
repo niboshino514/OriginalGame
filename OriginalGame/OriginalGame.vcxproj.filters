@@ -37,6 +37,12 @@
     <Filter Include="ヘッダー ファイル\Library">
       <UniqueIdentifier>{221649dc-6faa-4341-a1b1-4733a9c501ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Object\MapChip">
+      <UniqueIdentifier>{39eb1bcd-45f6-4847-b9f7-2151e354f04d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Object\MapChip">
+      <UniqueIdentifier>{b7671bb5-62b8-4ba7-97c8-15f95760793c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -101,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="Library\EvoLib.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TransparentBlockChip.cpp">
+      <Filter>ソース ファイル\Object\MapChip</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="Library\Load.h">
       <Filter>ヘッダー ファイル\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="TransparentBlockChip.h">
+      <Filter>ヘッダー ファイル\Object\MapChip</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

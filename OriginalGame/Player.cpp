@@ -2,7 +2,7 @@
 #include "Pad.h"
 #include "ObjectFactory.h"
 #include <tuple>
-#include "GameData.h"
+
 
 namespace
 {
@@ -11,6 +11,13 @@ namespace
 
 	// サイズ
 	const Vec2 kSize(20.0f, 30.0f);
+
+	// 氷の摩擦力
+	constexpr float kFrictionIce = 0.98f;
+
+	// コンベアの速度
+	constexpr float kConveyorSpeed = kMoveSpeed * 0.8f;
+
 }
 
 namespace
@@ -40,6 +47,10 @@ Player::Player() :
 	m_moveRect(),
 	m_rect(),
 	m_gravityDirection(),
+	m_size(),
+	m_isGround(),
+	m_isIceBlock(),
+	m_conveyor(),
 	m_pStateMachine(),
 	m_jumpInfo()
 {
@@ -104,6 +115,20 @@ void Player::StateNormalEnter()
 	// 重力方向変更
 	ChangeGravityDirection(Direction::Bottom);
 
+	// アイスブロックフラグをfalseにする
+	m_isIceBlock = false;
+
+
+
+	// コンベア情報初期化
+	{
+		// コンベアに乗っているかどうか
+		m_conveyor.isFrag = false;
+
+		// コンベアの速度
+		m_conveyor.speed = kConveyorSpeed;
+	}
+
 }
 
 void Player::StateNormalUpdate()
@@ -113,6 +138,7 @@ void Player::StateNormalUpdate()
 
 	// ジャンプ処理
 	Jump();
+
 
 	// 当たり判定
 	Collision();
@@ -174,8 +200,10 @@ void Player::Respawn()
 
 void Player::Move()
 {
-	// 移動量初期化
-	m_vec = Vec2();
+
+
+	// 移動量
+	Vec2 inputVec = Vec2();
 
 
 	if (m_gravityDirection == Direction::Top ||
@@ -184,11 +212,11 @@ void Player::Move()
 		// パッドを使用した移動
 		if (Pad::IsPress(PAD_INPUT_RIGHT))
 		{
-			m_vec.x += kMoveSpeed;
+			inputVec.x += kMoveSpeed;
 		}
 		if (Pad::IsPress(PAD_INPUT_LEFT))
 		{
-			m_vec.x -= kMoveSpeed;
+			inputVec.x -= kMoveSpeed;
 		}
 	}
 	else
@@ -196,13 +224,62 @@ void Player::Move()
 		// パッドを使用した移動
 		if (Pad::IsPress(PAD_INPUT_DOWN))
 		{
-			m_vec.y += kMoveSpeed;
+			inputVec.y += kMoveSpeed;
 		}
 		if (Pad::IsPress(PAD_INPUT_UP))
 		{
-			m_vec.y -= kMoveSpeed;
+			inputVec.y -= kMoveSpeed;
 		}
 	}
+
+
+	// コンベアに乗っている場合、移動量を変更する
+	if (m_isGround &&
+		m_conveyor.isFrag)
+	{
+		if (m_gravityDirection == Direction::Top ||
+			m_gravityDirection == Direction::Bottom)
+		{
+			if (m_conveyor.direction == Direction::Right)
+			{
+				inputVec.x += m_conveyor.speed;
+			}
+			else if (m_conveyor.direction == Direction::Left)
+			{
+				inputVec.x += -m_conveyor.speed;
+			}
+		}
+		else
+		{
+			if (m_conveyor.direction == Direction::Top)
+			{
+				inputVec.y += -m_conveyor.speed;
+			}
+			else if (m_conveyor.direction == Direction::Bottom)
+			{
+				inputVec.y += m_conveyor.speed;
+			}
+		}
+
+		// コンベアに乗っている場合、移動量を変更する
+		m_vec = inputVec;
+	}
+
+	// アイスブロックの場合、移動量を変更する
+	if(m_isIceBlock)
+	{
+		m_vec += inputVec;
+
+		m_vec.x = EvoLib::Calculation::Clamp(m_vec.x, -kMoveSpeed, kMoveSpeed);
+		m_vec.y = EvoLib::Calculation::Clamp(m_vec.y, -kMoveSpeed, kMoveSpeed);
+
+		m_vec *= kFrictionIce;
+
+		return;
+	}
+
+	// 移動量を代入
+	m_vec = inputVec;
 }
 
 void Player::Jump()
@@ -295,6 +372,11 @@ void Player::Jump()
 
 void Player::Collision()
 {
+
+	// 座標を四角形情報に変換
+	m_square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(m_pos, m_size));
+
+
 	// 地面の当たり判定
 	GroundCollision();
 
@@ -316,6 +398,12 @@ void Player::GroundCollision()
 	// 地面セル番号
 	std::vector<int>groundCellNumber;
 	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::Ground));
+	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::IceBlock));
+	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::TopConveyor));
+	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::BottomConveyor));
+	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::LeftConveyor));
+	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::RigthConveyor));
+	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::TransparentBlock));
 
 
 	// 移動可能範囲の矩形を取得
@@ -336,9 +424,8 @@ void Player::GroundCollision()
 
 
 
-
-
-
+	// 地面判定初期化
+	m_isGround = false;
 
 
 	if (m_gravityDirection == Direction::Top ||
@@ -369,14 +456,11 @@ void Player::GroundCollision()
 			}
 			if (m_pos.y > m_moveRect.bottom)
 			{
-				// 地面に着いているので、ジャンプフラグをfalseにする
-				m_jumpInfo.isJump = false;
-
-				// ジャンプカウントの最大値を代入する
-				m_jumpInfo.jumpCount = kJumpCountMax;
-
 				// 落下速度を0.0fにする
 				m_jumpInfo.fallSpeed = 0.0f;
+
+				// 地面フラグをtrueにする
+				m_isGround = true;
 
 				m_pos.y = m_moveRect.bottom;
 				m_vec.y = 0.0f;
@@ -386,11 +470,8 @@ void Player::GroundCollision()
 		{
 			if (m_pos.y < m_moveRect.top)
 			{
-				// 地面に着いているので、ジャンプフラグをfalseにする
-				m_jumpInfo.isJump = false;
-
-				// ジャンプカウントの最大値を代入する
-				m_jumpInfo.jumpCount = kJumpCountMax;
+				// 地面フラグをtrueにする
+				m_isGround = true;
 
 				// 落下速度を0.0fにする
 				m_jumpInfo.fallSpeed = 0.0f;
@@ -422,22 +503,16 @@ void Player::GroundCollision()
 			m_vec.y = 0.0f;
 		}
 
-
-
-
 		if (m_gravityDirection == Direction::Left)
 		{
 
 			if (m_pos.x < m_moveRect.left)
 			{
-				// 地面に着いているので、ジャンプフラグをfalseにする
-				m_jumpInfo.isJump = false;
-
-				// ジャンプカウントの最大値を代入する
-				m_jumpInfo.jumpCount = kJumpCountMax;
-
 				// 落下速度を0.0fにする
 				m_jumpInfo.fallSpeed = 0.0f;
+
+				// 地面フラグをtrueにする
+				m_isGround = true;
 
 				m_pos.x = m_moveRect.left;
 				m_vec.x = 0.0f;
@@ -463,15 +538,12 @@ void Player::GroundCollision()
 			}
 			if (m_pos.x > m_moveRect.right)
 			{
-				// 地面に着いているので、ジャンプフラグをfalseにする
-				m_jumpInfo.isJump = false;
-
-				// ジャンプカウントの最大値を代入する
-				m_jumpInfo.jumpCount = kJumpCountMax;
-
-
+		
 				// 落下速度を0.0fにする
 				m_jumpInfo.fallSpeed = 0.0f;
+
+				// 地面フラグをtrueにする
+				m_isGround = true;
 
 				m_pos.x = m_moveRect.right;
 				m_vec.x = 0.0f;
@@ -479,6 +551,18 @@ void Player::GroundCollision()
 		}
 	}
 
+
+	if(m_isGround)
+	{
+		// 地面に着いているので、ジャンプフラグをfalseにする
+		m_jumpInfo.isJump = false;
+
+		// ジャンプカウントの最大値を代入する
+		m_jumpInfo.jumpCount = kJumpCountMax;
+
+		// アイスブロックフラグをfalseにする
+		m_isIceBlock = false;
+	}
 
 
 
@@ -520,6 +604,8 @@ void Player::PosLinearInterpolation()
 
 void Player::MapChipCollision(const Vec2& pos)
 {
+	// コンベアフラグ初期化
+	m_conveyor.isFrag = false;
 
 	// マップ判定データを取得
 	std::vector<std::vector<ObjectFactory::MapCollisionData>> mapCollisionData =
@@ -563,6 +649,16 @@ void Player::MapChipCollision(const Vec2& pos)
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::LeftGravity ||
 				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::RightGravity;
 				
+			// アイスブロックの当たり判定を行うかどうか
+			const bool isIceBlockCollision =
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::IceBlock;
+
+			// コンベアの当たり判定を行うかどうか
+			const bool isConveyorCollision =
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::TopConveyor ||
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::BottomConveyor ||
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::LeftConveyor ||
+				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::RigthConveyor;
 
 
 			// マップ移動の当たり判定を行うかどうか
@@ -586,6 +682,20 @@ void Player::MapChipCollision(const Vec2& pos)
 				Gravity(mapCollisionData[x][y], pos);
 			}
 			
+			// アイスブロックの当たり判定を行うかどうか
+			if (isIceBlockCollision)
+			{
+				// アイスブロックの当たり判定
+				IceBlockCollision(mapCollisionData[x][y], pos);
+			}
+
+			// コンベアの当たり判定を行うかどうか
+			if(isConveyorCollision)
+			{
+				// コンベアの当たり判定
+				ConveyorCollision(mapCollisionData[x][y], pos);
+			}
+
 
 			// 存在しない場合、ループを抜ける
 			if (!m_isExlist)
@@ -712,4 +822,51 @@ void Player::ChangeGravityDirection(const Direction& gravityDirection)
 
 	// 重力方向を変更する
 	m_gravityDirection = gravityDirection;
+}
+
+void Player::IceBlockCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
+{
+	// 座標を四角形情報に変換
+	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
+
+	// 四角形同士の当たり判定
+	if (!EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
+	{
+		return;
+	}
+
+	m_isIceBlock = true;
+}
+
+void Player::ConveyorCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
+{
+	// 座標を四角形情報に変換
+	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
+
+	// 四角形同士の当たり判定
+	if (!EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
+	{
+		return;
+	}
+
+	// コンベアの方向を取得
+	if(mapCollisionData.chipType == ObjectFactory::ChipType::TopConveyor)
+	{
+		m_conveyor.direction = Direction::Top;
+	}
+	else if(mapCollisionData.chipType == ObjectFactory::ChipType::BottomConveyor)
+	{
+		m_conveyor.direction = Direction::Bottom;
+	}
+	else if(mapCollisionData.chipType == ObjectFactory::ChipType::LeftConveyor)
+	{
+		m_conveyor.direction = Direction::Left;
+	}
+	else if(mapCollisionData.chipType == ObjectFactory::ChipType::RigthConveyor)
+	{
+		m_conveyor.direction = Direction::Right;
+	}
+
+	// コンベアに乗っている
+	m_conveyor.isFrag = true;
 }

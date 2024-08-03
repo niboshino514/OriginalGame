@@ -161,6 +161,7 @@
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMain.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="TransparentBlockChip.cpp" />
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +187,7 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Sort.h" />
     <ClInclude Include="StateMachine.h" />
+    <ClInclude Include="TransparentBlockChip.h" />
     <ClInclude Include="Vec2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

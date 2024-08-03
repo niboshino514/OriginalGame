@@ -1,7 +1,6 @@
 #pragma once
 
 #include "StateMachine.h"
-#include <list>
 #include <memory>
 #include <vector>
 #include <string>
@@ -34,28 +33,36 @@ public:
 	// チップタイプ
 	enum class ChipType
 	{
-		None,			// 何もなし
-		Ground,			// 地面
-		NextStage,		// 次のステージ
-		PreviouseStage,	// 前のステージ
-		NextPos,		// 次のステージ座標
-		PreviousePos,	// 前のステージ座標
-		SpawnPos,		// スポーン座標
-		Save,			// セーブ
+		None,				// 何もなし
+		Ground,				// 地面
+		NextStage,			// 次のステージ
+		PreviouseStage,		// 前のステージ
+		NextPos,			// 次のステージ座標
+		PreviousePos,		// 前のステージ座標
+		SpawnPos,			// スポーン座標
+		Save,				// セーブ
 
-		TopNeedle,		// 上針
-		BottomNeedle,	// 下針
-		LeftNeedle,		// 左針
-		RightNeedle,	// 右針
-		DiedBlock,		// 死亡ブロック
+		TopNeedle,			// 上針
+		BottomNeedle,		// 下針
+		LeftNeedle,			// 左針
+		RightNeedle,		// 右針
+		DiedBlock,			// 死亡ブロック
 		
-		BottomGravity,	// 下重力
-		TopGravity,		// 上重力
-		LeftGravity,	// 左重力
-		RightGravity,	// 右重力
+		TopGravity,			// 上重力
+		BottomGravity,		// 下重力
+		LeftGravity,		// 左重力
+		RightGravity,		// 右重力
 
-		NotExists		// 存在しない
+		IceBlock,			// アイスブロック
+	
+		TopConveyor,		// 上コンベア
+		BottomConveyor,		// 下コンベア
+		LeftConveyor,		// 左コンベア
+		RigthConveyor,		// 右コンベア
+
+		TransparentBlock,	// 透明ブロック
 		
+		NotExists			// 存在しない
 	};
 
 
@@ -93,7 +100,6 @@ public:
 	};
 
 
-
 public:
 	ObjectFactory();
 	virtual ~ObjectFactory();
@@ -113,7 +119,7 @@ public:
 	/// マップ生成
 	/// </summary>
 	/// <param name="マップ情報"></param>
-	void MapChipCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType);
+	void MapCollisionDataCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType);
 
 	/// <summary>
 	/// オブジェクト削除
@@ -167,9 +173,13 @@ public:
 	/// </summary>
 	std::vector<std::vector<MapCollisionData>> GetMapCollisionData() { return m_mapInfoData.mapCollisionData; }
 
-
+	/// <summary>
+	/// オブジェクト情報を返す
+	/// </summary>
+	/// <returns>オブジェクト情報</returns>
+	std::vector<std::shared_ptr<ObjectBase>> GetObjectInfo() { return m_object; }
+	
 private:
-
 	/// <summary>
 	/// マップ関連初期設定
 	/// </summary>
@@ -180,12 +190,21 @@ private:
 	/// </summary>
 	void InitScreenCircle();
 
-
-
 	/// <summary>
 	/// マップデータファイルパスの初期設定
 	/// </summary>
 	void InitMapDataFilePath();
+
+	/// <summary>
+	/// マップチップ生成
+	/// </summary>
+	/// <param name="mapCollisionData">マップ判定データ</param>
+	void MapChipCreate(const MapCollisionData& mapCollisionData);
+
+	/// <summary>
+	/// ギミックリセット処理
+	/// </summary>
+	void GimmickReset();
 
 	/// <summary>
 	/// セルが範囲外かどうかを確認する
@@ -204,7 +223,7 @@ private:
 
 
 	// オブジェクト
-	std::list<std::shared_ptr<ObjectBase>>m_object;
+	std::vector<std::shared_ptr<ObjectBase>>m_object;
 
 	// マップ情報データ
 	MapInfoData m_mapInfoData;

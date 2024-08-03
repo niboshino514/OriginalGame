@@ -3,6 +3,8 @@
 #include "GameData.h"
 #include "Camera.h"
 #include "game.h"
+#include "TransparentBlockChip.h"
+
 
 #include <cassert>
 #include <string>
@@ -121,7 +123,7 @@ void ObjectFactory::CharacterCreate(const Vec2& pos)
 	m_object.back()->Init();
 }
 
-void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType)
+void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType)
 {
 	// マップデータ
 	std::vector<std::vector<MapCollisionData>>mapCollisionData(
@@ -193,6 +195,23 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 				}
 			}
 
+
+			// マップ判定データ設定
+			{
+				// チップタイプを入れる
+				mapCollisionData[x][y].chipType = ChipType(mapData[x][y]);
+
+				// 四角形情報計算
+				mapCollisionData[x][y].square.A = Vec2((m_mapInfoData.mapChip.chipSize * x), (m_mapInfoData.mapChip.chipSize * y));
+				mapCollisionData[x][y].square.B = Vec2((mapCollisionData[x][y].square.A.x + m_mapInfoData.mapChip.chipSize), mapCollisionData[x][y].square.A.y);
+				mapCollisionData[x][y].square.C = Vec2(mapCollisionData[x][y].square.B.x, (mapCollisionData[x][y].square.B.y + m_mapInfoData.mapChip.chipSize));
+				mapCollisionData[x][y].square.D = Vec2(mapCollisionData[x][y].square.A.x, mapCollisionData[x][y].square.C.y);
+
+				// 円情報計算
+				mapCollisionData[x][y].circle =
+					EvoLib::Convert::SquareToCircle(mapCollisionData[x][y].square);
+			}
+
 			// プレイヤー生成
 			{
 				// スポーンするかどうか
@@ -232,23 +251,21 @@ void ObjectFactory::MapChipCreate(const std::vector<std::vector<int>>& mapData, 
 				}
 			}
 
-			// マップ判定データ設定
+			// マップチップ生成
 			{
-				// チップタイプを入れる
-				mapCollisionData[x][y].chipType = ChipType(mapData[x][y]);
+				// チップ生成フラグ
+				const bool isCreateChip = 
+					mapCollisionData[x][y].chipType == ChipType::TransparentBlock;
 
-				// 四角形情報計算
-				mapCollisionData[x][y].square.A = Vec2((m_mapInfoData.mapChip.chipSize * x), (m_mapInfoData.mapChip.chipSize * y));
-				mapCollisionData[x][y].square.B = Vec2((mapCollisionData[x][y].square.A.x + m_mapInfoData.mapChip.chipSize), mapCollisionData[x][y].square.A.y);
-				mapCollisionData[x][y].square.C = Vec2(mapCollisionData[x][y].square.B.x, (mapCollisionData[x][y].square.B.y + m_mapInfoData.mapChip.chipSize));
-				mapCollisionData[x][y].square.D = Vec2(mapCollisionData[x][y].square.A.x, mapCollisionData[x][y].square.C.y);
-
-				// 円情報計算
-				mapCollisionData[x][y].circle =
-					EvoLib::Convert::SquareToCircle(mapCollisionData[x][y].square);
-
-				
+				// チップ生成
+				if (isCreateChip)
+				{
+					// マップチップ生成
+					MapChipCreate(mapCollisionData[x][y]);
+				}
 			}
+
+
 		}
 	}
 
@@ -443,7 +460,7 @@ void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 	m_mapInfoData.mapChip = m_pPlatinumLoader->GetMapChip();
 
 	// マップ生成
-	MapChipCreate(mapData[mapLayer].mapData, mapSwitchType);
+	MapCollisionDataCreate(mapData[mapLayer].mapData, mapSwitchType);
 }
 
 
@@ -491,6 +508,9 @@ std::tuple<bool, Vec2>  ObjectFactory::GetSavePointPos()
 
 		return std::tuple<bool, Vec2>(true, Vec2());
 	}
+
+	// ギミックリセット
+	GimmickReset();
 
 	// セルから変換した座標を返す
 	return std::tuple<bool, Vec2>(false, EvoLib::Convert::CellToPos(savePointData.cell, m_mapInfoData.mapChip.chipSize));
@@ -554,6 +574,35 @@ void ObjectFactory::InitMapDataFilePath()
 		// 処理カウントを増やす
 		processCount++;
 	}	
+}
+
+void ObjectFactory::MapChipCreate(const MapCollisionData& mapCollisionData)
+{
+	if (mapCollisionData.chipType == ChipType::TransparentBlock)
+	{
+		// マップチップ生成
+		m_object.push_back(std::make_shared<TransparentBlockChip>());
+	}
+	// 描画ランクを代入
+	m_object.back()->SetDrawRank(ObjectBase::DrawRank::Rank_2);
+
+	// ポインタを送る
+	m_object.back()->SetObjectFactory(shared_from_this());
+
+	// 座標を代入
+	m_object.back()->SetSquare(mapCollisionData.square);
+
+	// 初期化処理
+	m_object.back()->Init();
+}
+
+void ObjectFactory::GimmickReset()
+{
+	// ギミックフラグをリセット
+	for (auto& object : m_object)
+	{
+		object->SetGimiickFlag(false);
+	}
 }
 
 bool ObjectFactory::IsCellCheckOutOfRange(const Cell& cell)
@@ -684,8 +733,7 @@ void ObjectFactory::TestMapDraw()
 			pos2 += GameData::GetInstance()->GetCameraPos();
 
 
-			// マップの描画
-			DrawGraph(pos1.x, pos1.y, m_testMapGraph[static_cast<int>(m_mapInfoData.mapCollisionData[x][y].chipType)], true);
+
 
 			int color = 0x00ff00;
 
@@ -726,6 +774,14 @@ void ObjectFactory::TestMapDraw()
 
 				continue;
 			}
+
+			if (m_mapInfoData.mapCollisionData[x][y].chipType == ChipType::TransparentBlock)
+			{
+				continue;
+			}
+
+			// マップの描画
+			DrawGraphF(pos1.x, pos1.y, m_testMapGraph[static_cast<int>(m_mapInfoData.mapCollisionData[x][y].chipType)], true);
 
 			// マップの描画
 			DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
