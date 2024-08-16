@@ -45,18 +45,12 @@ void TransparentBlockChip::Draw()
 	drawSquare.D += offset;
 
 	// “§–¾ƒuƒƒbƒN•`‰æ
-	DrawBox(drawSquare.A.x, drawSquare.A.y, drawSquare.C.x, drawSquare.C.y, 0xffffff, TRUE);
+	DrawBoxAA(drawSquare.A.x, drawSquare.A.y, drawSquare.C.x, drawSquare.C.y, 0xffffff, TRUE);
 	
 }
 
 void TransparentBlockChip::Collision()
 {
-	
-
-
-
-
-
 	const auto& objectData = m_pObjectFactory->GetObjectInfo();
 
 	for (auto& object : objectData)

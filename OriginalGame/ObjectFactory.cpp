@@ -264,8 +264,6 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 					MapChipCreate(mapCollisionData[x][y]);
 				}
 			}
-
-
 		}
 	}
 
