@@ -110,9 +110,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;$(ProjectDir);$(ProjectDir)Library</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;$(ProjectDir)Library;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -128,9 +129,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;$(ProjectDir)Library;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="GameData.cpp" />
     <ClCompile Include="Library\Calculation.cpp" />
     <ClCompile Include="Library\Collision.cpp" />
@@ -154,18 +157,24 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainScreen.cpp" />
     <ClCompile Include="ObjectBase.cpp" />
-    <ClCompile Include="ObjectFactory.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Pad.cpp" />
+    <ClCompile Include="Pause.cpp" />
     <ClCompile Include="PlatinumLoader.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SaveDataSelectScreen.cpp" />
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMain.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneSaveDataSelect.cpp" />
+    <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="TitleScreen.cpp" />
     <ClCompile Include="TransparentBlockChip.cpp" />
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameData.h" />
     <ClInclude Include="Library\Calculation.h" />
@@ -178,15 +187,20 @@
     <ClInclude Include="Library\Load.h" />
     <ClInclude Include="MainScreen.h" />
     <ClInclude Include="ObjectBase.h" />
-    <ClInclude Include="ObjectFactory.h" />
+    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Pad.h" />
+    <ClInclude Include="Pause.h" />
     <ClInclude Include="PlatinumLoader.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SaveDataSelectScreen.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneMain.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneSaveDataSelect.h" />
+    <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="Sort.h" />
     <ClInclude Include="StateMachine.h" />
+    <ClInclude Include="TitleScreen.h" />
     <ClInclude Include="TransparentBlockChip.h" />
     <ClInclude Include="Vec2.h" />
   </ItemGroup>

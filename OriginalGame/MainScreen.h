@@ -2,7 +2,7 @@
 #include <memory>
 
 
-class ObjectFactory;
+class ObjectManager;
 
 class MainScreen
 {
@@ -22,6 +22,6 @@ private:
 	////////////////////
 
 	// オブジェクトファクトリーポインタ
-	std::shared_ptr<ObjectFactory>m_pObjectFactory;
+	std::shared_ptr<ObjectManager>m_pObjectFactory;
 
 };

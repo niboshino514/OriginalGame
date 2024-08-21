@@ -12,11 +12,15 @@
 
 #include <tuple>
 
+
+template <class TState> class StateMachine;
+
 class ObjectBase;
 class PlatinumLoader;
 class Camera;
+class Pause;
 
-class ObjectFactory : public std::enable_shared_from_this<ObjectFactory>
+class ObjectManager : public std::enable_shared_from_this<ObjectManager>
 {
 public:
 
@@ -101,14 +105,39 @@ public:
 
 
 public:
-	ObjectFactory();
-	virtual ~ObjectFactory();
+
+	// ステート
+	enum class State
+	{
+		// 設定
+		Setting,
+		// 通常
+		Normal,
+		// ポーズ画面
+		Pause,
+	};
+
+
+public:
+	ObjectManager();
+	virtual ~ObjectManager();
 
 	void Init();
 	void Update();
 	void Draw();
 
 public:
+
+
+
+	/// <summary>
+	/// ステート設定
+	/// </summary>
+	/// <param name="state">ステート</param>
+	void SetState(const State& state);
+
+
+
 
 	/// <summary>
 	/// キャラクター生成
@@ -180,6 +209,25 @@ public:
 	std::vector<std::shared_ptr<ObjectBase>> GetObjectInfo() { return m_object; }
 	
 private:
+
+	/// <summary>
+	/// ステート初期化
+	/// </summary>
+	void StateInit();
+
+	// 設定ステート処理
+	void StateSettingInit();
+
+	// ノーマルステート処理
+	void StateNormalUpdate();
+	void StateNormalDraw();
+
+	// ポーズステート処理
+	void StatePauseUpdate();
+	void StatePauseDraw();
+
+
+private:
 	/// <summary>
 	/// マップ関連初期設定
 	/// </summary>
@@ -213,14 +261,24 @@ private:
 	/// <returns>セルが範囲外かどうかのフラグ</returns>
 	bool IsCellCheckOutOfRange(const Cell& cell);
 
+
+	/// <summary>
+	/// オブジェクト更新
+	/// </summary>
+	void ObjectUpdate();
+
+	/// <summary>
+	/// オブジェクト描画
+	/// </summary>
+	void ObjectDraw();
+
+
 	/// <summary>
 	/// マップ描画
 	/// </summary>
 	void TestMapDraw();
 
 private:
-
-
 
 	// オブジェクト
 	std::vector<std::shared_ptr<ObjectBase>>m_object;
@@ -234,6 +292,14 @@ private:
 	// マップグラフィック
 	std::vector<int>m_testMapGraph;
 
+	//////////////////
+	// ステート関連 //
+	//////////////////
+
+	// ステートマシン
+	StateMachine<State>m_pStateMachine;
+
+
 	////////////////////
 	// クラスポインタ //
 	////////////////////
@@ -243,4 +309,7 @@ private:
 
 	// カメラ
 	std::shared_ptr<Camera>m_pCamera;
+
+	// ポーズ
+	std::shared_ptr<Pause>m_pPause;
 };

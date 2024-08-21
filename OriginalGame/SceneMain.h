@@ -13,11 +13,11 @@ public:
 	virtual ~SceneMain();
 
 
-	virtual void init() override;
-	virtual void end() override {}
+	virtual void Init() override;
+	virtual void End() override {}
 
-	virtual SceneBase* update() override;
-	virtual void draw() override;
+	virtual SceneBase* Update() override;
+	virtual void Draw() override;
 private:
 
 

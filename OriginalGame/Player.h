@@ -115,21 +115,21 @@ private:
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
 	/// <param name="pos">プレイヤーの座標</param>
-	void ObstacleCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
 
 	/// <summary>
 	/// マップ移動
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
 	/// <param name="pos">プレイヤーの座標</param>
-	void MapMove(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void MapMove(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
 
 	/// <summary>
 	/// 重力処理
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
 	/// <param name="pos">プレイヤーの座標</param>
-	void Gravity(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void Gravity(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
 
 	/// <summary>
 	/// 重力変更
@@ -142,14 +142,14 @@ private:
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
 	/// <param name="pos">プレイヤーの座標</param>
-	void IceBlockCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void IceBlockCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
 
 	/// <summary>
 	/// コンベアの衝突処理
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
 	/// <param name="pos">プレイヤーの座標</param>
-	void ConveyorCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void ConveyorCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
 
 
 private:

@@ -38,13 +38,13 @@ SceneMain::~SceneMain()
 {
 }
 
-void SceneMain::init()
+void SceneMain::Init()
 {
 	// ‰Šú‰»ˆ—
 	m_pMainScreen->Init();
 }
 
-SceneBase* SceneMain::update()
+SceneBase* SceneMain::Update()
 {
 	// XVˆ—
 	m_pMainScreen->Update();
@@ -52,7 +52,7 @@ SceneBase* SceneMain::update()
 	return this;
 }
 
-void SceneMain::draw()
+void SceneMain::Draw()
 {
 	//// “§–¾‚É‚µ‚Ä•\Ž¦‚·‚é
 	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, kBackGroundAlpha);

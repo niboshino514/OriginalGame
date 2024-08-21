@@ -4,20 +4,29 @@
 
 class SceneManager
 {
+
+
 public:
 	SceneManager();
 	virtual ~SceneManager();
 
-	void init();
-	void end();
+	void Init();
+	void End();
 
-	void update();
-	void draw();
+	void Update();
+	void Draw();
+
+
+
+
 
 
 private:
+	// シーン
 	SceneBase* m_pScene;
 
+	// 更新処理速度
 	int m_updateTime = 0;
+	// 描画処理速度
 	int m_drawTime = 0;
 };

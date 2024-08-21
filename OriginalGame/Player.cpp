@@ -1,8 +1,8 @@
 #include "Player.h"
 #include "Pad.h"
-#include "ObjectFactory.h"
+#include "ObjectManager.h"
 #include <tuple>
-
+#include "Controller.h"
 
 namespace
 {
@@ -62,6 +62,8 @@ Player::~Player()
 
 void Player::Init()
 {
+	// 座標をゲームデータに代入
+	GameData::GetInstance()->SetPlayerPos(m_pos);
 	// オブジェクトID設定
 	m_objectID = ObjectID::Player;
 
@@ -119,7 +121,6 @@ void Player::StateNormalEnter()
 	m_isIceBlock = false;
 
 
-
 	// コンベア情報初期化
 	{
 		// コンベアに乗っているかどうか
@@ -138,7 +139,6 @@ void Player::StateNormalUpdate()
 
 	// ジャンプ処理
 	Jump();
-
 
 	// 当たり判定
 	Collision();
@@ -182,7 +182,7 @@ void Player::StateNormalExit()
 void Player::Respawn()
 {
 	// セーブポイントセルを取得する
-	if (Pad::IsPress(PAD_INPUT_1))
+	if (Controller::GetInstance()->IsTrigger(Controller::ControllerButton::RESPAWN))
 	{
 		// ステージを変更するかどうか
 		bool isChangeStage = false;
@@ -209,12 +209,17 @@ void Player::Move()
 	if (m_gravityDirection == Direction::Top ||
 		m_gravityDirection == Direction::Bottom)
 	{
+
+	
+
+
+
 		// パッドを使用した移動
-		if (Pad::IsPress(PAD_INPUT_RIGHT))
+		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::RIGHT))
 		{
 			inputVec.x += kMoveSpeed;
 		}
-		if (Pad::IsPress(PAD_INPUT_LEFT))
+		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::LEFT))
 		{
 			inputVec.x -= kMoveSpeed;
 		}
@@ -222,11 +227,11 @@ void Player::Move()
 	else
 	{
 		// パッドを使用した移動
-		if (Pad::IsPress(PAD_INPUT_DOWN))
+		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::DOWN))
 		{
 			inputVec.y += kMoveSpeed;
 		}
-		if (Pad::IsPress(PAD_INPUT_UP))
+		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::UP))
 		{
 			inputVec.y -= kMoveSpeed;
 		}
@@ -285,7 +290,7 @@ void Player::Move()
 void Player::Jump()
 {
 	// ボタンを押したとき、ジャンプカウントが0以上ならばジャンプ力を与える
-	if (Pad::IsTrigger(PAD_INPUT_10)&&
+	if (Controller::GetInstance()->IsTrigger(Controller::ControllerButton::JUMP) &&
 		m_jumpInfo.jumpCount > 0)
 	{
 		// ジャンプフラグをtrueにする
@@ -302,7 +307,7 @@ void Player::Jump()
 	if (m_jumpInfo.isJump)
 	{
 		// ボタンを押しているかどうかで、ジャンプ力が変わる
-		if (Pad::IsPress(PAD_INPUT_10))
+		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::JUMP))
 		{
 			// 小さい重力を与える
 			m_jumpInfo.fallSpeed += kSmallGravity;
@@ -397,13 +402,13 @@ void Player::GroundCollision()
 
 	// 地面セル番号
 	std::vector<int>groundCellNumber;
-	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::Ground));
-	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::IceBlock));
-	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::TopConveyor));
-	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::BottomConveyor));
-	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::LeftConveyor));
-	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::RigthConveyor));
-	groundCellNumber.push_back(static_cast<int>(ObjectFactory::ChipType::TransparentBlock));
+	groundCellNumber.push_back(static_cast<int>(ObjectManager::ChipType::Ground));
+	groundCellNumber.push_back(static_cast<int>(ObjectManager::ChipType::IceBlock));
+	groundCellNumber.push_back(static_cast<int>(ObjectManager::ChipType::TopConveyor));
+	groundCellNumber.push_back(static_cast<int>(ObjectManager::ChipType::BottomConveyor));
+	groundCellNumber.push_back(static_cast<int>(ObjectManager::ChipType::LeftConveyor));
+	groundCellNumber.push_back(static_cast<int>(ObjectManager::ChipType::RigthConveyor));
+	groundCellNumber.push_back(static_cast<int>(ObjectManager::ChipType::TransparentBlock));
 
 
 	// 移動可能範囲の矩形を取得
@@ -608,7 +613,7 @@ void Player::MapChipCollision(const Vec2& pos)
 	m_conveyor.isFrag = false;
 
 	// マップ判定データを取得
-	std::vector<std::vector<ObjectFactory::MapCollisionData>> mapCollisionData =
+	std::vector<std::vector<ObjectManager::MapCollisionData>> mapCollisionData =
 		m_pObjectFactory->GetMapInfoData().mapCollisionData;
 
 	// マップの幅と高さを取得
@@ -628,37 +633,37 @@ void Player::MapChipCollision(const Vec2& pos)
 
 			// マップ移動フラグを行うかどうか
 			const bool isMapMove =
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::NextStage ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::PreviouseStage ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::Save;
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::NextStage ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::PreviouseStage ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::Save;
 
 
 			// 障害物の当たり判定を行うかどうか
 			const bool isObstacleCollision =
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::TopNeedle ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::BottomNeedle ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::LeftNeedle ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::RightNeedle ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::DiedBlock;
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::TopNeedle ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::BottomNeedle ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::LeftNeedle ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::RightNeedle ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::DiedBlock;
 
 
 			// 重力方向を変更するかどうか
 			const bool isGravity =
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::TopGravity ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::BottomGravity ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::LeftGravity ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::RightGravity;
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::TopGravity ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::BottomGravity ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::LeftGravity ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::RightGravity;
 				
 			// アイスブロックの当たり判定を行うかどうか
 			const bool isIceBlockCollision =
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::IceBlock;
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::IceBlock;
 
 			// コンベアの当たり判定を行うかどうか
 			const bool isConveyorCollision =
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::TopConveyor ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::BottomConveyor ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::LeftConveyor ||
-				mapCollisionData[x][y].chipType == ObjectFactory::ChipType::RigthConveyor;
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::TopConveyor ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::BottomConveyor ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::LeftConveyor ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::RigthConveyor;
 
 
 			// マップ移動の当たり判定を行うかどうか
@@ -706,13 +711,13 @@ void Player::MapChipCollision(const Vec2& pos)
 	}
 }
 
-void Player::ObstacleCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
 {
 	// 座標を四角形情報に変換
 	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
 
 	// 四角形と四角形の当たり判定
-	if (mapCollisionData.chipType == ObjectFactory::ChipType::DiedBlock)
+	if (mapCollisionData.chipType == ObjectManager::ChipType::DiedBlock)
 	{
 		// 四角形同士の当たり判定
 		if (EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
@@ -736,7 +741,7 @@ void Player::ObstacleCollision(const ObjectFactory::MapCollisionData& mapCollisi
 	}
 }
 
-void Player::MapMove(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
 {
 	// 座標を四角形情報に変換
 	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
@@ -749,29 +754,29 @@ void Player::MapMove(const ObjectFactory::MapCollisionData& mapCollisionData, co
 	}
 
 	// セーブポイントに当たった場合、セーブする
-	if (mapCollisionData.chipType == ObjectFactory::ChipType::Save)
+	if (mapCollisionData.chipType == ObjectManager::ChipType::Save)
 	{
 		m_pObjectFactory->SetSavePoint(mapCollisionData.circle.centerPos);
 	}
 
 	// 次のステージに進む
-	if (mapCollisionData.chipType == ObjectFactory::ChipType::NextStage)
+	if (mapCollisionData.chipType == ObjectManager::ChipType::NextStage)
 	{
-		m_pObjectFactory->StageMove(ObjectFactory::MapSwitchType::NextStage);
+		m_pObjectFactory->StageMove(ObjectManager::MapSwitchType::NextStage);
 
 		return;
 	}
 
 	// 前のステージに戻る
-	if (mapCollisionData.chipType == ObjectFactory::ChipType::PreviouseStage)
+	if (mapCollisionData.chipType == ObjectManager::ChipType::PreviouseStage)
 	{
-		m_pObjectFactory->StageMove(ObjectFactory::MapSwitchType::PreviouseStage);
+		m_pObjectFactory->StageMove(ObjectManager::MapSwitchType::PreviouseStage);
 
 		return;
 	}
 }
 
-void Player::Gravity(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::Gravity(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
 {
 	// 座標を四角形情報に変換
 	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
@@ -787,19 +792,19 @@ void Player::Gravity(const ObjectFactory::MapCollisionData& mapCollisionData, co
 	Direction gravityDirection = Direction();
 
 	// 重力方向を変更する
-	if (mapCollisionData.chipType == ObjectFactory::ChipType::TopGravity)
+	if (mapCollisionData.chipType == ObjectManager::ChipType::TopGravity)
 	{
 		gravityDirection = Direction::Top;
 	}
-	else if (mapCollisionData.chipType == ObjectFactory::ChipType::BottomGravity)
+	else if (mapCollisionData.chipType == ObjectManager::ChipType::BottomGravity)
 	{
 		gravityDirection = Direction::Bottom;
 	}
-	else if(mapCollisionData.chipType == ObjectFactory::ChipType::LeftGravity)
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::LeftGravity)
 	{
 		gravityDirection = Direction::Left;
 	}
-	else if (mapCollisionData.chipType == ObjectFactory::ChipType::RightGravity)
+	else if (mapCollisionData.chipType == ObjectManager::ChipType::RightGravity)
 	{
 		gravityDirection = Direction::Right;
 	}
@@ -824,7 +829,7 @@ void Player::ChangeGravityDirection(const Direction& gravityDirection)
 	m_gravityDirection = gravityDirection;
 }
 
-void Player::IceBlockCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::IceBlockCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
 {
 	// 座標を四角形情報に変換
 	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
@@ -838,7 +843,7 @@ void Player::IceBlockCollision(const ObjectFactory::MapCollisionData& mapCollisi
 	m_isIceBlock = true;
 }
 
-void Player::ConveyorCollision(const ObjectFactory::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::ConveyorCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
 {
 	// 座標を四角形情報に変換
 	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
@@ -850,19 +855,19 @@ void Player::ConveyorCollision(const ObjectFactory::MapCollisionData& mapCollisi
 	}
 
 	// コンベアの方向を取得
-	if(mapCollisionData.chipType == ObjectFactory::ChipType::TopConveyor)
+	if(mapCollisionData.chipType == ObjectManager::ChipType::TopConveyor)
 	{
 		m_conveyor.direction = Direction::Top;
 	}
-	else if(mapCollisionData.chipType == ObjectFactory::ChipType::BottomConveyor)
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::BottomConveyor)
 	{
 		m_conveyor.direction = Direction::Bottom;
 	}
-	else if(mapCollisionData.chipType == ObjectFactory::ChipType::LeftConveyor)
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::LeftConveyor)
 	{
 		m_conveyor.direction = Direction::Left;
 	}
-	else if(mapCollisionData.chipType == ObjectFactory::ChipType::RigthConveyor)
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::RigthConveyor)
 	{
 		m_conveyor.direction = Direction::Right;
 	}

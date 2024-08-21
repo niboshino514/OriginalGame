@@ -22,3 +22,24 @@ void EvoLib::Assert::ErrorMessage(const std::string& errorMessage)
 	_wassert(_wtext, _CRT_WIDE(__FILE__), (unsigned)(__LINE__));
 #endif
 }
+
+void EvoLib::Assert::ErrorMessageBox(const std::string& errorMessage)
+{
+#if _DEBUG
+	// 終了メッセージ
+	const std::string endMsg = "\n\n\nプログラムの実行を続けますか？";
+
+	// エラーメッセージ
+	const std::string errorMsg = errorMessage + endMsg;
+
+	// エラー処理
+	int result = MessageBox(NULL, errorMsg.c_str(), "エラーメッセージ", MB_YESNO);
+
+	// メッセージボックスの結果がIDNOだった場合プログラムを終了する
+	if (result == IDNO)
+	{
+		// プログラム終了
+		DxLib_End();
+	}
+#endif
+}

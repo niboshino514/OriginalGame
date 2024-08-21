@@ -650,3 +650,19 @@ bool EvoLib::Calculation::IsCellRange(const Cell& cell, const Cell& maxCell, con
     // trueを返す
     return true;
 }
+
+Vec2 EvoLib::Calculation::TargetMoveValue(const Vec2& pos, const Vec2& targetPos, const float& moveSpeed)
+{
+
+    // ターゲットの座標から自身の座標を引いた値を求める
+    Vec2 vel = targetPos - pos;
+
+    // 求めた距離をノマライズすることにより距離の長さを１とみる
+    vel.normalize();
+
+    // ノーマライズされた距離に移動速度をかける
+    vel *= moveSpeed;
+
+    // 移動量を返す
+    return vel;
+}

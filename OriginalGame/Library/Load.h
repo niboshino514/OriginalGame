@@ -64,5 +64,16 @@ namespace EvoLib
 		/// <returns>分割されたグラフィックハンドルを返す</returns>
 		static std::vector<int> LoadDivGraph_EvoLib_Revision(const char* filePath, const DivNum& div);
 
+
+		/// <summary>
+		/// フォントの読み込み
+		/// </summary>
+		/// <param name="filePath">フォントファイルパス</param>
+		/// <param name="fontName">フォント名</param>
+		/// <param name="fontSize">フォントサイズ</param>
+		/// <returns>フォント情報</returns>
+		static int LoadFont(const char* filePath, const char* fontName, const int& fontSize);
+
+
 	};
 }

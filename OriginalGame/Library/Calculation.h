@@ -163,6 +163,12 @@ namespace EvoLib
 		/// <returns></returns>
 		template<typename T>
 		static T Clamp(T x, T low, T high);
+
+
+		// ターゲットに向かう移動量を求める
+		static Vec2 TargetMoveValue(const Vec2& pos, const Vec2& targetPos, const float& moveSpeed);
+
+
 	};
 	template<typename T>
 	inline bool Calculation::IsValueNegativeCount(T& value)

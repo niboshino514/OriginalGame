@@ -1,9 +1,8 @@
 #pragma once
 #include <DxLib.h>
 #include <vector>
-#include "Vec2.h"
 #include <string>
-
+#include "Vec2.h"
 
 /// <summary>
 /// 向き
@@ -133,6 +132,15 @@ namespace EvoLib
 		/// </summary>
 		/// <param name="errorMessage">エラーメッセージ</param>
 		static void ErrorMessage(const std::string& errorMessage);
+
+
+
+		
+		/// <summary>
+		/// メッセージボックス
+		/// </summary>
+		/// <param name="errorMessage">エラーメッセージ</param>
+		static void ErrorMessageBox(const std::string& errorMessage);
 	};
 
 	

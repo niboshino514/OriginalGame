@@ -1,10 +1,10 @@
-#include "ObjectFactory.h"
+#include "ObjectManager.h"
 #include "Player.h"
 #include "GameData.h"
 #include "Camera.h"
 #include "game.h"
 #include "TransparentBlockChip.h"
-
+#include "Pause.h"
 
 #include <cassert>
 #include <string>
@@ -22,17 +22,19 @@ namespace
 }
 
 
-ObjectFactory::ObjectFactory() :
+ObjectManager::ObjectManager() :
 	m_object(),
 	m_mapInfoData(),
 	m_screenCircle(),
 	m_testMapGraph(),
+	m_pStateMachine(),
 	m_pPlatinumLoader(std::make_shared<PlatinumLoader>()),
-	m_pCamera(std::make_shared<Camera>())
+	m_pCamera(std::make_shared<Camera>()),
+	m_pPause(std::make_shared<Pause>())
 {
 }
 
-ObjectFactory::~ObjectFactory()
+ObjectManager::~ObjectManager()
 {
 	for (auto& graph : m_testMapGraph)
 	{
@@ -41,39 +43,109 @@ ObjectFactory::~ObjectFactory()
 
 }
 
-void ObjectFactory::Init()
+void ObjectManager::Init()
+{
+
+
+	// ステート初期化
+	StateInit();
+}
+
+void ObjectManager::Update()
+{
+	// ポーズクラス更新
+	m_pPause->Update();
+
+	// ステートマシンの更新
+	m_pStateMachine.Update();
+}
+
+void ObjectManager::Draw()
+{
+
+	// オブジェクト描画
+	ObjectDraw();
+
+
+	
+	// マップ描画
+	TestMapDraw();
+
+
+	// ステートマシンの描画
+	m_pStateMachine.Draw();
+}
+
+void ObjectManager::StateInit()
+{
+	// ステートマシンの初期化、Entry
+	auto dummy = []() {};
+
+
+	// 設定ステート
+	{
+		auto enter = [this]() { StateSettingInit(); };
+		
+		m_pStateMachine.AddState(State::Setting, enter, dummy, dummy, dummy);
+	}
+
+	// 通常ステート
+	{
+		auto update = [this]() { StateNormalUpdate(); };
+		auto draw = [this]() { StateNormalDraw(); };
+		
+
+		m_pStateMachine.AddState(State::Normal, dummy, update, draw, dummy);
+	}
+	// ポーズステート
+	{	
+		auto update = [this]() { StatePauseUpdate(); };
+		auto draw = [this]() { StatePauseDraw(); };
+		
+
+		m_pStateMachine.AddState(State::Pause, dummy, update, draw, dummy);
+	}
+
+	// 初期ステートを設定
+	SetState(State::Setting);
+}
+
+void ObjectManager::StateSettingInit()
 {
 	// マップ関連初期設定
 	InitMap();
-
-	// カメラクラスにオブジェクトファクトリークラスポインタを送る
-	m_pCamera->SetObjectFactoryPointer(shared_from_this());
 
 	// スクリーンサークル初期化
 	InitScreenCircle();
 
 
+	// カメラクラスにオブジェクトファクトリークラスポインタを送る
+	m_pCamera->SetObjectFactoryPointer(shared_from_this());
+
+	// ポーズクラスにオブジェクトファクトリークラスポインタを送る
+	m_pPause->SetObjectFactoryPointer(shared_from_this());
+	// ポーズクラス初期化
+	m_pPause->Init();
+
+
+
+
 
 	// マップグラフィック代入
 	{
-
 		EvoLib::Load::DivNum divNum = EvoLib::Load::DivNum(16, 16);
 
 		m_testMapGraph = EvoLib::Load::LoadDivGraph_EvoLib_Revision("Data/mapSetting.png", divNum);
-	
 	}
 
-
+	// ステートを通常に変更
+	SetState(State::Normal);
 }
 
-void ObjectFactory::Update()
+void ObjectManager::StateNormalUpdate()
 {
-	// 更新処理(ラムダ式使用)
-	std::for_each(m_object.begin(), m_object.end(),
-		[](std::shared_ptr<ObjectBase> object)
-		{
-			object->Update(); 
-		});
+	// オブジェクト更新
+	ObjectUpdate();
 
 	// スクリーン内かどうかを調べる
 	ScreenCheck();
@@ -85,27 +157,27 @@ void ObjectFactory::Update()
 	ObjectErase();
 }
 
-void ObjectFactory::Draw()
+void ObjectManager::StateNormalDraw()
 {
-	// 描画ランクの逆順にオブジェクトを描画するループ
-	for (int i = static_cast<int>(ObjectBase::DrawRank::RankNum) - 1; i >= 0; --i) {
-		// 描画ランク
-		const ObjectBase::DrawRank drawRank = static_cast<ObjectBase::DrawRank>(i);
-
-		// 条件を満たすすべてのオブジェクトを描画する
-		std::for_each(m_object.begin(), m_object.end(),
-			[drawRank](const std::shared_ptr<ObjectBase>& object) {
-				if (object->GetDrawRank() == drawRank) {
-					object->Draw();
-				}
-			});
-	}
-	
-	// マップ描画
-	TestMapDraw();
 }
 
-void ObjectFactory::CharacterCreate(const Vec2& pos)
+void ObjectManager::StatePauseUpdate()
+{
+}
+
+void ObjectManager::StatePauseDraw()
+{
+	// ポーズクラス描画
+	m_pPause->Draw();
+}
+
+void ObjectManager::SetState(const State& state)
+{
+	// ステートを設定
+	m_pStateMachine.SetState(state);
+}
+
+void ObjectManager::CharacterCreate(const Vec2& pos)
 {
 	// キャラクター生成
 	m_object.push_back(std::make_shared<Player>());
@@ -123,7 +195,7 @@ void ObjectFactory::CharacterCreate(const Vec2& pos)
 	m_object.back()->Init();
 }
 
-void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType)
+void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType)
 {
 	// マップデータ
 	std::vector<std::vector<MapCollisionData>>mapCollisionData(
@@ -164,28 +236,28 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 			{
 				switch (mapChipType)
 				{
-				case ObjectFactory::ChipType::NextStage:
+				case ObjectManager::ChipType::NextStage:
 
 				
 					// 次のステージ座標セルを代入
 					nextStageCell = Cell(x, y);
 					break;
-				case ObjectFactory::ChipType::PreviouseStage:
+				case ObjectManager::ChipType::PreviouseStage:
 
 					// 前のステージ座標セルを代入
 					previouseStageCell = Cell(x, y);
 					break;
-				case ObjectFactory::ChipType::NextPos:
+				case ObjectManager::ChipType::NextPos:
 
 					// 次のステージ座標チップ個数を増やす
 					nextPosChip++;
 					break;
-				case ObjectFactory::ChipType::PreviousePos:
+				case ObjectManager::ChipType::PreviousePos:
 
 					// 前のステージ座標チップ個数を増やす
 					previousePosChip++;
 					break;
-				case ObjectFactory::ChipType::SpawnPos:
+				case ObjectManager::ChipType::SpawnPos:
 
 					// スポーンチップ個数を増やす
 					spawnChip++;
@@ -303,10 +375,10 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 	// エラーメッセージ処理
 	{
 		// チップ数が多かった場合のエラーメッセージ
-		const std::string overChip = "Too many ";
+		const std::string overChip = "が多すぎるようです";
 
 		// チップ数が無い場合のエラーメッセージ
-		const std::string noChip = "No ";
+		const std::string noChip = "が足りないようです";
 
 
 		// チップ名
@@ -315,7 +387,7 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 
 		// 現在のfmfファイル名
 		std::string fmfFileName = m_mapInfoData.filePath[m_mapInfoData.mapNumber];
-		fmfFileName = " in [ " + fmfFileName + " ] file";
+		fmfFileName = "[ fmfFileName ]の";
 
 		// エラーメッセージ
 		std::string errorMessage = "";
@@ -328,12 +400,12 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 		if (mapSwitchType == MapSwitchType::Spawn)
 		{
 			// チップ名をSpawnChipにする
-			chipName = "SpawnChip";
+			chipName = "[ SpawnChip ]";
 
 			if (spawnChip <= 0)
 			{
 				// エラーメッセージ生成
-				errorMessage = noChip + chipName + fmfFileName;
+				errorMessage = fmfFileName + chipName + noChip;
 
 				// エラーメッセージフラグ
 				isErrorMessage = true;
@@ -341,7 +413,7 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 			else if (spawnChip > 1)
 			{
 				// エラーメッセージ生成
-				errorMessage = overChip + chipName + fmfFileName;
+				errorMessage = fmfFileName + chipName + overChip;
 
 				// エラーメッセージフラグ
 				isErrorMessage = true;
@@ -357,7 +429,7 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 			if (nextPosChip <= 0)
 			{
 				// エラーメッセージ生成
-				errorMessage = noChip + chipName + fmfFileName;
+				errorMessage = fmfFileName + chipName + noChip;
 
 				// エラーメッセージフラグ
 				isErrorMessage = true;
@@ -365,7 +437,7 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 			else if (nextPosChip > 1)
 			{
 				// エラーメッセージ生成
-				errorMessage = overChip + chipName + fmfFileName;
+				errorMessage = fmfFileName + chipName + overChip;
 
 				// エラーメッセージフラグ
 				isErrorMessage = true;
@@ -381,7 +453,7 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 			if (previousePosChip <= 0)
 			{
 				// エラーメッセージ生成
-				errorMessage = noChip + chipName + fmfFileName;
+				errorMessage = fmfFileName + chipName + noChip;
 
 				// エラーメッセージフラグ
 				isErrorMessage = true;
@@ -389,7 +461,7 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 			else if (previousePosChip > 1)
 			{
 				// エラーメッセージ生成
-				errorMessage = overChip + chipName + fmfFileName;
+				errorMessage = fmfFileName + chipName + overChip;
 
 				// エラーメッセージフラグ
 				isErrorMessage = true;
@@ -400,12 +472,12 @@ void ObjectFactory::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 		if (isErrorMessage)
 		{
 			// エラーメッセージを出す
-			EvoLib::Assert::ErrorMessage(errorMessage);
+			EvoLib::Assert::ErrorMessageBox(errorMessage);
 		}
 	}
 }
 
-void ObjectFactory::ObjectErase()
+void ObjectManager::ObjectErase()
 {	
 	// すべてのオブジェクトを見て、削除する
 	auto rmIt = std::remove_if
@@ -419,7 +491,7 @@ void ObjectFactory::ObjectErase()
 	m_object.erase(rmIt, m_object.end());
 }
 
-void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
+void ObjectManager::StageMove(const MapSwitchType& mapSwitchType)
 {
 	// 次のステージに移動するかどうかのフラグからステージナンバーを増やすか決める
 	if (mapSwitchType == MapSwitchType::NextStage)
@@ -462,7 +534,7 @@ void ObjectFactory::StageMove(const MapSwitchType& mapSwitchType)
 }
 
 
-std::vector<std::vector<int>> ObjectFactory::GetMapChipNumber()
+std::vector<std::vector<int>> ObjectManager::GetMapChipNumber()
 {
 	// 二次元の要素数を持った可変長配列
 	std::vector<std::vector<int>>mapChipNumber(m_mapInfoData.mapChip.mapWidth, std::vector<int>(m_mapInfoData.mapChip.mapHeight));
@@ -479,7 +551,7 @@ std::vector<std::vector<int>> ObjectFactory::GetMapChipNumber()
 	return mapChipNumber;
 }
 
-void ObjectFactory::SetSavePoint(const Vec2& pos)
+void ObjectManager::SetSavePoint(const Vec2& pos)
 {
 	// 座標からセルを求める
 	const Cell saveCell = EvoLib::Convert::PosToCell(pos, m_mapInfoData.mapChip.chipSize);
@@ -493,7 +565,7 @@ void ObjectFactory::SetSavePoint(const Vec2& pos)
 	return;
 }
 
-std::tuple<bool, Vec2>  ObjectFactory::GetSavePointPos()
+std::tuple<bool, Vec2>  ObjectManager::GetSavePointPos()
 {
 	// セーブポイントデータを取得
 	const GameData::SavePointData savePointData = GameData::GetInstance()->GetSavePointData();
@@ -514,7 +586,7 @@ std::tuple<bool, Vec2>  ObjectFactory::GetSavePointPos()
 	return std::tuple<bool, Vec2>(false, EvoLib::Convert::CellToPos(savePointData.cell, m_mapInfoData.mapChip.chipSize));
 }
 
-void ObjectFactory::InitMap()
+void ObjectManager::InitMap()
 {
 	// マップデータ初期設定
 	InitMapDataFilePath();
@@ -526,7 +598,7 @@ void ObjectFactory::InitMap()
 	StageMove(MapSwitchType::Spawn);
 }
 
-void ObjectFactory::InitScreenCircle()
+void ObjectManager::InitScreenCircle()
 {
 	// 画面の四角形情報
 	Square screenSquare = Square();
@@ -542,7 +614,7 @@ void ObjectFactory::InitScreenCircle()
 		EvoLib::Convert::SquareToCircle(screenSquare);
 }
 
-void ObjectFactory::InitMapDataFilePath()
+void ObjectManager::InitMapDataFilePath()
 {
 	// 処理数カウント
 	int processCount = 0;
@@ -574,7 +646,7 @@ void ObjectFactory::InitMapDataFilePath()
 	}	
 }
 
-void ObjectFactory::MapChipCreate(const MapCollisionData& mapCollisionData)
+void ObjectManager::MapChipCreate(const MapCollisionData& mapCollisionData)
 {
 	if (mapCollisionData.chipType == ChipType::TransparentBlock)
 	{
@@ -594,7 +666,7 @@ void ObjectFactory::MapChipCreate(const MapCollisionData& mapCollisionData)
 	m_object.back()->Init();
 }
 
-void ObjectFactory::GimmickReset()
+void ObjectManager::GimmickReset()
 {
 	// ギミックフラグをリセット
 	for (auto& object : m_object)
@@ -603,7 +675,7 @@ void ObjectFactory::GimmickReset()
 	}
 }
 
-bool ObjectFactory::IsCellCheckOutOfRange(const Cell& cell)
+bool ObjectManager::IsCellCheckOutOfRange(const Cell& cell)
 {
 	if (cell.x < 0)return true;
 	if (cell.x >= m_mapInfoData.mapChip.mapWidth)return true;
@@ -613,7 +685,34 @@ bool ObjectFactory::IsCellCheckOutOfRange(const Cell& cell)
 	return false;
 }
 
-Triangle ObjectFactory::ChipTypeToTriangle(const ChipType& needleDirection, const Square& square)
+void ObjectManager::ObjectUpdate()
+{
+	// 更新処理(ラムダ式使用)
+	std::for_each(m_object.begin(), m_object.end(),
+		[](std::shared_ptr<ObjectBase> object)
+		{
+			object->Update();
+		});
+}
+
+void ObjectManager::ObjectDraw()
+{
+	// 描画ランクの逆順にオブジェクトを描画するループ
+	for (int i = static_cast<int>(ObjectBase::DrawRank::RankNum) - 1; i >= 0; --i) {
+		// 描画ランク
+		const ObjectBase::DrawRank drawRank = static_cast<ObjectBase::DrawRank>(i);
+
+		// 条件を満たすすべてのオブジェクトを描画する
+		std::for_each(m_object.begin(), m_object.end(),
+			[drawRank](const std::shared_ptr<ObjectBase>& object) {
+				if (object->GetDrawRank() == drawRank) {
+					object->Draw();
+				}
+			});
+	}
+}
+
+Triangle ObjectManager::ChipTypeToTriangle(const ChipType& needleDirection, const Square& square)
 {
 	// 左上
 	const Vec2 leftTopPos = square.A;
@@ -679,7 +778,7 @@ Triangle ObjectFactory::ChipTypeToTriangle(const ChipType& needleDirection, cons
 	return triangle;
 }
 
-void ObjectFactory::ScreenCheck()
+void ObjectManager::ScreenCheck()
 {
 	// 判定用の円情報
 	Circle collisionMapCircle = Circle();
@@ -701,7 +800,7 @@ void ObjectFactory::ScreenCheck()
 	}
 }
 
-void ObjectFactory::TestMapDraw()
+void ObjectManager::TestMapDraw()
 {
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA,200);

@@ -9,6 +9,11 @@ namespace Game
 	// ウインドウサイズ
 	constexpr int kScreenWidth = 1400;
 	constexpr int kScreenHeight = 800;
+
+	// ウィンドウ中心座標
+	constexpr int kWindowCenterX = kScreenWidth / 2;
+	constexpr int kWindowCenterY = kScreenHeight / 2;
+
 	// カラーモード
 	constexpr int kColorDepth = 32;		// 32 or 16
 };

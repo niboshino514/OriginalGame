@@ -23,6 +23,10 @@ namespace EvoLib
 		/// <summary>
 		/// 文字列を分割して返す
 		static std::vector<std::string> Split(const std::string& input, const char& delimiter);
+
+		/// 文字列を分割して返す
+		static std::vector<std::wstring> SplitWString(const std::wstring& input, const wchar_t& delimiter);
+		
 	public:
 
 		/// <summary>
@@ -33,22 +37,27 @@ namespace EvoLib
 		static bool IsFileExist(const std::string& name);
 
 
+	
 		/// <summary>
 		/// CSVファイルを読み込む
 		/// </summary>
 		/// <param name="filePath">ファイルパス</param>
 		/// <param name="isLoadFirstLine">最初の一行を読み込むかどうか</param>
+		/// <param name="isLoadOneColumn">最初の一列を読み込むかどうか</param>
 		/// <returns>読み込んだ文字列を返す</returns>
-		static std::vector<std::vector<std::string>> CsvFileLoading(const std::string& filePath, bool isLoadFirstLine = true);
+		static std::vector<std::vector<std::string>> CsvFileLoading(const std::string& filePath, LoadType loadType = LoadType::Noramal);
 
 		/// <summary>
 		/// CSVファイルを読み込む(改訂版)
 		/// </summary>
 		/// <param name="filePath">ファイルパス</param>
-		/// <param name="isLoadFirstLine">最初の一行を読み込むかどうか</param>
-		/// <param name="isLoadOneColumn">最初の一列を読み込むかどうか</param>
+		/// <param name="isSkipOneArray">最初の一列を飛ばすかどうか</param>
+		/// <param name="skipColumnNum">各列何個まで飛ばすかの数</param>
+		/// <param name="isDeleteEmptyCell">空のセルを削除するかどうか</param>
 		/// <returns>読み込んだ文字列を返す</returns>
-		static std::vector<std::vector<std::string>> CsvFileLoading_Revision(const std::string& filePath, LoadType loadType = LoadType::Noramal);
+		static std::vector<std::vector<std::string>> CsvFileLoading_Revision(const std::string& filePath, const bool& isSkipOneArray = false, const int& skipColumnNum = 0, const bool& isDeleteEmptyCell = false);
+
+
 
 		/// <summary>
 		/// 簡易CSVファイル書き込み

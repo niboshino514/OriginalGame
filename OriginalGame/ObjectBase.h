@@ -2,11 +2,11 @@
 #include "Vec2.h"
 #include <DxLib.h>
 #include "EvoLib.h"
-#include "ObjectFactory.h"
+#include "ObjectManager.h"
 #include <memory>
 #include "GameData.h"
 
-class ObjectFactory;
+class ObjectManager;
 
 class ObjectBase
 {
@@ -45,7 +45,7 @@ public:
 	/// オブジェクトファクトリークラスをコピー
 	/// </summary>
 	/// <param name="objectFactory">オブジェクトファクトリー</param>
-	void SetObjectFactory(std::shared_ptr<ObjectFactory>objectFactory) { m_pObjectFactory = objectFactory; }
+	void SetObjectFactory(std::shared_ptr<ObjectManager>objectFactory) { m_pObjectFactory = objectFactory; }
 
 	/// <summary>
 	/// 存在フラグ代入
@@ -139,5 +139,5 @@ protected:
 	// クラスポインタ //
 	////////////////////
 
-	std::shared_ptr<ObjectFactory>m_pObjectFactory;// オブジェクトファクトリー
+	std::shared_ptr<ObjectManager>m_pObjectFactory;// オブジェクトファクトリー
 };

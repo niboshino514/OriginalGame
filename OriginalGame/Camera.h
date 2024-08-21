@@ -3,7 +3,7 @@
 #include <memory>
 
 
-class ObjectFactory;;
+class ObjectManager;
 
 class Camera
 {
@@ -17,7 +17,7 @@ public:
 	/// オブジェクトファクトリークラスポインタを取得
 	/// </summary>
 	/// <param name="objectFactory">オブジェクトファクトリーポインタ</param>
-	void SetObjectFactoryPointer(const std::shared_ptr<ObjectFactory>& objectFactory) { m_pObjectFactory = objectFactory; }
+	void SetObjectFactoryPointer(const std::shared_ptr<ObjectManager>& objectFactory) { m_pObjectFactory = objectFactory; }
 
 	/// <summary>
 	/// オフセット値計算
@@ -35,6 +35,6 @@ private:
 	Vec2 m_cameraPos;
 
 	// オブジェクトファクトリークラス
-	std::shared_ptr<ObjectFactory> m_pObjectFactory;
+	std::shared_ptr<ObjectManager> m_pObjectFactory;
 };
 

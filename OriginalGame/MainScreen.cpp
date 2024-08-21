@@ -1,9 +1,9 @@
 #include "MainScreen.h"
-#include "ObjectFactory.h"
+#include "ObjectManager.h"
 
 
 MainScreen::MainScreen():
-	m_pObjectFactory(std::make_shared<ObjectFactory>())
+	m_pObjectFactory(std::make_shared<ObjectManager>())
 {
 }
 

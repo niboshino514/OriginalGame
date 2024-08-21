@@ -25,23 +25,41 @@
     <Filter Include="ソース ファイル\setting">
       <UniqueIdentifier>{26cec8b7-f465-41f4-bbde-ec35228952f7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Object">
+    <Filter Include="ソース ファイル\screenMain">
+      <UniqueIdentifier>{ae7df7c4-243e-4afd-a16a-cb7b67a76347}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\screenMain\Object">
       <UniqueIdentifier>{cfa39810-fc59-413b-bd9a-4baa67821394}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\Object">
-      <UniqueIdentifier>{183c868f-89f9-476e-8c12-f0142f803762}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Library">
-      <UniqueIdentifier>{4a903e87-1e5b-4bda-83af-941babdebc30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Library">
-      <UniqueIdentifier>{221649dc-6faa-4341-a1b1-4733a9c501ff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Object\MapChip">
+    <Filter Include="ソース ファイル\screenMain\Object\MapChip">
       <UniqueIdentifier>{39eb1bcd-45f6-4847-b9f7-2151e354f04d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\Object\MapChip">
+    <Filter Include="ソース ファイル\library">
+      <UniqueIdentifier>{4a903e87-1e5b-4bda-83af-941babdebc30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\library">
+      <UniqueIdentifier>{221649dc-6faa-4341-a1b1-4733a9c501ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\titleScreen">
+      <UniqueIdentifier>{0992370c-103a-44a9-9e8d-c5578f5eaa6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\mainScreen">
+      <UniqueIdentifier>{5e8b86e2-7b13-4375-a5b6-34535944ebad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\mainScreen\Object">
+      <UniqueIdentifier>{183c868f-89f9-476e-8c12-f0142f803762}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\mainScreen\Object\MapChip">
       <UniqueIdentifier>{b7671bb5-62b8-4ba7-97c8-15f95760793c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\titleScreen">
+      <UniqueIdentifier>{76a5d1e8-77ba-408d-9fef-f6aadc44fe72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\saveDataSelectScreen">
+      <UniqueIdentifier>{1abe729a-f74d-471a-9778-6e2ae49f53f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\saveDataSelectScreen">
+      <UniqueIdentifier>{dcacaf8c-a150-4fdc-8819-c3e2880bc97c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,53 +81,71 @@
     <ClCompile Include="Vec2.cpp">
       <Filter>ソース ファイル\setting</Filter>
     </ClCompile>
-    <ClCompile Include="MainScreen.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>ソース ファイル\Object</Filter>
+      <Filter>ソース ファイル\screenMain\Object</Filter>
     </ClCompile>
     <ClCompile Include="ObjectBase.cpp">
-      <Filter>ソース ファイル\Object</Filter>
+      <Filter>ソース ファイル\screenMain\Object</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectFactory.cpp">
-      <Filter>ソース ファイル\Object</Filter>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>ソース ファイル\screenMain\Object</Filter>
     </ClCompile>
     <ClCompile Include="PlatinumLoader.cpp">
       <Filter>ソース ファイル\setting</Filter>
     </ClCompile>
-    <ClCompile Include="GameData.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Library\Calculation.cpp">
-      <Filter>ソース ファイル\Library</Filter>
+      <Filter>ソース ファイル\library</Filter>
     </ClCompile>
     <ClCompile Include="Library\Convert.cpp">
-      <Filter>ソース ファイル\Library</Filter>
+      <Filter>ソース ファイル\library</Filter>
     </ClCompile>
     <ClCompile Include="Library\Draw.cpp">
-      <Filter>ソース ファイル\Library</Filter>
+      <Filter>ソース ファイル\library</Filter>
     </ClCompile>
     <ClCompile Include="Library\File.cpp">
-      <Filter>ソース ファイル\Library</Filter>
+      <Filter>ソース ファイル\library</Filter>
     </ClCompile>
     <ClCompile Include="Library\FPS.cpp">
-      <Filter>ソース ファイル\Library</Filter>
+      <Filter>ソース ファイル\library</Filter>
     </ClCompile>
     <ClCompile Include="Library\Load.cpp">
-      <Filter>ソース ファイル\Library</Filter>
+      <Filter>ソース ファイル\library</Filter>
     </ClCompile>
     <ClCompile Include="Library\Collision.cpp">
-      <Filter>ソース ファイル\Library</Filter>
-    </ClCompile>
-    <ClCompile Include="Library\EvoLib.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\library</Filter>
     </ClCompile>
     <ClCompile Include="TransparentBlockChip.cpp">
-      <Filter>ソース ファイル\Object\MapChip</Filter>
+      <Filter>ソース ファイル\screenMain\Object\MapChip</Filter>
+    </ClCompile>
+    <ClCompile Include="MainScreen.cpp">
+      <Filter>ソース ファイル\screenMain</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData.cpp">
+      <Filter>ソース ファイル\screenMain</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>ソース ファイル\screenMain</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneTitle.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScreen.cpp">
+      <Filter>ソース ファイル\titleScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneSaveDataSelect.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveDataSelectScreen.cpp">
+      <Filter>ソース ファイル\saveDataSelectScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\EvoLib.cpp">
+      <Filter>ソース ファイル\library</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>ソース ファイル\setting</Filter>
+    </ClCompile>
+    <ClCompile Include="Pause.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,59 +167,77 @@
     <ClInclude Include="game.h">
       <Filter>ヘッダー ファイル\setting</Filter>
     </ClInclude>
-    <ClInclude Include="MainScreen.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>ヘッダー ファイル\Object</Filter>
+      <Filter>ヘッダー ファイル\mainScreen\Object</Filter>
     </ClInclude>
     <ClInclude Include="ObjectBase.h">
-      <Filter>ヘッダー ファイル\Object</Filter>
+      <Filter>ヘッダー ファイル\mainScreen\Object</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectFactory.h">
-      <Filter>ヘッダー ファイル\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Sort.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>ヘッダー ファイル\mainScreen\Object</Filter>
     </ClInclude>
     <ClInclude Include="PlatinumLoader.h">
       <Filter>ヘッダー ファイル\setting</Filter>
     </ClInclude>
-    <ClInclude Include="GameData.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="StateMachine.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Library\FPS.h">
-      <Filter>ヘッダー ファイル\Library</Filter>
+      <Filter>ヘッダー ファイル\library</Filter>
     </ClInclude>
     <ClInclude Include="Library\Calculation.h">
-      <Filter>ヘッダー ファイル\Library</Filter>
+      <Filter>ヘッダー ファイル\library</Filter>
     </ClInclude>
     <ClInclude Include="Library\Collision.h">
-      <Filter>ヘッダー ファイル\Library</Filter>
+      <Filter>ヘッダー ファイル\library</Filter>
     </ClInclude>
     <ClInclude Include="Library\Convert.h">
-      <Filter>ヘッダー ファイル\Library</Filter>
+      <Filter>ヘッダー ファイル\library</Filter>
     </ClInclude>
     <ClInclude Include="Library\Draw.h">
-      <Filter>ヘッダー ファイル\Library</Filter>
+      <Filter>ヘッダー ファイル\library</Filter>
     </ClInclude>
     <ClInclude Include="Library\EvoLib.h">
-      <Filter>ヘッダー ファイル\Library</Filter>
+      <Filter>ヘッダー ファイル\library</Filter>
     </ClInclude>
     <ClInclude Include="Library\File.h">
-      <Filter>ヘッダー ファイル\Library</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\library</Filter>
     </ClInclude>
     <ClInclude Include="Library\Load.h">
-      <Filter>ヘッダー ファイル\Library</Filter>
+      <Filter>ヘッダー ファイル\library</Filter>
     </ClInclude>
     <ClInclude Include="TransparentBlockChip.h">
-      <Filter>ヘッダー ファイル\Object\MapChip</Filter>
+      <Filter>ヘッダー ファイル\mainScreen\Object\MapChip</Filter>
+    </ClInclude>
+    <ClInclude Include="MainScreen.h">
+      <Filter>ヘッダー ファイル\mainScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>ヘッダー ファイル\mainScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="Sort.h">
+      <Filter>ヘッダー ファイル\setting</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData.h">
+      <Filter>ヘッダー ファイル\mainScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>ヘッダー ファイル\setting</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneTitle.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScreen.h">
+      <Filter>ヘッダー ファイル\titleScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneSaveDataSelect.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveDataSelectScreen.h">
+      <Filter>ヘッダー ファイル\saveDataSelectScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>ヘッダー ファイル\setting</Filter>
+    </ClInclude>
+    <ClInclude Include="Pause.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

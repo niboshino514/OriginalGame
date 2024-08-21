@@ -1,6 +1,6 @@
 #include "Camera.h"
 #include "game.h"
-#include "ObjectFactory.h"
+#include "ObjectManager.h"
 #include "GameData.h"
 
 Camera::Camera():

@@ -33,7 +33,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// 最初のシーンの初期化
 	SceneManager scene;
-	scene.init();
+	scene.Init();
 
 	while (ProcessMessage() == 0)
 	{
@@ -41,17 +41,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// 画面のクリア
 		ClearDrawScreen();
 
-		scene.update();
-		scene.draw();
-
-
-		// フレーム終了時間を計測
-		const LONGLONG endTime = GetNowHiPerformanceCount();
-		const LONGLONG frameTime = endTime - time;
-
-		// フレーム時間をミリ秒単位に変換して表示
-		float frameTimeMs = static_cast<float>(frameTime) / 1000.0f;
-		DrawFormatString(0, 0, 0xffffff, "処理速度ミリ秒単位=%f", frameTimeMs);
+		scene.Update();
+		scene.Draw();
 
 
 		//裏画面を表画面を入れ替える
@@ -66,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 
-	scene.end();
+	scene.End();
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 
