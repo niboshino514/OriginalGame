@@ -13,11 +13,23 @@ Controller::Controller()
     // ログの初期化
     m_padLog.resize(kLogSize);
 
-    // 現在の入力デバイス
-    m_currentInputDevice = ControllerType::CONTROLLER;
+    // 設定の初期化
+    {
+        // 自動切換え
+        m_controllerSetting.autoSwitch = Controller::AutoSwitch::ON;
+
+        // パッドタイプ
+        m_controllerSetting.padType = Controller::PadType::XBOX;
+
+        // コントローラータイプ
+        m_controllerSetting.controllerType = Controller::ControllerType::CONTROLLER;
+    }
 
     // キー状態の初期化
     m_keyInputState = {};
+
+    // 入力受付フラグ
+    m_isAcceptInput = true;
 }
 
 void Controller::Update()
@@ -47,8 +59,13 @@ void Controller::KeyInputUpdate()
                 m_keyInputState.count[i] = 10000;
             }
 
-            // キーボード入力があった場合、入力デバイスをキーボードに設定
-            m_currentInputDevice = ControllerType::KEYBOARD;
+            // オートスイッチがONの場合
+            if(m_controllerSetting.autoSwitch == AutoSwitch::ON)
+			{
+				// キーボード入力があった場合、入力デバイスをキーボードに設定
+				m_controllerSetting.controllerType = ControllerType::KEYBOARD;
+			}
+
         }
         else
         {              // 押されていなければ
@@ -65,7 +82,11 @@ void Controller::PadInputUpdate()
     // パッド入力があった場合、入力デバイスをキーボードに設定
     if (padState != 0)
     {
-        m_currentInputDevice = ControllerType::CONTROLLER;
+        // オートスイッチがONの場合
+        if (m_controllerSetting.autoSwitch == AutoSwitch::ON)
+        {
+            m_controllerSetting.controllerType = ControllerType::CONTROLLER;
+        }
     }
     // ログの更新
     for (int i = kLogSize - 1; i >= 1; i--)
@@ -79,15 +100,23 @@ void Controller::PadInputUpdate()
 
 bool Controller::IsPress(const ControllerButton& button)
 {
+    // 入力受付フラグがfalseの場合、入力を受け付けない
+    if (!m_isAcceptInput)
+	{
+		return false;
+	}
+
+
+
     // ボタンのコードを取得
     const int buttonCode = GetButton(button);
 
-    if(m_currentInputDevice == ControllerType::CONTROLLER)
+    if(m_controllerSetting.controllerType == ControllerType::CONTROLLER)
 	{
 		// コントローラーの場合
 		return (m_padLog[0] & buttonCode);
 	}
-    else if (m_currentInputDevice == ControllerType::KEYBOARD)
+    else if (m_controllerSetting.controllerType == ControllerType::KEYBOARD)
     {
         // キーボードの場合
         return (m_keyInputState.key[buttonCode] != 0);
@@ -98,15 +127,21 @@ bool Controller::IsPress(const ControllerButton& button)
 
 bool Controller::IsTrigger(const ControllerButton& button)
 {
+    // 入力受付フラグがfalseの場合、入力を受け付けない
+    if (!m_isAcceptInput)
+    {
+        return false;
+    }
+
     // ボタンのコードを取得
     const int buttonCode = GetButton(button);
 
-	if (m_currentInputDevice == ControllerType::CONTROLLER)
+	if (m_controllerSetting.controllerType == ControllerType::CONTROLLER)
 	{
 		// コントローラーの場合
 		return ((m_padLog[0] & buttonCode) && !(m_padLog[1] & buttonCode));
 	}
-	else if (m_currentInputDevice == ControllerType::KEYBOARD)
+	else if (m_controllerSetting.controllerType == ControllerType::KEYBOARD)
 	{
 		// キーボードの場合
 		return (m_keyInputState.key[buttonCode] != 0 && m_keyInputState.count[buttonCode] == 1);
@@ -117,20 +152,41 @@ bool Controller::IsTrigger(const ControllerButton& button)
 
 int Controller::GetButton(const ControllerButton& button)
 {
-    // 入力デバイスによってボタンを切り替え
-    switch (m_currentInputDevice)
+
+    
+    if (m_controllerSetting.controllerType == ControllerType::KEYBOARD)
     {
-    case ControllerType::KEYBOARD:
         // キーボードの場合
-        return keyboardMapping.at(button);
-
-    case ControllerType::CONTROLLER:
-
-        // コントローラの場合
-        return controllerMapping.at(button);
-    default:
-
-        // キーボードの場合
-        return keyboardMapping.at(button);
+		return keyboardMapping.at(button);
     }
+    else
+    {
+
+        switch (m_controllerSetting.padType)
+        {
+        case Controller::PadType::XBOX:
+            // XBOXの場合
+            return xboxMapping.at(button);
+
+            break;
+        case Controller::PadType::DUALSHOCK:
+            // デュアルショックの場合
+            return dualShockMapping.at(button);
+
+            break;
+        case Controller::PadType::SWITCH_PRO:
+            // SWITCHPROの場合
+            return switchProMapping.at(button);
+            break;
+        default:
+            // XBOXの場合
+            return xboxMapping.at(button);
+
+            break;
+        }
+    }
+
+
+    // キーボードの場合
+    return keyboardMapping.at(button);
 }

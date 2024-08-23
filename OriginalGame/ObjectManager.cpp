@@ -5,6 +5,7 @@
 #include "game.h"
 #include "TransparentBlockChip.h"
 #include "Pause.h"
+#include "MainScreen.h"
 
 #include <cassert>
 #include <string>
@@ -76,6 +77,12 @@ void ObjectManager::Draw()
 	m_pStateMachine.Draw();
 }
 
+void ObjectManager::ChangeScene(const SceneMain::Scene& nextScene)
+{
+	// シーン変更
+	m_pMainScreen->ChangeScene(nextScene);
+}
+
 void ObjectManager::StateInit()
 {
 	// ステートマシンの初期化、Entry
@@ -126,9 +133,6 @@ void ObjectManager::StateSettingInit()
 	m_pPause->SetObjectFactoryPointer(shared_from_this());
 	// ポーズクラス初期化
 	m_pPause->Init();
-
-
-
 
 
 	// マップグラフィック代入

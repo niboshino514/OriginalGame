@@ -23,7 +23,7 @@ void TitleScreen::Update()
 	// ボタンが押されたらフェードアウトを設定する
 	if (Controller::GetInstance()->IsTrigger(Controller::ControllerButton::DECIDE))
 	{
-		m_pSceneTitle->ChangeScene(SceneTitle::NextScene::SaveDataSelect);
+		m_pSceneTitle->ChangeScene(SceneTitle::Scene::SaveDataSelect);
 	}
 }
 

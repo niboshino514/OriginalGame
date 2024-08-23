@@ -18,6 +18,22 @@ public:
 
 	virtual SceneBase* Update() override;
 	virtual void Draw() override;
+
+public:
+
+	// シーン
+	enum class Scene
+	{
+		// タイトルシーン
+		Title,
+
+	};
+
+	/// <summary>
+	/// シーン変更
+	/// </summary>
+	void ChangeScene(const Scene& nextScene);
+
 private:
 
 

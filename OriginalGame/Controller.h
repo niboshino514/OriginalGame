@@ -55,6 +55,54 @@ public:
 		RIGHT,  // 右
 	};
 
+	// コントローラー自動切換え
+	enum class AutoSwitch
+	{
+		// オン
+		ON,
+		// オフ
+		OFF,
+		// セレクト数
+		AUTO_SWITCH_NUM,
+	};
+
+	// コントローラタイプ
+	enum class ControllerType
+	{
+		// キーボード
+		KEYBOARD,
+		// コントローラ
+		CONTROLLER,
+		// 項目数
+		CONTROLLER_NUM,
+	};
+
+	// パッドのタイプ
+	enum class PadType
+	{
+		// XBOXコントローラ
+		XBOX,
+		// デュアルショック
+		DUALSHOCK,
+		// SWITCHPRO
+		SWITCH_PRO,
+		// 項目数
+		PADTYPE_NUM,
+	};
+
+	// 設定
+	struct ControllerSetting
+	{
+		// 自動切換え
+		AutoSwitch autoSwitch = AutoSwitch::ON;
+
+		// パッドタイプ
+		PadType padType = PadType::XBOX;
+
+		// コントローラータイプ
+		ControllerType controllerType = ControllerType::KEYBOARD;
+	};
+
 private:
 
 	// ボタンのマッピング
@@ -74,8 +122,8 @@ private:
 		{ControllerButton::RIGHT, KEY_INPUT_RIGHT},
 	};
 
-	// ボタンのマッピング
-	const std::unordered_map<ControllerButton, int> controllerMapping =
+	// xboxコントローラーのマッピング
+	const std::unordered_map<ControllerButton, int> xboxMapping =
 	{
 		{ControllerButton::DECIDE, PAD_INPUT_1},
 		{ControllerButton::CANCEL, PAD_INPUT_2},
@@ -91,14 +139,41 @@ private:
 		{ControllerButton::RIGHT, PAD_INPUT_RIGHT},
 	};
 
-	// コントローラタイプ
-	enum class ControllerType
+	// dualshockコントローラーマッピング
+	const std::unordered_map<ControllerButton, int> dualShockMapping =
 	{
-		// キーボード
-		KEYBOARD,
-		// コントローラ
-		CONTROLLER,
+		{ControllerButton::DECIDE, PAD_INPUT_2},
+		{ControllerButton::CANCEL, PAD_INPUT_3},
+
+		{ControllerButton::JUMP, PAD_INPUT_2},
+		{ControllerButton::RESPAWN, PAD_INPUT_4},
+
+		{ControllerButton::PAUSE, PAD_INPUT_10},
+
+		{ControllerButton::UP, PAD_INPUT_UP},
+		{ControllerButton::DOWN, PAD_INPUT_DOWN},
+		{ControllerButton::LEFT, PAD_INPUT_LEFT},
+		{ControllerButton::RIGHT, PAD_INPUT_RIGHT},
 	};
+
+	// switchProコントローラーマッピング
+	const std::unordered_map<ControllerButton, int> switchProMapping =
+	{
+		{ControllerButton::DECIDE, PAD_INPUT_2},
+		{ControllerButton::CANCEL, PAD_INPUT_3},
+
+		{ControllerButton::JUMP, PAD_INPUT_2},
+		{ControllerButton::RESPAWN, PAD_INPUT_4},
+
+		{ControllerButton::PAUSE, PAD_INPUT_10},
+
+		{ControllerButton::UP, PAD_INPUT_UP},
+		{ControllerButton::DOWN, PAD_INPUT_DOWN},
+		{ControllerButton::LEFT, PAD_INPUT_LEFT},
+		{ControllerButton::RIGHT, PAD_INPUT_RIGHT},
+	};
+
+
 
 public:
 
@@ -118,6 +193,17 @@ public:
 	// 押された瞬間かどうか
 	bool IsTrigger(const ControllerButton& button);
 
+	/// <summary>
+	/// 操作を受け付けるかどうかを設定
+	/// </summary>
+	/// <param name="isAcceptInput">受付フラグ</param>
+	void SetAcceptInput(bool isAcceptInput) { m_isAcceptInput = isAcceptInput; }
+
+	/// <summary>
+	/// コントローラー設定を返す
+	/// </summary>
+	/// <returns>コントローラー設定</returns>
+	ControllerSetting GetControllerSetting() { return m_controllerSetting; }
 
 private:
 
@@ -140,6 +226,9 @@ private:
 	// キーの状態
 	KeyInputState m_keyInputState;
 
-	// 現在の入力デバイス
-	ControllerType m_currentInputDevice = ControllerType::KEYBOARD;
+	// コントローラーの設定
+	ControllerSetting m_controllerSetting;
+
+	// 操作を受け付けるかどうか
+	bool m_isAcceptInput;
 };

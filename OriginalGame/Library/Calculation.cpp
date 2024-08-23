@@ -88,217 +88,89 @@ int EvoLib::Calculation::SelectLoopNumber(const int& minNumber, const int& maxNu
     return number;
 }
 
-std::vector<Vec2> EvoLib::Calculation::GraphicWidthCoordinate(const int& handle, const int& num, const float& graphScale, const Vec2& centerPos, const Vec2& distancePos, bool isSide)
+Vec2 EvoLib::Calculation::GetGraphSize_EvoLib(std::vector<int> graphHandle, const double& graphMagnificationRate)
 {
-    // 座標
-    std::vector<Vec2> pos;
+    const int graph = graphHandle[0];
 
-    // グラフィックの個数分、座標変数を増やす
-    pos.resize(num);
+    int wide = 0;       // グラフィックの横幅
+    int height = 0;     // グラフィックの縦幅
 
-    // 一時的なグラフィックのサイズ格納変数
-    int sizeX = 0;
-    int sizeY = 0;
-
-    // グラフィックサイズを取得
-    GetGraphSize(handle, &sizeX, &sizeY);
-
-    // グラフィックのサイズ格納変数
-    Vec2 size;
-
-    // サイズを代入
-    size.x = static_cast<float>(sizeX);
-    size.y = static_cast<float>(sizeY);
-
-
-    // 調整グラフィックサイズをかける
-    size *= graphScale;
-    size += distancePos;
-
-    // 基準座標
-    Vec2 basePos = {};
-
-    // 偶数判定
-    const bool isEvenNumber = (num % 2 == 0);
-
-    // 偶数か奇数かでベース座標を変更する
-    if (isEvenNumber)
+    // プレイヤーのグラフィックサイズを取得
     {
-        basePos = centerPos;
-
-        basePos -= (size * 0.5);
-    }
-    else
-    {
-        basePos = centerPos;
+  
+        GetGraphSize(graph, &wide, &height);
     }
 
 
-    int n = num;
+    
+    Vec2 graphSize = Vec2();
 
-    if (isEvenNumber)
-    {
-        n--;
-    }
-
-    n /= 2;
+    graphSize.x = static_cast<float>(wide * graphMagnificationRate);
+    graphSize.y = static_cast<float>(height * graphMagnificationRate);
 
 
 
-    // 一時保存座標
-    Vec2 savePos;
-
-    // ナンバー変数
-    int number = 0;
-
-    // カウント変数
-    int count = 0;
-
-    for (int i = 0; i < num; i++)
-    {
-        // 一時保存座標にベース座標を代入
-        savePos = basePos;
-
-        // ナンバー変数初期化
-        number = 0;
-
-        // iが奇数が偶数かで代入する座標を変更する
-        if (i % 2 == 0)
-        {
-            if (isSide)
-            {
-                savePos.x -= size.x * count;
-            }
-            else
-            {
-                savePos.y -= size.y * count;
-            }
-
-            number -= count;
-        }
-        else
-        {
-            if (isSide)
-            {
-                savePos.x += size.x * count;
-            }
-            else
-            {
-                savePos.y += size.y * count;
-            }
-
-            number += count;
-        }
-
-        // 座標代入
-        pos[number + n] = savePos;
-
-        if (i % 2 == 0)
-        {
-            count++;
-        }
-    }
-
-    // 値を返す
-    return pos;
+    return graphSize;
 }
 
-std::vector<Vec2> EvoLib::Calculation::SortCoordinateEqually(const int& num, const Vec2& centerPos, const Vec2& distancePos, bool isSide)
+
+
+
+
+
+std::vector<Vec2> EvoLib::Calculation::GraphEqualization(const Vec2& graphSize, const Vec2& basePos, const int& num, const Vec2& graphInterval, const bool& isHorizontalSort)
 {
-    // 座標
-    std::vector<Vec2> pos;
-
-    // 座標の要素を増やす
-    pos.resize(num);
-
-    // サイズ変数に幅とする座標を代入する
-    const Vec2 size = distancePos;
-
-    // 基準座標
-    Vec2 basePos = {};
-
-    // 偶数判定
-    const bool isEvenNumber = (num % 2 == 0);
-
-    // 偶数か奇数かでベース座標を変更する
-    if (isEvenNumber)
-    {
-        basePos = centerPos;
-
-        basePos -= (size * 0.5);
-    }
-    else
-    {
-        basePos = centerPos;
-    }
-
-
-    int n = num;
-
-    if (isEvenNumber)
-    {
-        n--;
-    }
-
-    n /= 2;
+    // 座標リスト
+    std::vector<Vec2> posList;
 
 
 
-    // 一時保存座標
-    Vec2 savePos;
+    Vec2 posWidth = Vec2();
+    
+    // 横並びかどうかで処理を変更する
+    if(isHorizontalSort)
+	{
+		// 座標の幅
+        posWidth.x = graphSize.x + graphInterval.x;
+	}
+	else
+	{
+		// 座標の幅
+		posWidth.y = graphSize.y + graphInterval.y;
+	}
 
-    // ナンバー変数
-    int number = 0;
-    // カウント変数
-    int count = 0;
+    // 座標の幅
+    const Vec2 posDistance = posWidth * (num - 1);
 
     for (int i = 0; i < num; i++)
     {
-        // 一時保存座標にベース座標を代入
-        savePos = basePos;
+        Vec2 pos = basePos - posDistance * 0.5f + posWidth * i;
 
-        // ナンバー変数初期化
-        number = 0;
-
-        // iが奇数か偶数かで一時保存座標の値を変更する
-        if (i % 2 == 0)
-        {
-            if (isSide)
-            {
-                savePos.x -= size.x * count;
-            }
-            else
-            {
-                savePos.y -= size.y * count;
-            }
-
-            number -= count;
-        }
-        else
-        {
-            if (isSide)
-            {
-                savePos.x += size.x * count;
-            }
-            else
-            {
-                savePos.y += size.y * count;
-            }
-
-            number += count;
-        }
-
-        // 座標代入
-        pos[number + n] = savePos;
-
-        if (i % 2 == 0)
-        {
-            count++;
-        }
+        posList.push_back(pos);
     }
 
-    // 値を返す
-    return pos;
+
+    return posList;
+}
+
+std::vector<Vec2> EvoLib::Calculation::PosEqualization(const Vec2& basePos, const int& num, const Vec2& interval)
+{
+    // 座標リスト
+    std::vector<Vec2> posList;
+
+    // 座標の幅
+    const Vec2 posDistance = interval * (num - 1);
+
+
+    for (int i = 0; i < num; i++)
+    {
+        Vec2 pos = basePos - posDistance * 0.5f + interval * i;
+
+        posList.push_back(pos);
+    }
+
+
+    return posList;
 }
 
 bool EvoLib::Calculation::IsTargetRangeValue(const float& currentValue, const float& targetValue, const float& addSubValue)

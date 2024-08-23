@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="ControllerOption.cpp" />
     <ClCompile Include="GameData.cpp" />
     <ClCompile Include="Library\Calculation.cpp" />
     <ClCompile Include="Library\Collision.cpp" />
@@ -175,6 +176,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="ControllerOption.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameData.h" />
     <ClInclude Include="Library\Calculation.h" />

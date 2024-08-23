@@ -6,7 +6,7 @@
 #include <string>
 #include "Vec2.h"
 #include "PlatinumLoader.h"
-
+#include "SceneMain.h"
 
 #include "EvoLib.h"
 
@@ -15,6 +15,7 @@
 
 template <class TState> class StateMachine;
 
+class MainScreen;
 class ObjectBase;
 class PlatinumLoader;
 class Camera;
@@ -122,9 +123,25 @@ public:
 	ObjectManager();
 	virtual ~ObjectManager();
 
+	/// <summary>
+	/// メインスクリーンポインタ取得
+	/// </summary>
+	/// <param name="pMainScreen">メインスクリーンポインタ</param>
+	void SetMainScreenPointer(const std::shared_ptr<MainScreen>& pMainScreen) { m_pMainScreen = pMainScreen; }
+
+
 	void Init();
 	void Update();
 	void Draw();
+
+public:
+
+	/// <summary>
+	/// シーン変更
+	/// </summary>
+	/// <param name="nextScene">次のシーン</param>
+	void ChangeScene(const SceneMain::Scene& nextScene);
+
 
 public:
 
@@ -303,6 +320,9 @@ private:
 	////////////////////
 	// クラスポインタ //
 	////////////////////
+
+	// メインスクリーン
+	std::shared_ptr<MainScreen>m_pMainScreen;
 
 	// プラチナムローダー
 	std::shared_ptr<PlatinumLoader>m_pPlatinumLoader;

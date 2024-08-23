@@ -17,8 +17,8 @@ public:
 
 public:
 
-	// 次のシーン
-	enum class NextScene
+	// シーン
+	enum class Scene
 	{
 		// セーブデータ選択シーン
 		SaveDataSelect,
@@ -29,7 +29,7 @@ public:
 	/// <summary>
 	/// シーン変更
 	/// </summary>
-	void ChangeScene(const NextScene& nextScene);
+	void ChangeScene(const Scene& nextScene);
 
 private:
 

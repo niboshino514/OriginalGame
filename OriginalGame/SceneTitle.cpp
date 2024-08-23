@@ -4,7 +4,7 @@
 
 #include "SceneSaveDataSelect.h"
 #include "SceneMain.h"
-
+#include "Controller.h"
 namespace
 {
 	// フェードインアウトのスピード
@@ -34,6 +34,9 @@ void SceneTitle::Init()
 	m_pTitleScreen->SetSceneTitle(this);
 	// 初期化処理
 	m_pTitleScreen->Init();
+
+	// 操作受付を有効にする
+	Controller::GetInstance()->SetAcceptInput(true);
 }
 
 SceneBase* SceneTitle::Update()
@@ -42,7 +45,7 @@ SceneBase* SceneTitle::Update()
 	UpdateFade();
 
 
-	// フェードインが終了していたらシーン遷移する
+	// フェードアウトが終了していたらシーン遷移する
 	if (IsFadeOutEnd())
 	{
 		// シーン遷移
@@ -66,21 +69,23 @@ void SceneTitle::Draw()
 	DrawFade();
 }
 
-void SceneTitle::ChangeScene(const NextScene& nextScene)
+void SceneTitle::ChangeScene(const Scene& nextScene)
 {
 	// 次のシーンを設定
 	switch (nextScene)
 	{
-	case SceneTitle::NextScene::SaveDataSelect:
+	case SceneTitle::Scene::SaveDataSelect:
 
 		// セーブデータ選択シーン
 		m_nextScene = new SceneSaveDataSelect();
 
 		break;
+
+		// セーブデータ選択シーン
+		m_nextScene = new SceneSaveDataSelect();
 	default:
 		break;
 	}
-
 
 
 	// フェードアウト設定

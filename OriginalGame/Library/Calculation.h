@@ -52,27 +52,39 @@ namespace EvoLib
 
 
 		/// <summary>
-		/// ある位置を基準とし、幅を考慮したグラフィックの座標を返す
+		/// グラフィックのサイズを取得
 		/// </summary>
-		/// <param name="handle">グラフィックハンドル</param>
-		/// <param name="num">グラフィックの個数</param>
-		/// <param name="graphScale">グラフィックスケール</param>
-		/// <param name="centerPos">基準とする座標</param>
-		/// <param name="distancePos">幅とする座標</param>
-		/// <param name="isSide">横かどうか</param>
-		/// <returns>幅を考慮したグラフィック座標を返す</returns>
-		static std::vector<Vec2> GraphicWidthCoordinate(const int& handle, const int& num, const float& graphScale, const Vec2& centerPos, const Vec2& distancePos, bool isSide = true);
+		/// <param name="graphHandle">グラフィックハンドル</param>
+		/// <param name="graphMagnificationRate">グラフィックの拡大率</param>
+		/// <returns>グラフィックのサイズ</returns>
+		static Vec2 GetGraphSize_EvoLib(std::vector<int>graphHandle, const double& graphMagnificationRate);
+
 
 
 		/// <summary>
-		/// 座標を均等に並べる
+		/// 画像サイズを基準として、個数分座標を均等に配置する
 		/// </summary>
-		/// <param name="num">均等に並べる数</param>
-		/// <param name="centerPos">基準とする位置</param>
-		/// <param name="distancePos">幅とする座標</param>
-		/// <param name="isSide">横に並べるかどうか</param>
-		/// <returns>均等に並べた座標</returns>
-		static std::vector<Vec2> SortCoordinateEqually(const int& num, const Vec2& centerPos, const Vec2& distancePos, bool isSide = true);
+		/// <param name="graphSize">グラフのサイズ</param>
+		/// <param name="basePos">基準座標</param>
+		/// <param name="num">個数</param>
+		/// <param name="graphInterval">グラフィック同士の幅</param>
+		/// <param name="isHorizontalSort">横並びかどうか</param>
+		/// <returns>座標</returns>
+		static std::vector<Vec2>GraphEqualization(const Vec2& graphSize, const Vec2& basePos, const int& num, const Vec2& graphInterval, const bool& isHorizontalSort);
+
+	
+	
+
+
+		/// <summary>
+		/// ある座標を基準として、個数分座標を均等に配置する
+		/// </summary>
+		/// <param name="basePos">基準座標</param>
+		/// <param name="num">個数</param>
+		/// <param name="interval">間隔</param>
+		/// <returns>座標</returns>
+		static std::vector<Vec2>PosEqualization(const Vec2& basePos, const int& num, const Vec2& interval);
+
 
 
 		/// <summary>
