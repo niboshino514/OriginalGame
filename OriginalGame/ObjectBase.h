@@ -5,6 +5,7 @@
 #include "ObjectManager.h"
 #include <memory>
 #include "GameData.h"
+#include <vector>
 
 class ObjectManager;
 
@@ -39,7 +40,49 @@ public:
 		RankNum,
 	};
 	
+	// アニメーションの種類
+	enum class AnimationType
+	{
+		// 停止状態
+		Idle,
+		// 移動状態
+		Move,
+	};
 
+
+	/// <summary>
+	/// アニメーションの詳細を表す構造体
+	/// </summary>
+	struct AnimationDetails
+	{
+		// アニメーション番号
+		int number = 0;
+		// アニメーションの速度
+		int frameSpeed = 0;
+		// キャラクターが動いているかどうかの処理
+		AnimationType type = AnimationType();
+		// 向き
+		Direction direction[2];
+	};
+
+	/// <summary>
+	/// アニメーションの範囲を表す構造体
+	/// </summary>
+	struct AnimationRange
+	{
+		// 最小インデックス
+		int minIndex = 0;
+		// 最大インデックス
+		int maxIndex = 0;
+		// アニメーションを開始する配列番号
+		int dirNo = 0;
+		// 停止中の配列番号
+		int stopNo = 0;
+	};
+
+
+
+public:
 
 	/// <summary>
 	/// オブジェクトファクトリークラスをコピー
@@ -111,6 +154,23 @@ public:
 	/// <param name="isGimmick">ギミックフラグ</param>
 	void SetGimiickFlag(const bool& isGimmick) { m_isGimmick = isGimmick; }
 
+	/// <summary>
+	/// グラフィックハンドルをセット
+	/// </summary>
+	/// <param name="graphicHandle">グラフィックハンドル</param>
+	void SetGraphicHandle(const std::vector<int>& graphicHandle) { m_graphicHandle = graphicHandle; }
+
+protected:
+
+	/// <summary>
+	///  アニメーション番号更新
+	/// </summary>
+	/// <param name="animationDetails">アニメーション詳細</param>
+	/// <param name="animationRange">アニメーション範囲</param>
+	/// <returns>アニメーション番号</returns>
+	int AnimationNamberUpdate(const AnimationDetails& animationDetails, const AnimationRange& animationRange);
+
+
 protected:
 
 
@@ -135,6 +195,23 @@ protected:
 	// 描画の優先順位
 	DrawRank m_drawRank;
 
+	//////////////////////
+	// グラフィック関連 //
+	//////////////////////
+
+	// 画像ハンドル
+	std::vector<int>m_graphicHandle;
+
+	////////////////////////
+	// アニメーション関連 //
+	////////////////////////
+
+	// アニメーション詳細
+	AnimationDetails m_animationDetails;
+
+	// アニメーション範囲
+	AnimationRange m_animationRange;
+	
 	////////////////////
 	// クラスポインタ //
 	////////////////////

@@ -87,7 +87,7 @@ public:
 		// SWITCHPRO
 		SWITCH_PRO,
 		// 項目数
-		PADTYPE_NUM,
+		PAD_TYPE_NUM,
 	};
 
 	// 設定
@@ -191,7 +191,7 @@ public:
 	// 押され続けてるかどうか
 	bool IsPress(const ControllerButton& button);
 	// 押された瞬間かどうか
-	bool IsTrigger(const ControllerButton& button);
+	bool IsTrigger(const ControllerButton& button, bool isAllController = false);
 
 	/// <summary>
 	/// 操作を受け付けるかどうかを設定
@@ -204,6 +204,12 @@ public:
 	/// </summary>
 	/// <returns>コントローラー設定</returns>
 	ControllerSetting GetControllerSetting() { return m_controllerSetting; }
+
+	/// <summary>
+	/// コントローラー設定をセット
+	/// </summary>
+	/// <param name="controllerSetting">コントローラー設定</param>
+	void SetControllerSetting(const ControllerSetting& controllerSetting) { m_controllerSetting = controllerSetting; }
 
 private:
 

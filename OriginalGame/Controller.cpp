@@ -125,8 +125,10 @@ bool Controller::IsPress(const ControllerButton& button)
     return false;
 }
 
-bool Controller::IsTrigger(const ControllerButton& button)
+bool Controller::IsTrigger(const ControllerButton& button, bool isAllController)
 {
+
+    
     // 入力受付フラグがfalseの場合、入力を受け付けない
     if (!m_isAcceptInput)
     {
@@ -135,6 +137,17 @@ bool Controller::IsTrigger(const ControllerButton& button)
 
     // ボタンのコードを取得
     const int buttonCode = GetButton(button);
+
+
+    if (isAllController)
+    {
+
+        bool isNow = (m_padLog[0] & buttonCode);   // 現在の状態
+        bool isLast = (m_padLog[1] & buttonCode);  // １フレーム前の状態
+        return (isNow && !isLast);
+    }
+
+
 
 	if (m_controllerSetting.controllerType == ControllerType::CONTROLLER)
 	{

@@ -2,6 +2,9 @@
 #include "ObjectManager.h"
 
 
+
+
+
 MainScreen::MainScreen():
 	m_pSceneMain(nullptr),
 	m_pObjectFactory(std::make_shared<ObjectManager>())

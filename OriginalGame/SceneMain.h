@@ -34,8 +34,16 @@ public:
 	/// </summary>
 	void ChangeScene(const Scene& nextScene);
 
+
+
 private:
 
+	/// <summary>
+	/// フェードアウト時、だんだん音が小さくなるサウンド処理
+	/// </summary>
+	void FadeOutSound();
+
+private:
 
 	////////////////////
 	// クラスポインタ //

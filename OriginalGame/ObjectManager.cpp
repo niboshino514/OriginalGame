@@ -6,11 +6,14 @@
 #include "TransparentBlockChip.h"
 #include "Pause.h"
 #include "MainScreen.h"
+#include "Sound.h"
 
 #include <cassert>
 #include <string>
 #include <filesystem>
 #include <DxLib.h>
+
+
 
 
 namespace
@@ -22,6 +25,28 @@ namespace
 	const std::string kFilePathExtension = ".fmf";
 }
 
+namespace
+{
+	// 画像データ
+	struct GraphData
+	{
+		// グラフィックファイルパス
+		const char* const kFilePath;
+		// 分割数
+		const EvoLib::Load::DivNum kDivNum;
+	};
+}
+
+
+namespace PlayerGraph
+{
+	// プレイヤーグラフィックデータ
+	const GraphData kPlayerGraphData[] =
+	{
+		{ "Data/Character/Marisa.png", EvoLib::Load::DivNum(3, 4) },
+	};
+}
+
 
 ObjectManager::ObjectManager() :
 	m_object(),
@@ -29,6 +54,7 @@ ObjectManager::ObjectManager() :
 	m_screenCircle(),
 	m_testMapGraph(),
 	m_pStateMachine(),
+	m_playerGraphHandle(),
 	m_pPlatinumLoader(std::make_shared<PlatinumLoader>()),
 	m_pCamera(std::make_shared<Camera>()),
 	m_pPause(std::make_shared<Pause>())
@@ -42,12 +68,14 @@ ObjectManager::~ObjectManager()
 		DeleteGraph(graph);
 	}
 
+	for (auto& graph : m_playerGraphHandle)
+	{
+		DeleteGraph(graph);
+	}
 }
 
 void ObjectManager::Init()
 {
-
-
 	// ステート初期化
 	StateInit();
 }
@@ -119,6 +147,9 @@ void ObjectManager::StateInit()
 
 void ObjectManager::StateSettingInit()
 {
+	// ロード
+	Load();
+
 	// マップ関連初期設定
 	InitMap();
 
@@ -144,6 +175,9 @@ void ObjectManager::StateSettingInit()
 
 	// ステートを通常に変更
 	SetState(State::Normal);
+
+	// BGM再生
+	Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::BGM)]);
 }
 
 void ObjectManager::StateNormalUpdate()
@@ -181,6 +215,23 @@ void ObjectManager::SetState(const State& state)
 	m_pStateMachine.SetState(state);
 }
 
+void ObjectManager::Load()
+{
+	// プレイヤーグラフィックロード
+	{
+		for (const auto& graphData : PlayerGraph::kPlayerGraphData)
+		{
+			m_playerGraphHandle = 
+				(EvoLib::Load::LoadDivGraph_EvoLib_Revision(graphData.kFilePath, graphData.kDivNum));
+		}
+	}
+
+	// サウンドロード
+	{
+		Sound::GetInstance()->Load(kSoundFileName,false);
+	}
+}
+
 void ObjectManager::CharacterCreate(const Vec2& pos)
 {
 	// キャラクター生成
@@ -194,6 +245,9 @@ void ObjectManager::CharacterCreate(const Vec2& pos)
 
 	// 座標を代入
 	m_object.back()->SetPos(pos);
+
+	// グラフィックハンドルを代入
+	m_object.back()->SetGraphicHandle(m_playerGraphHandle);
 
 	// 初期化処理
 	m_object.back()->Init();
@@ -555,19 +609,22 @@ std::vector<std::vector<int>> ObjectManager::GetMapChipNumber()
 	return mapChipNumber;
 }
 
-void ObjectManager::SetSavePoint(const Vec2& pos)
+void ObjectManager::SetSavePoint(const Vec2& pos, const Direction& gravityDirection)
 {
 	// 座標からセルを求める
 	const Cell saveCell = EvoLib::Convert::PosToCell(pos, m_mapInfoData.mapChip.chipSize);
 
-	
 
-	// セーブポイントのセルを設定
-	GameData::GetInstance()->SetSavePointData(
-		GameData::SavePointData(m_mapInfoData.mapNumber, saveCell));
 
-	return;
+	// セーブポイントのステージナンバー、セル、プレイヤーステータスを設定
+	GameData::GetInstance()->SetSavePointData
+	(GameData::SavePointData(
+		m_mapInfoData.mapNumber, 
+		saveCell, 
+		GameData::PlayerStatus(gravityDirection)));
 }
+
+
 
 std::tuple<bool, Vec2>  ObjectManager::GetSavePointPos()
 {
@@ -885,7 +942,7 @@ void ObjectManager::TestMapDraw()
 			DrawGraphF(pos1.x, pos1.y, m_testMapGraph[static_cast<int>(m_mapInfoData.mapCollisionData[x][y].chipType)], true);
 
 			// マップの描画
-			DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
+			//DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
 		}
 	}
 

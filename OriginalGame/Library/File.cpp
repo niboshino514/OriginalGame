@@ -52,6 +52,17 @@ bool EvoLib::File::IsFileExist(const std::string& name)
 
 std::vector<std::vector<std::string>> EvoLib::File::CsvFileLoading(const std::string& filePath, LoadType loadType)
 {
+
+
+    // ファイルが存在しない場合
+    if (!IsFileExist(filePath))
+    {
+        std::string errorText = "[" + filePath + "] " +
+            "ファイルは存在しないようです。";
+
+        EvoLib::Assert::ErrorMessageBox(errorText);
+    }
+
     // ファイル情報の読み込み
     std::ifstream ifs(filePath);
     std::string line;

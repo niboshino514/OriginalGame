@@ -15,6 +15,44 @@
 
 template <class TState> class StateMachine;
 
+
+
+namespace
+{
+	// サウンドファイル名
+	static std::vector<std::string> kSoundFileName =
+	{
+		"Bgm_0",		// BGM
+
+		"Determination",// 決定音
+		"Cancel",		// キャンセル音
+		"Select",		// 選択音
+
+		"Pause",		// ポーズ音
+
+		"Jump",			// ジャンプ音
+		"Dead",			// 死亡音
+	};
+
+	// サウンド名
+	enum class SoundName
+	{
+		BGM,			// BGM
+
+		Decision,		// 決定音
+		Cancel,			// キャンセル音
+		Select,			// 選択音
+
+		Pause,			// ポーズ音
+
+		Jump,			// ジャンプ音
+		Dead,			// 死亡音
+	};
+
+}
+
+
+
 class MainScreen;
 class ObjectBase;
 class PlatinumLoader;
@@ -153,8 +191,10 @@ public:
 	/// <param name="state">ステート</param>
 	void SetState(const State& state);
 
-
-
+	/// <summary>
+	/// ロード
+	/// </summary>
+	void Load();
 
 	/// <summary>
 	/// キャラクター生成
@@ -193,7 +233,7 @@ public:
 	/// セーブポイントを設定する
 	/// </summary>
 	/// <param name="pos">座標</param>
-	void SetSavePoint(const Vec2& pos);
+	void SetSavePoint(const Vec2& pos, const Direction& gravityDirection);
 
 	/// <summary>
 	/// セーブポイントの座標を返す
@@ -308,6 +348,13 @@ private:
 
 	// マップグラフィック
 	std::vector<int>m_testMapGraph;
+
+	//////////////////////
+	// グラフィック関連 //
+	//////////////////////
+
+	// プレイヤーグラフィックハンドル
+	std::vector<int>m_playerGraphHandle;
 
 	//////////////////
 	// ステート関連 //

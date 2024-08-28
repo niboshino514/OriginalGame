@@ -80,6 +80,17 @@ protected:
 	/// </summary>
 	void DrawFade();
 
+	/// <summary>
+	/// フェードアウト中かどうか
+	/// </summary>
+	/// <returns>フェードアウトフラグ</returns>
+	bool GetIsFadeOut() { return m_fade.state == Fade::Out; }
+
+	/// <summary>
+	/// フェードアルファ値取得
+	/// </summary>
+	/// <returns>フェードアルファ値</returns>
+	int GetFadeAlpha() { return m_fade.alpha; }
 
 protected:
 

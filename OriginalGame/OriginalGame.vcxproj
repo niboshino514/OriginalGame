@@ -169,6 +169,7 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneSaveDataSelect.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="TitleScreen.cpp" />
     <ClCompile Include="TransparentBlockChip.cpp" />
     <ClCompile Include="Vec2.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="SceneSaveDataSelect.h" />
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="Sort.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="TitleScreen.h" />
     <ClInclude Include="TransparentBlockChip.h" />

@@ -140,11 +140,11 @@ std::vector<Vec2> EvoLib::Calculation::GraphEqualization(const Vec2& graphSize, 
 	}
 
     // 座標の幅
-    const Vec2 posDistance = posWidth * (num - 1);
+    const Vec2 posDistance = posWidth * static_cast<float>(num - 1);
 
     for (int i = 0; i < num; i++)
     {
-        Vec2 pos = basePos - posDistance * 0.5f + posWidth * i;
+        Vec2 pos = basePos - (posDistance * 0.5f) + (posWidth * static_cast<float>(i));
 
         posList.push_back(pos);
     }
@@ -159,12 +159,12 @@ std::vector<Vec2> EvoLib::Calculation::PosEqualization(const Vec2& basePos, cons
     std::vector<Vec2> posList;
 
     // 座標の幅
-    const Vec2 posDistance = interval * (num - 1);
+    const Vec2 posDistance = interval * static_cast<float>(num - 1);
 
 
     for (int i = 0; i < num; i++)
     {
-        Vec2 pos = basePos - posDistance * 0.5f + interval * i;
+        Vec2 pos = basePos - (posDistance * 0.5f) + (interval * static_cast<float>(i));
 
         posList.push_back(pos);
     }
@@ -538,3 +538,49 @@ Vec2 EvoLib::Calculation::TargetMoveValue(const Vec2& pos, const Vec2& targetPos
     // 移動量を返す
     return vel;
 }
+
+Vec2 EvoLib::Calculation::SatelliteTrajectory(const Vec2& centerPos, const float& radian, const float& circleRadius)
+{
+    // 移動量
+    Vec2 vec = Vec2();
+
+    // 中心位置から半径をもとに軌道を計算
+    vec.x = cos(radian) * circleRadius;
+    vec.y = sin(radian) * circleRadius;
+
+    // ベクトルを位置に加算
+    const Vec2 pos = centerPos + vec;
+
+    // 座標を返す
+    return pos;
+}
+
+std::vector<Vec2> EvoLib::Calculation::VertexCoordinateRotation(const Vec2& rotaCenterPos, const float& radian, const std::vector<Vec2> vertexPos)
+{
+    // 各頂点のラジアン
+    float vertexRad;
+
+    // 各頂点の座標
+    std::vector<Vec2>vertexRotaPos;
+
+    for (int i = 0; i < static_cast<int>(vertexPos.size()); i++)
+    {
+        // 頂点のラジアンを求める
+        vertexRad = Atan2_Lib(vertexPos[i], rotaCenterPos) + radian;
+
+        // 頂点の回転座標を調べる
+        vertexRotaPos.push_back(SatelliteTrajectory(rotaCenterPos, vertexRad, ThreeSquareTheorem(vertexPos[i], rotaCenterPos)));
+    }
+
+    return vertexRotaPos;
+}
+
+float EvoLib::Calculation::Atan2_Lib(const Vec2& targetPos, const Vec2& startPos)
+{
+    // ターゲット座標を向く、ラジアンを求める
+    const float radian = atan2(targetPos.y - startPos.y, targetPos.x - startPos.x);
+
+    // ターゲット座標を向くラジアン
+    return radian;
+}
+

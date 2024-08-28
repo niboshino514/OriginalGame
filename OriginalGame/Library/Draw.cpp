@@ -587,3 +587,76 @@ void EvoLib::Draw::DrawCube3D_EvoLib(const VECTOR& centerPos, const VECTOR& oneS
     // 通常描画に戻す
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
+
+void EvoLib::Draw::DrawRotatingImage(const int& handle, const Vec2& pos, const int& frameSpeed, const bool& isHorizontalRot, const float& graphRota, const bool& isRotateOne, const bool& isReverseGraph, const bool& isTrans, const bool& isUpdate)
+{
+    // 画像のサイズを取得
+    int w, h;
+    GetGraphSize(handle, &w, &h);
+
+    // 横回転最大フレーム数を計算
+    int maxFrame = isHorizontalRot ? static_cast<int>(w * graphRota) : static_cast<int>(h * graphRota);
+
+    // フレーム数を調整
+    if (!isRotateOne) {
+        maxFrame /= 2;
+    }
+
+    // フレーム数の初期化
+    static int frameCount = 0;
+
+    // フレーム数の増減フラグ
+    static bool isAdd = true;
+
+    // フレーム数の加算/減算処理
+    if (frameCount <= 0) {
+        frameCount = 0;
+        isAdd = true;
+    }
+    else if (frameCount > maxFrame) {
+        frameCount = maxFrame;
+        isAdd = false;
+    }
+
+    // フレーム数の増減
+    if (isUpdate)
+    {
+        // フレーム数の増減
+        frameCount += isAdd ? frameSpeed : -frameSpeed;
+    }
+
+    
+    // 画像の左上と右下の座標を計算
+    Vec2 leftTop = {
+        pos.x - w * graphRota * 0.5f,
+        pos.y - h * graphRota * 0.5f
+    };
+
+    Vec2 rightBottom = {
+        pos.x + w * graphRota * 0.5f,
+        pos.y + h * graphRota * 0.5f
+    };
+
+    // フレーム数に応じて座標を調整
+    if (isHorizontalRot) {
+        leftTop.x += frameCount;
+        rightBottom.x -= frameCount;
+    }
+    else {
+        leftTop.y += frameCount;
+        rightBottom.y -= frameCount;
+    }
+
+    // 画像を反転させる
+    if (isReverseGraph) {
+        leftTop.x += w * graphRota;
+        rightBottom.x -= w * graphRota;
+    }
+
+    // 画像を描画
+    DrawExtendGraphF(
+        leftTop.x, leftTop.y,
+        rightBottom.x, rightBottom.y,
+        handle, isTrans
+    );
+}

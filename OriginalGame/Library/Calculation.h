@@ -180,6 +180,32 @@ namespace EvoLib
 		// ターゲットに向かう移動量を求める
 		static Vec2 TargetMoveValue(const Vec2& pos, const Vec2& targetPos, const float& moveSpeed);
 
+		/// <summary>
+		/// 衛星軌道(中心点を軸に、角度を参照して回転する座標を計算する)
+		/// </summary>
+		/// <param name="centerPos">中心座標</param>
+		/// <param name="radian">ラジアン</param>
+		/// <param name="circleRadius">円の半径</param>
+		/// <returns>アングルに対応した座標を返す</returns>
+		static Vec2 SatelliteTrajectory(const Vec2& centerPos, const float& radian, const float& circleRadius);
+
+		/// <summary>
+		/// 頂点座標を回転させる
+		/// </summary>
+		/// <param name="rotaCenterPos">回転の中心座標</param>
+		/// <param name="radian">回転させるラジアン</param>
+		/// <param name="vertexPos">頂点座標</param>
+		/// <returns></returns>
+		static std::vector<Vec2> VertexCoordinateRotation(const Vec2& rotaCenterPos, const float& radian, const std::vector<Vec2> vertexPos);
+
+		/// <summary>
+		/// Atan2(ターゲット方向に向かう、ラジアンを求める)
+		/// </summary>
+		/// <param name="targetPos">ターゲット座標</param>
+		/// <param name="startPos">スタート座標</param>
+		/// <returns>ターゲット座標を向くラジアン</returns>
+		static float Atan2_Lib(const Vec2& targetPos, const Vec2& startPos);
+
 
 	};
 	template<typename T>

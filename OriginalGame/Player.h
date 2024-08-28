@@ -92,8 +92,13 @@ private:
 	/// </summary>
 	void Collision();
 
+
 private:
 
+	/// <summary>
+	/// アニメーション
+	/// </summary>
+	void Animation();
 
 	/// <summary>
 	/// 地面の衝突判定
@@ -173,7 +178,6 @@ private:
 	// サイズ
 	Vec2 m_size;
 
-
 	// 地面にいるかどうか
 	bool m_isGround;
 
@@ -182,6 +186,7 @@ private:
 	
 	// コンベア
 	Conveyor m_conveyor;
+
 
 	//////////////////
 	// ステート関連 //

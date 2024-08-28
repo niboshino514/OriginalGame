@@ -6,6 +6,8 @@
 
 #include <crtdbg.h>
 
+#include "Sound.h"
+
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -30,6 +32,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// ダブルバッファモード
 	SetDrawScreen(DX_SCREEN_BACK);
+
+
+	// サウンドロード
+	Sound::GetInstance()->Init();
+
+
+
 
 	// 最初のシーンの初期化
 	SceneManager scene;

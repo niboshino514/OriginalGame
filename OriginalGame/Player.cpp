@@ -3,6 +3,9 @@
 #include "ObjectManager.h"
 #include <tuple>
 #include "Controller.h"
+#include "GameData.h"
+#include <string>
+#include "Sound.h"
 
 namespace
 {
@@ -40,6 +43,55 @@ namespace
 	// 重力反転フラグ
 	constexpr bool kGravityReverseFlag = true;
 }
+namespace Graph
+{
+	// 拡大率
+	const double kScale = 1.5;
+	// 縦幅調整値
+	const float kAdjustmentValue = (5.0f);
+	
+
+
+	// キャラクター描画の調整値を表す構造体
+	struct CharacterDrawAdjustment
+	{
+		// 座標調整値
+		Vec2 adjustmentPos = Vec2();
+
+		// 角度
+		float angle = 0.0f;
+	};
+
+	// キャラクター描画の調整値の配列
+	const CharacterDrawAdjustment kCharacterDrawAdjustment[4] =
+	{
+		// 上
+		{Vec2(0.0f, kAdjustmentValue), 180.0f},
+		// 下
+		{Vec2(0.0f, -kAdjustmentValue), 0.0f},
+		// 左
+		{Vec2(kAdjustmentValue, 0.0f), 90.0f},
+		// 右
+		{Vec2(-kAdjustmentValue, 0.0f), 270.0f},
+	};
+}
+
+
+namespace Anime
+{
+	const ObjectBase::AnimationRange kAnimationRange[4] =
+	{
+		{ 0, 2, 1,1 },// 上
+		{ 6, 8, 7 ,7},	// 下
+		{ 9, 11, 10 ,10},	// 左
+		{ 3, 5, 4 ,4},	// 右
+	};
+
+	// アニメーション速度
+	constexpr int kAnimeSpeed = 5;
+}
+
+
 
 
 Player::Player() :
@@ -64,6 +116,7 @@ void Player::Init()
 {
 	// 座標をゲームデータに代入
 	GameData::GetInstance()->SetPlayerPos(m_pos);
+
 	// オブジェクトID設定
 	m_objectID = ObjectID::Player;
 
@@ -115,7 +168,7 @@ void Player::StateInit()
 void Player::StateNormalEnter()
 {
 	// 重力方向変更
-	ChangeGravityDirection(Direction::Bottom);
+	ChangeGravityDirection(GameData::GetInstance()->GetPlayerStatus().gravityDirection);
 
 	// アイスブロックフラグをfalseにする
 	m_isIceBlock = false;
@@ -130,6 +183,21 @@ void Player::StateNormalEnter()
 		m_conveyor.speed = kConveyorSpeed;
 	}
 
+	// アニメーション
+	{
+		// アニメーションデータ初期化
+		m_animationDetails.frameSpeed = Anime::kAnimeSpeed;
+
+		// 向き初期化
+		m_animationDetails.direction[0] = Direction::Left;
+
+		// アニメーション番号初期化
+		m_animationDetails.number = Anime::kAnimationRange[static_cast<int>(m_animationDetails.direction[0])].stopNo;
+
+		// アニメーションタイプ初期化
+		m_animationDetails.type = AnimationType::Idle;
+	}
+
 }
 
 void Player::StateNormalUpdate()
@@ -142,6 +210,9 @@ void Player::StateNormalUpdate()
 
 	// 当たり判定
 	Collision();
+
+	// アニメーション処理
+	Animation();
 }
 
 void Player::StateNormalDraw()
@@ -149,12 +220,11 @@ void Player::StateNormalDraw()
 	// オフセット値を取得
 	const Vec2 offset = GameData::GetInstance()->GetCameraPos();
 
-
 	// デバッグ描画
 #if(true)
 	// 描画座標を計算
 	const Rect drawRect = EvoLib::Convert::PosToRect(m_pos + offset, m_size);
-	
+
 	// 移動可能範囲の矩形を取得
 	Rect drawMoveRect = Rect();
 
@@ -172,10 +242,31 @@ void Player::StateNormalDraw()
 	DrawBoxAA(drawMoveRect.left, drawMoveRect.top, drawMoveRect.right, drawMoveRect.bottom,
 		0x0000ff, false);
 #endif
+
+
+	Vec2 pos = m_pos + offset;
+	pos += Graph::kCharacterDrawAdjustment[static_cast<int>(m_gravityDirection)].adjustmentPos;
+	
+	// 回転角度
+	const float rota = EvoLib::Convert::ConvertAngleToRadian(Graph::kCharacterDrawAdjustment[static_cast<int>(m_gravityDirection)].angle);
+
+	// 反転フラグ
+	const bool isReverse = 
+		m_gravityDirection == Direction::Right ||
+		m_gravityDirection == Direction::Top;
+
+	// プレイヤー描画
+	DrawRotaGraphF(
+		pos.x,
+		pos.y,
+		Graph::kScale, rota,
+		m_graphicHandle[m_animationDetails.number], true, isReverse);
 }
 
 void Player::StateNormalExit()
 {
+	// 死亡音を再生
+	Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Dead)]);
 }
 
 
@@ -194,12 +285,21 @@ void Player::Respawn()
 		if (!isChangeStage)
 		{
 			m_pStateMachine.SetState(State::Normal);
+
+			// 重力方向変更
+			ChangeGravityDirection(GameData::GetInstance()->GetPlayerStatus().gravityDirection);
 		}
 	}
 }
 
 void Player::Move()
 {
+
+	// 前のフレームのプレイヤーの向きを保存
+	for (int i = 1; i > 0; i--)
+	{
+		m_animationDetails.direction[i] = m_animationDetails.direction[i - 1];
+	}
 
 
 	// 移動量
@@ -209,20 +309,34 @@ void Player::Move()
 	if (m_gravityDirection == Direction::Top ||
 		m_gravityDirection == Direction::Bottom)
 	{
-
-	
-
-
-
 		// パッドを使用した移動
 		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::RIGHT))
 		{
 			inputVec.x += kMoveSpeed;
+
+			// 向いている方向を右にする
+			m_animationDetails.direction[0] = Direction::Right;
 		}
 		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::LEFT))
 		{
 			inputVec.x -= kMoveSpeed;
+
+			// 向いている方向を左にする
+			m_animationDetails.direction[0] = Direction::Left;
 		}
+
+		// 移動量が0.0fの場合、アニメーションをアイドルにする
+		if (inputVec.x == 0.0f)
+		{
+			m_animationDetails.type = AnimationType::Idle;
+			m_animationDetails.number = 
+				Anime::kAnimationRange[static_cast<int>(m_animationDetails.direction[0])].stopNo;
+		}
+		else
+		{
+			m_animationDetails.type = AnimationType::Move;
+		}
+
 	}
 	else
 	{
@@ -230,11 +344,30 @@ void Player::Move()
 		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::DOWN))
 		{
 			inputVec.y += kMoveSpeed;
+
+			// 向いている方向を右にする
+			m_animationDetails.direction[0] = Direction::Right;
 		}
 		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::UP))
 		{
 			inputVec.y -= kMoveSpeed;
+
+			// 向いている方向を左にする
+			m_animationDetails.direction[0] = Direction::Left;
 		}
+
+		// 移動量が0.0fの場合、アニメーションをアイドルにする
+		if (inputVec.y == 0.0f)
+		{
+			m_animationDetails.type = AnimationType::Idle;
+			m_animationDetails.number = 
+				Anime::kAnimationRange[static_cast<int>(m_animationDetails.direction[0])].stopNo;
+		}
+		else
+		{
+			m_animationDetails.type = AnimationType::Move;
+		}
+
 	}
 
 
@@ -293,6 +426,10 @@ void Player::Jump()
 	if (Controller::GetInstance()->IsTrigger(Controller::ControllerButton::JUMP) &&
 		m_jumpInfo.jumpCount > 0)
 	{
+		// ジャンプ音を再生
+		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Jump)]);
+
+
 		// ジャンプフラグをtrueにする
 		m_jumpInfo.isJump = true;
 
@@ -387,6 +524,28 @@ void Player::Collision()
 
 	// 線形補間
 	PosLinearInterpolation();
+}
+
+void Player::Animation()
+{
+
+	DrawFormatString(0, 15 * 4, 0xffffff, "アニメーション番号:%d", m_animationDetails.number);
+
+
+	if (m_animationDetails.direction[0] != m_animationDetails.direction[1])
+	{
+		m_animationDetails.number = Anime::kAnimationRange[static_cast<int>(m_animationDetails.direction[0])].dirNo;
+	}
+
+	// 移動以外の場合、アニメーションを行わない
+	if (m_animationDetails.type != AnimationType::Move)
+	{
+		return;
+	}
+
+	
+	// アニメーション番号を更新
+	m_animationDetails.number = AnimationNamberUpdate(m_animationDetails, Anime::kAnimationRange[static_cast<int>(m_animationDetails.direction[0])]);
 }
 
 void Player::GroundCollision()
@@ -756,7 +915,8 @@ void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData, co
 	// セーブポイントに当たった場合、セーブする
 	if (mapCollisionData.chipType == ObjectManager::ChipType::Save)
 	{
-		m_pObjectFactory->SetSavePoint(mapCollisionData.circle.centerPos);
+		// セーブポイントをセットする
+		m_pObjectFactory->SetSavePoint(mapCollisionData.circle.centerPos, m_gravityDirection);
 	}
 
 	// 次のステージに進む

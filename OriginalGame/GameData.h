@@ -38,6 +38,12 @@ public:
 
 public:
 
+	// プレイヤーのステータス
+	struct PlayerStatus
+	{
+		// 重力方向
+		Direction gravityDirection = Direction::Bottom;
+	};
 
 
 	// セーブポイントデータ
@@ -48,6 +54,9 @@ public:
 
 		// セーブしたセル
 		Cell cell = Cell();
+
+		// プレイヤーステータス
+		PlayerStatus playerStatus = PlayerStatus();
 	}; 
 
 
@@ -89,6 +98,13 @@ public:
 	/// </summary>
 	/// <returns>カメラ座標</returns>
 	Vec2 GetCameraPos() { return m_cameraPos; }
+
+
+	/// <summary>
+	/// プレイヤーステータスを返す
+	/// </summary>
+	/// <returns>プレイヤーステータスの取得</returns>
+	PlayerStatus GetPlayerStatus() { return m_savePointData.playerStatus; }
 
 private:
 

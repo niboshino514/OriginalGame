@@ -5,7 +5,7 @@
 #include "Pad.h"
 #include "MainScreen.h"
 #include "SceneTitle.h"
-
+#include "Sound.h"
 
 
 
@@ -46,6 +46,8 @@ SceneBase* SceneMain::Update()
 	// フェード処理
 	UpdateFade();
 
+	// フェードアウト時、だんだん音が小さくなるサウンド処理
+	FadeOutSound();
 
 	// フェードインが終了していたらシーン遷移する
 	if (IsFadeOutEnd())
@@ -92,4 +94,16 @@ void SceneMain::ChangeScene(const Scene& nextScene)
 
 	// フェードアウト設定
 	SetFadeOut(kFadeSpeed, kFadeColor);
+}
+
+void SceneMain::FadeOutSound()
+{
+	// フェードアウト中で無ければ処理をしない
+	if (!GetIsFadeOut())
+	{
+		return;
+	}
+
+	// フェードに合わせてBGMの音量を下げる
+	Sound::GetInstance()->ScreenFadeBGMStop(GetFadeAlpha());
 }

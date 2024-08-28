@@ -68,6 +68,19 @@ namespace EvoLib
 		static void DrawCube3D_EvoLib(const VECTOR& centerPos, const VECTOR& oneSideLength, int alphaValue = 255, int lineThickness = 1, Color color = { 0.0f,1.0f, 0.0f });
 
 
-		
+		/// <summary>
+		/// 縦と横に回転するグラフィックを描画する
+		/// </summary>
+		/// <param name="handle">グラフィックハンドル</param>
+		/// <param name="pos">中心座標</param>
+		/// <param name="frameSpeed">フレームスピード</param>
+		/// <param name="isHorizontalRot">横回転</param>
+		/// <param name="graphRota">画像拡大率(デフォルト 1.0f)</param>
+		/// <param name="isRotateOne">一回転させるかどうか</param>
+		/// <param name="isReverseGraph">画像を反転させる</param>
+		/// <param name="isTrans">画像を透過させる</param>
+		/// <param name="isUpdate">更新するかどうか</param>
+		static void DrawRotatingImage(const int& handle, const Vec2& pos, const int& frameSpeed, const bool& isHorizontalRot, const float& graphRota = 1.0f, const bool& isRotateOne = true, const bool& isReverseGraph = false, const bool& isTrans = true, const bool& isUpdate = true);
+
 	};
 }

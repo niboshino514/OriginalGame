@@ -107,7 +107,7 @@ private:
 	/// <summary>
 	/// グラフィックのロード
 	/// </summary>
-	void LoadGraph();
+	void Load();
 
 
 
@@ -141,6 +141,9 @@ private:
 	/// </summary>
 	void PauseSelectDraw();
 
+	// タイトルに戻るウィンドウ描画
+	void DrawBackTitleWindow();
+
 	/// <summary>
 	/// バックタイトル選択描画
 	/// </summary>
@@ -154,23 +157,20 @@ private:
 
 
 
-	// ポーズセレクトグラフィック構造体
-	struct PauseSelectGraph
+
+
+
+	// グラフィック情報
+	struct GraphInfo
 	{
-		// グラフィック
+		// ハンドル
 		std::vector<int> handle;
+
 		// 座標
 		std::vector<Vec2> pos;
 	};
 
-	// バックタイトルセレクトグラフィック構造体
-	struct BackTitleSelectGraph
-	{
-		// グラフィック
-		std::vector<int> handle;
-		// 座標
-		std::vector<Vec2> pos;
-	};
+
 
 private:
 
@@ -189,11 +189,20 @@ private:
 	// グラフィック関連 //
 	//////////////////////
 
+	// ポーズウィンドウ名グラフィック
+	GraphInfo m_windowNameGraph;
+
 	// ポーズ選択グラフィック
-	PauseSelectGraph m_pauseSelectGprah;
+	GraphInfo m_pauseSelectGprah;
+
+	// バックタイトルグラフィック
+	GraphInfo m_backTitleGraph;
 
 	// バックタイトル選択グラフィック
-	BackTitleSelectGraph m_backTitleSelectGraph;
+	GraphInfo m_backTitleSelectGraph;
+
+	// セレクト三角形グラフィック
+	int m_selectTriangleGraph;
 
 	//////////////////
 	// ステート関連 //
