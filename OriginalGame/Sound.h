@@ -67,6 +67,13 @@ private:
 		std::string filePath;				// ファイルパス
 	};
 
+	// サウンドボリューム
+	struct SoundVolume
+	{
+		int bgm = 100;// BGMボリューム
+		int se = 100;	// SEボリューム
+	};
+
 public:
 	// 初期処理
 	void Init();
@@ -106,7 +113,17 @@ public:
 	/// <param name="soundPercentVolume">サウンドパーセントボリューム</param>
 	void SetSoundVolume(const SoundType& soundType, const int& soundPercentVolume);
 
+	/// <summary>
+	/// サウンド音量取得
+	/// </summary>
+	/// <returns>サウンド音量を返す</returns>
+	SoundVolume GetSoundVolume() const { return m_soundPercentVolume; }
+
 private:
+
 	// 音声データ
 	std::map<std::string, SoundData> m_soundData;
+
+	// サウンドパーセントボリューム
+	SoundVolume m_soundPercentVolume;
 };

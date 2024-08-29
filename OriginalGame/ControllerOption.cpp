@@ -20,7 +20,7 @@ namespace Window
 
 
 
-namespace WindowName
+namespace WindowNameGraph
 {
 	// グラフィックファイルパス
 	const char* const kFilePath = "Data/ControllerOption/WindowName.png";
@@ -31,7 +31,7 @@ namespace WindowName
 }
 
 
-namespace SettingItem
+namespace SettingItemGraph
 {
 	// グラフィックファイルパス
 	const char* const kFilePath = "Data/ControllerOption/SettingItem.png";
@@ -47,10 +47,10 @@ namespace SettingItem
 	const int kAlpha = 100;
 }
 
-namespace Back
+namespace BackGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/ControllerOption/Back.png";
+	const char* const kFilePath = "Data/Selection/Back.png";
 	// 分割数
 	const EvoLib::Load::DivNum kDivNum = { 1, 1 };
 	// 拡大率
@@ -122,9 +122,9 @@ namespace
 
 
 ControllerOption::ControllerOption():
-	m_settingItemSenect(),
+	m_settingItemSelect(),
 	m_controllerSetting(),
-	isCloseWindow(),
+	m_isCloseWindow(),
 	m_settingItemGraph(),
 	m_controllerSettingGraph(),
 	m_windowNameGraph(),
@@ -178,7 +178,7 @@ void ControllerOption::Update()
 	// キャンセルボタンが押されたらウィンドウを閉じる
 	if (Controller::GetInstance()->IsTrigger(Controller::ControllerButton::CANCEL))
 	{
-		isCloseWindow = true;
+		m_isCloseWindow = true;
 
 		// キャンセル音を再生
 		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Cancel)]);
@@ -201,16 +201,16 @@ void ControllerOption::Draw()
 
 
 	// 戻るボタンの描画
-	DrawRotaGraphF(m_backGraph.pos[0].x, m_backGraph.pos[0].y, Back::kScale, 0.0, m_backGraph.handle[0], TRUE);
+	DrawRotaGraphF(m_backGraph.pos[0].x, m_backGraph.pos[0].y, BackGraph::kScale, 0.0, m_backGraph.handle[0], TRUE);
 }
 
 void ControllerOption::InitSettingItem()
 {
 	// 選択項目の初期化
-	m_settingItemSenect = SettingItemSenect::AUTO_SWITCH;
+	m_settingItemSelect = SettingItemSenect::AUTO_SWITCH;
 
 	// ウィンドウを閉じるかどうか
-	isCloseWindow = false;
+	m_isCloseWindow = false;
 }
 
 void ControllerOption::Load()
@@ -219,7 +219,7 @@ void ControllerOption::Load()
 	{
 		// グラフィックロード
 		m_windowNameGraph.handle = EvoLib::Load::LoadDivGraph_EvoLib_Revision
-		(WindowName::kFilePath, WindowName::kDivNum);
+		(WindowNameGraph::kFilePath, WindowNameGraph::kDivNum);
 
 		// ウィンドウの上Y座標
 		const float windowTop_Y = Game::kWindowCenterY - Window::kHeight / 2;
@@ -239,14 +239,14 @@ void ControllerOption::Load()
 	{
 		// グラフィックロード
 		m_settingItemGraph.handle = EvoLib::Load::LoadDivGraph_EvoLib_Revision
-		(SettingItem::kFilePath, SettingItem::kDivNum);
+		(SettingItemGraph::kFilePath, SettingItemGraph::kDivNum);
 
 		// 座標の設定
-		const Vec2 graphSize = EvoLib::Calculation::GetGraphSize_EvoLib(m_settingItemGraph.handle, SettingItem::kScale);
+		const Vec2 graphSize = EvoLib::Calculation::GetGraphSize_EvoLib(m_settingItemGraph.handle, SettingItemGraph::kScale);
 
 		// 座標の設定
 		m_settingItemGraph.pos = EvoLib::Calculation::GraphEqualization
-		(graphSize, SettingItem::kCenterPos, static_cast<int>(m_settingItemGraph.handle.size()), SettingItem::kDistanceValue, false);
+		(graphSize, SettingItemGraph::kCenterPos, static_cast<int>(m_settingItemGraph.handle.size()), SettingItemGraph::kDistanceValue, false);
 
 	}
 	
@@ -279,7 +279,7 @@ void ControllerOption::Load()
 	{
 		// グラフィックロード
 		m_backGraph.handle = EvoLib::Load::LoadDivGraph_EvoLib_Revision
-		(Back::kFilePath,Back::kDivNum);
+		(BackGraph::kFilePath,BackGraph::kDivNum);
 
 		// ウィンドウの下Y座標
 		const float windowBottom_Y = Game::kWindowCenterY + Window::kHeight / 2;
@@ -287,7 +287,7 @@ void ControllerOption::Load()
 		const float windowRight_X = Game::kWindowCenterX + Window::kWidth / 2;
 
 		// 座標の設定
-		const Vec2 graphSize = EvoLib::Calculation::GetGraphSize_EvoLib(m_backGraph.handle, Back::kScale);
+		const Vec2 graphSize = EvoLib::Calculation::GetGraphSize_EvoLib(m_backGraph.handle, BackGraph::kScale);
 
 
 		// 座標の設定
@@ -318,7 +318,7 @@ void ControllerOption::UpdateSettingItem()
 	if(Controller::GetInstance()->IsTrigger(Controller::ControllerButton::DOWN))
 	{
 		// 選択項目の更新
-		m_settingItemSenect = static_cast<SettingItemSenect>((static_cast<int>(m_settingItemSenect) + 1) % selectNum);
+		m_settingItemSelect = static_cast<SettingItemSenect>((static_cast<int>(m_settingItemSelect) + 1) % selectNum);
 
 		// コントローラー設定の更新
 		Controller::GetInstance()->SetControllerSetting(m_controllerSetting);
@@ -329,7 +329,7 @@ void ControllerOption::UpdateSettingItem()
 	else if(Controller::GetInstance()->IsTrigger(Controller::ControllerButton::UP))
 	{
 		// 選択項目の更新
-		m_settingItemSenect = static_cast<SettingItemSenect>((static_cast<int>(m_settingItemSenect) - 1 + selectNum) % selectNum);
+		m_settingItemSelect = static_cast<SettingItemSenect>((static_cast<int>(m_settingItemSelect) - 1 + selectNum) % selectNum);
 
 		// コントローラー設定の更新
 		Controller::GetInstance()->SetControllerSetting(m_controllerSetting);
@@ -342,7 +342,7 @@ void ControllerOption::UpdateSettingItem()
 void ControllerOption::UpdateControllerSetting()
 {
 	// 選択項目によって処理を分ける
-	switch (m_settingItemSenect)
+	switch (m_settingItemSelect)
 	{
 	case ControllerOption::SettingItemSenect::AUTO_SWITCH:
 
@@ -481,7 +481,7 @@ void ControllerOption::DrawWindow()
 
 
 	// ウィンドウ名の描画
-	DrawRotaGraphF(m_windowNameGraph.pos[0].x, m_windowNameGraph.pos[0].y, WindowName::kScale, 0.0, m_windowNameGraph.handle[0], TRUE);
+	DrawRotaGraphF(m_windowNameGraph.pos[0].x, m_windowNameGraph.pos[0].y, WindowNameGraph::kScale, 0.0, m_windowNameGraph.handle[0], TRUE);
 }
 
 void ControllerOption::DrawSettingItem()
@@ -493,10 +493,10 @@ void ControllerOption::DrawSettingItem()
 			SettingItemSenect(i) == SettingItemSenect::INPUT_DEVICE)
 		{
 			// 透明度設定
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, SettingItem::kAlpha);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, SettingItemGraph::kAlpha);
 		}
 
-		DrawRotaGraphF(m_settingItemGraph.pos[i].x, m_settingItemGraph.pos[i].y, SettingItem::kScale, 0.0, m_settingItemGraph.handle[i], TRUE);
+		DrawRotaGraphF(m_settingItemGraph.pos[i].x, m_settingItemGraph.pos[i].y, SettingItemGraph::kScale, 0.0, m_settingItemGraph.handle[i], TRUE);
 
 		// 透明度解除
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -540,7 +540,7 @@ void ControllerOption::DrawControllerSetting()
 		}
 
 		// 選ばれている選択肢は赤色で描画
-		if(m_settingItemSenect == SettingItemSenect(i))
+		if(m_settingItemSelect == SettingItemSenect(i))
 		{
 			// 選ばれている選択肢は赤色で描画
 			SetDrawBright(255, 0, 0);
@@ -550,7 +550,7 @@ void ControllerOption::DrawControllerSetting()
 			Vec2 pos = Vec2();
 
 
-			switch (m_settingItemSenect)
+			switch (m_settingItemSelect)
 			{
 			case ControllerOption::SettingItemSenect::AUTO_SWITCH:
 

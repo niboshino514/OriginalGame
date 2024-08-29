@@ -18,11 +18,13 @@ namespace
 
 void Sound::Init()
 {
+
+	// サウンドの初期化
+	m_soundPercentVolume = SoundVolume();
+
 	// サウンドデータの読み込み
 	const std::vector<std::vector<std::string>> loadData = 
 		EvoLib::File::CsvFileLoading(kSoundDataFilePath, EvoLib::File::LoadType::SkipFirstLine);
-	
-
 	
 
 	// デフォルトデータ
@@ -267,10 +269,33 @@ void Sound::ScreenFadeBGMStop(const int& fadeValue)
 
 void Sound::SetSoundVolume(const SoundType& soundType, const int& soundPercentVolume)
 {
+	
+	// サウンドの音量を代入する
+	switch (soundType)
+	{
+	case Sound::SoundType::BGM:
+
+		// サウンドの音量を代入する
+		m_soundPercentVolume.bgm = soundPercentVolume;
+
+		break;
+	case Sound::SoundType::SE:
+
+		// サウンドの音量を代入する
+		m_soundPercentVolume.se = soundPercentVolume;
+
+		break;
+	default:
+		// サウンドの音量を代入する
+		m_soundPercentVolume.bgm = soundPercentVolume;
+		break;
+	}
+
+
 	// サウンドの読み込み
 	for (auto& data : m_soundData)
 	{
-		// サウンドタイプが異なる場合、continueする
+		// サウンドタイプが異なる場合、c:ontinueする
 		if (data.second.soundType != soundType)
 		{
 			continue;

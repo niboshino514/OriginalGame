@@ -8,6 +8,7 @@ template <class TState> class StateMachine;
 
 class ObjectManager;
 class ControllerOption;
+class SoundOption;
 
 class Pause
 {
@@ -22,6 +23,10 @@ public:
 		Pause,
 		// 入力切替
 		ChangeInput,
+
+		// 音量調整
+		SoundOption,
+
 		// バックタイトル
 		BackTitle,
 	};
@@ -94,6 +99,11 @@ private:
 	void StateChangeInputEnter();
 	void StateChangeInputUpdate();
 	void StateChangeInputDraw();
+
+	// 音量調整ステート処理
+	void StateSoundOptionEnter();
+	void StateSoundOptionUpdate();
+	void StateSoundOptionDraw();
 
 
 	// バックタイトルステート処理
@@ -220,5 +230,8 @@ private:
 
 	// コントローラーオプションクラス
 	std::shared_ptr<ControllerOption> m_pControllerOption;
+
+	// サウンドオプションクラス
+	std::shared_ptr<SoundOption> m_pSoundOption;
 };
 

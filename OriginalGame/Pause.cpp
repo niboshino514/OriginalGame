@@ -6,7 +6,7 @@
 #include "EvoLib.h"
 #include "ControllerOption.h"
 #include "Sound.h"
-
+#include "SoundOption.h"
 
 namespace Window
 {
@@ -20,7 +20,7 @@ namespace Window
 	const int kAlpha = 200;
 }
 
-namespace WindowName
+namespace WindowNameGraph
 {
 	// グラフィックファイルパス
 	const char* const kFilePath = "Data/Pause/WindowName.png";
@@ -115,7 +115,8 @@ Pause::Pause():
 	m_selectTriangleGraph(),
 	m_pStateMachine(),
 	m_pObjectFactory(),
-	m_pControllerOption(std::make_shared<ControllerOption>())
+	m_pControllerOption(std::make_shared<ControllerOption>()),
+	m_pSoundOption(std::make_shared<SoundOption>())
 {
 }
 
@@ -148,11 +149,20 @@ void Pause::Init()
 	// コントローラーオプションの初期化
 	m_pControllerOption->Init();
 
+	// サウンドオプションの初期化
+	m_pSoundOption->Init();
+
+
 	// グラフィックのロード
 	Load();
 
 	// ステートマシンの初期化
 	StateInit();
+
+
+
+	m_pauseSelect = PauseSelect::Volume;
+
 }
 
 void Pause::Update()
@@ -202,6 +212,14 @@ void Pause::StateInit()
 		auto draw = [this]() { StateChangeInputDraw(); };
 
 		m_pStateMachine.AddState(State::ChangeInput, enter, update, draw, dummy);
+	}
+	// 音量調整ステート
+	{
+		auto enter = [this]() { StateSoundOptionEnter(); };
+		auto update = [this]() { StateSoundOptionUpdate(); };
+		auto draw = [this]() { StateSoundOptionDraw(); };
+
+		m_pStateMachine.AddState(State::SoundOption, enter, update, draw, dummy);
 	}
 	// バックタイトルステート
 	{
@@ -307,6 +325,30 @@ void Pause::StateChangeInputDraw()
 	m_pControllerOption->Draw();
 }
 
+void Pause::StateSoundOptionEnter()
+{
+	// サウンドオプションの初期化
+	m_pSoundOption->InitSettingItem();
+}
+
+void Pause::StateSoundOptionUpdate()
+{
+	// 設定項目更新
+	m_pSoundOption->Update();
+
+	if (m_pSoundOption->GetIsCloseWindow())
+	{
+		// ポーズステートに遷移
+		m_pStateMachine.SetState(State::Pause);
+	}
+}
+
+void Pause::StateSoundOptionDraw()
+{
+	// 設定項目描画
+	m_pSoundOption->Draw();
+}
+
 void Pause::StateBackTitleEnter()
 {
 }
@@ -335,7 +377,7 @@ void Pause::Load()
 	{
 		// グラフィックロード
 		m_windowNameGraph.handle = EvoLib::Load::LoadDivGraph_EvoLib_Revision
-		(WindowName::kFilePath, WindowName::kDivNum);
+		(WindowNameGraph::kFilePath, WindowNameGraph::kDivNum);
 
 		// ウィンドウの上Y座標
 		const float windowTop_Y = Game::kWindowCenterY - Window::kHeight / 2;
@@ -438,6 +480,10 @@ void Pause::PauseSelectDecision()
 
 		break;
 	case PauseSelect::Volume:
+
+		// サウンドオプションステートに遷移
+		m_pStateMachine.SetState(State::SoundOption);
+
 		break;
 	case PauseSelect::ChangeInput:
 
@@ -549,7 +595,7 @@ void Pause::DrawPauseWindow()
 
 
 	// ウィンドウ名描画
-	DrawRotaGraphF(m_windowNameGraph.pos[0].x, m_windowNameGraph.pos[0].y, WindowName::kScale, 0.0, m_windowNameGraph.handle[0], true);
+	DrawRotaGraphF(m_windowNameGraph.pos[0].x, m_windowNameGraph.pos[0].y, WindowNameGraph::kScale, 0.0, m_windowNameGraph.handle[0], true);
 }
 
 void Pause::PauseSelectDraw()

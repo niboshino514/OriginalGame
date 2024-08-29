@@ -19,7 +19,7 @@ public:
 
 
 	// ウィンドウを閉じるかどうか
-	bool GetIsCloseWindow() { return isCloseWindow; }
+	bool GetIsCloseWindow() { return m_isCloseWindow; }
 private:
 
 	// 設定項目
@@ -83,13 +83,13 @@ private:
 	//////////////
 
 	// 選択項目
-	SettingItemSenect m_settingItemSenect;
+	SettingItemSenect m_settingItemSelect;
 
 	// コントローラー設定
 	Controller::ControllerSetting m_controllerSetting;
 
 	// ウィンドウを閉じるかどうか
-	bool isCloseWindow;
+	bool m_isCloseWindow;
 
 	//////////////////////
 	// グラフィック関連 //
