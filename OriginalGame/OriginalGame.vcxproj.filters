@@ -61,6 +61,12 @@
     <Filter Include="ヘッダー ファイル\saveDataSelectScreen">
       <UniqueIdentifier>{dcacaf8c-a150-4fdc-8819-c3e2880bc97c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\message">
+      <UniqueIdentifier>{95454364-be5b-4db2-bc6d-1c943dff2bca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\message">
+      <UniqueIdentifier>{52dc67bb-990b-498f-a1d5-b143f9a4e9eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -155,6 +161,18 @@
     </ClCompile>
     <ClCompile Include="SoundOption.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="OpeningScreen.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\MessageTextLoader.cpp">
+      <Filter>ソース ファイル\message</Filter>
+    </ClCompile>
+    <ClCompile Include="Message\MessageWindow.cpp">
+      <Filter>ソース ファイル\message</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneOpening.cpp">
+      <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +274,18 @@
     </ClInclude>
     <ClInclude Include="SoundOption.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneOpening.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="OpeningScreen.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\MessageTextLoader.h">
+      <Filter>ヘッダー ファイル\message</Filter>
+    </ClInclude>
+    <ClInclude Include="Message\MessageWindow.h">
+      <Filter>ヘッダー ファイル\message</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

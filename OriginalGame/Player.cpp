@@ -12,7 +12,7 @@ namespace
 	// 通常移動スピード
 	constexpr float kMoveNormalSpeed = 5.0f;
 	// 速い移動スピード
-	constexpr float kMoveFastSpeed = kMoveNormalSpeed * 1.5f;
+	constexpr float kMoveFastSpeed = kMoveNormalSpeed * 1.8f;
 	// 遅い移動スピード
 	constexpr float kMoveSlowSpeed = kMoveNormalSpeed * 0.7f;
 
@@ -24,7 +24,6 @@ namespace
 
 	// コンベアの速度
 	constexpr float kConveyorSpeed = kMoveNormalSpeed * 0.8f;
-
 }
 
 namespace

@@ -1,13 +1,7 @@
-#include <DxLib.h>
+#include "SceneOpening.h"
 #include "SceneMain.h"
-#include "Vec2.h"
-#include "game.h"
-#include "Pad.h"
-#include "MainScreen.h"
-#include "SceneTitle.h"
 #include "Sound.h"
-
-
+#include "OpeningScreen.h"
 
 namespace
 {
@@ -19,29 +13,28 @@ namespace
 }
 
 
-
-SceneMain::SceneMain():
-	m_pMainScreen(std::make_shared<MainScreen>())
+SceneOpening::SceneOpening():
+	m_pOpeningScreen(std::make_shared<OpeningScreen>())
 {
 }
 
-SceneMain::~SceneMain()
+SceneOpening::~SceneOpening()
 {
 }
 
-void SceneMain::Init()
+void SceneOpening::Init()
 {
 	// フェードイン設定
 	SetFadeIn(kFadeSpeed, kFadeColor);
 
-	// メインスクリーンに自身のポインタを渡す
-	m_pMainScreen->SetSceneMain(this);
+	// オープニングスクリーンに自身のポインタを渡す
+	m_pOpeningScreen->SetSceneOpeningPointer(this);
 
 	// 初期化処理
-	m_pMainScreen->Init();
+	m_pOpeningScreen->Init();
 }
 
-SceneBase* SceneMain::Update()
+SceneBase* SceneOpening::Update()
 {
 	// フェード処理
 	UpdateFade();
@@ -57,44 +50,32 @@ SceneBase* SceneMain::Update()
 	}
 
 	// 更新処理
-	m_pMainScreen->Update();
+	m_pOpeningScreen->Update();
 
 
 	return this;
 }
 
-void SceneMain::Draw()
+void SceneOpening::Draw()
 {
 	// 描画処理
-	m_pMainScreen->Draw();
+	m_pOpeningScreen->Draw();
 
-	// フェード描画(一番下に来るようにする)
+	// フェード描画
 	DrawFade();
 }
 
-void SceneMain::ChangeScene(const Scene& nextScene)
+void SceneOpening::ChangeScene()
 {
 	// 次のシーンを設定
-	switch (nextScene)
-	{
-	case SceneMain::Scene::Title:
+	m_nextScene = new SceneMain();
 
-		// タイトルシーン
-		m_nextScene = new SceneTitle();
-
-		break;
-
-		// タイトルシーン
-		m_nextScene = new SceneTitle();
-	default:
-		break;
-	}
 
 	// フェードアウト設定
 	SetFadeOut(kFadeSpeed, kFadeColor);
 }
 
-void SceneMain::FadeOutSound()
+void SceneOpening::FadeOutSound()
 {
 	// フェードアウト中で無ければ処理をしない
 	if (!GetIsFadeOut())

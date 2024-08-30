@@ -42,7 +42,7 @@ namespace PlayerGraph
 	// プレイヤーグラフィックデータ
 	const GraphData kPlayerGraphData[] =
 	{
-		{ "Data/Graphic/Character/Marisa.png", EvoLib::Load::DivNum(3, 4) },
+		{ "Data/Graphic/Character/GameMain/Marisa.png", EvoLib::Load::DivNum(3, 4) },
 	};
 }
 

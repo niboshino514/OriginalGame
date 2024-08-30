@@ -3,6 +3,8 @@
 
 #include "SceneTitle.h"
 #include "SceneMain.h"
+#include "SceneOpening.h"
+
 #include "Pad.h"
 #include <DxLib.h>
 #include "game.h"
@@ -18,7 +20,7 @@ SceneManager::~SceneManager()
 
 void SceneManager::Init()
 {
-	m_pScene = new SceneMain;
+	m_pScene = new SceneOpening;
 	m_pScene->Init();
 }
 
