@@ -38,11 +38,46 @@ public:
 
 public:
 
+	// ジャンプタイプ
+	enum class JumpType
+	{
+		Infinite,	// 無限ジャンプ
+		Second,	// 2段ジャンプ
+	};
+
+	// ジャンプ力
+	enum class JumpPower
+	{
+		// 通常
+		Normal,
+		// 強
+		Strong,
+		// 弱
+		Weak,
+	};
+
+	// 移動速度
+	enum class MoveSpeed
+	{
+		Normal,// 通常
+		Slow,// 遅い
+		Fast,// 速い
+	};
+
 	// プレイヤーのステータス
 	struct PlayerStatus
 	{
 		// 重力方向
 		Direction gravityDirection = Direction::Bottom;
+
+		// ジャンプタイプ
+		JumpType jumpType = JumpType::Second;
+
+		// ジャンプ力
+		JumpPower jumpPower = JumpPower::Normal;
+
+		// 加速フラグ
+		MoveSpeed moveSpeed = MoveSpeed::Normal;
 	};
 
 
@@ -105,6 +140,12 @@ public:
 	/// </summary>
 	/// <returns>プレイヤーステータスの取得</returns>
 	PlayerStatus GetPlayerStatus() { return m_savePointData.playerStatus; }
+
+	/// <summary>
+	/// プレイヤーステータスを設定
+	/// </summary>
+	/// <param name="playerStatus">プレイヤーのステータスを設定</param>
+	void SetPlayerStatus(const PlayerStatus& playerStatus) { m_savePointData.playerStatus = playerStatus; }
 
 private:
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "ObjectBase.h"
-
+#include "GameData.h"
 
 
 template <class TState> class StateMachine;
@@ -119,22 +119,26 @@ private:
 	/// 障害物の当たり判定
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
-	/// <param name="pos">プレイヤーの座標</param>
-	void ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
+	/// <param name="pos">プレイヤーの四角形情報</param>
+	void ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Square& square);
+
+
+	/// <summary>
+	/// セーブポイントの衝突処理
+	/// </summary>
+	void SavePointCollision();
 
 	/// <summary>
 	/// マップ移動
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
-	/// <param name="pos">プレイヤーの座標</param>
-	void MapMove(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void MapMove(const ObjectManager::MapCollisionData& mapCollisionData);
 
 	/// <summary>
 	/// 重力処理
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
-	/// <param name="pos">プレイヤーの座標</param>
-	void Gravity(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void Gravity(const ObjectManager::MapCollisionData& mapCollisionData);
 
 	/// <summary>
 	/// 重力変更
@@ -145,17 +149,31 @@ private:
 	/// <summary>
 	/// アイスブロックの衝突処理
 	/// </summary>
-	/// <param name="mapCollisionData">マップ判定データ</param>
-	/// <param name="pos">プレイヤーの座標</param>
-	void IceBlockCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void IceBlockCollision();
 
 	/// <summary>
 	/// コンベアの衝突処理
 	/// </summary>
 	/// <param name="mapCollisionData">マップ判定データ</param>
-	/// <param name="pos">プレイヤーの座標</param>
-	void ConveyorCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos);
+	void ConveyorCollision(const ObjectManager::MapCollisionData& mapCollisionData);
 
+	/// <summary>
+	/// ジャンプタイプの衝突処理
+	/// </summary>
+	/// <param name="mapCollisionData">マップ判定データ</param>
+	void JumpTypeCollision(const ObjectManager::MapCollisionData& mapCollisionData);
+
+	/// <summary>
+	/// ジャンプ力の衝突処理
+	/// </summary>
+	/// <param name="mapCollisionData"マップ判定データ></param>
+	void JumpPowerCollision(const ObjectManager::MapCollisionData& mapCollisionData);
+
+	/// <summary>
+	/// 加速フラグの衝突処理
+	/// </summary>
+	/// <param name="mapCollisionData">マップ判定データ</param>
+	void AccelerationCollision(const ObjectManager::MapCollisionData& mapCollisionData);
 
 private:
 
@@ -172,9 +190,6 @@ private:
 	// 移動矩形
 	Rect m_moveRect;
 
-	// 重力方向
-	Direction m_gravityDirection;
-
 	// サイズ
 	Vec2 m_size;
 
@@ -187,6 +202,12 @@ private:
 	// コンベア
 	Conveyor m_conveyor;
 
+	////////////////////
+	// プレイヤー状態 //
+	////////////////////
+
+	// プレイヤーステータス
+	GameData::PlayerStatus m_playerStatus;
 
 	//////////////////
 	// ステート関連 //

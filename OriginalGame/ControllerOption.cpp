@@ -23,7 +23,7 @@ namespace Window
 namespace WindowNameGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/ControllerOption/WindowName.png";
+	const char* const kFilePath = "Data/Graphic/ControllerOption/WindowName.png";
 	// 分割数
 	const EvoLib::Load::DivNum kDivNum = { 1, 1 };
 	// 拡大率
@@ -34,7 +34,7 @@ namespace WindowNameGraph
 namespace SettingItemGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/ControllerOption/SettingItem.png";
+	const char* const kFilePath = "Data/Graphic/ControllerOption/SettingItem.png";
 	// グラフィックのグラフィック距離
 	const Vec2 kDistanceValue = Vec2(0, 40);
 	// 分割数
@@ -50,7 +50,7 @@ namespace SettingItemGraph
 namespace BackGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/Selection/Back.png";
+	const char* const kFilePath = "Data/Graphic/Selection/Back.png";
 	// 分割数
 	const EvoLib::Load::DivNum kDivNum = { 1, 1 };
 	// 拡大率
@@ -60,7 +60,7 @@ namespace BackGraph
 namespace SelectTriangleGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/Selection/SelectTriangle.png";
+	const char* const kFilePath = "Data/Graphic/Selection/SelectTriangle.png";
 
 	// 拡大率
 	const float kScale = 0.6f;
@@ -96,19 +96,19 @@ namespace
 	{
 		// コントローラー自動切換え
 		{
-			"Data/ControllerOption/Switch.png",
+			"Data/Graphic/ControllerOption/Switch.png",
 			{ 1, 2 },
 		
 		},
 		// コントローラータイプ選択
 		{
-			"Data/ControllerOption/ControllerType.png",
+			"Data/Graphic/ControllerOption/ControllerType.png",
 			{ 1, 3 },
 		
 		},
 		// 入力デバイス切替
 		{
-			"Data/ControllerOption/InputDevice.png",
+			"Data/Graphic/ControllerOption/InputDevice.png",
 			{ 1, 2 },
 		
 		},

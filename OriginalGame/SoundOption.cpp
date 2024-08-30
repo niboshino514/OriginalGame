@@ -73,7 +73,7 @@ namespace SoundVolumeGraph
 namespace SelectTriangleGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/Selection/SelectTriangle.png";
+	const char* const kFilePath = "Data/Graphic/Selection/SelectTriangle.png";
 
 	// 拡大率
 	const float kScale = 0.7f;
@@ -85,7 +85,7 @@ namespace SelectTriangleGraph
 namespace BackGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/Selection/Back.png";
+	const char* const kFilePath = "Data/Graphic/Selection/Back.png";
 	// 分割数
 	const EvoLib::Load::DivNum kDivNum = { 1, 1 };
 	// 拡大率

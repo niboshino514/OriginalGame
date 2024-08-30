@@ -52,8 +52,6 @@ bool EvoLib::File::IsFileExist(const std::string& name)
 
 std::vector<std::vector<std::string>> EvoLib::File::CsvFileLoading(const std::string& filePath, LoadType loadType)
 {
-
-
     // ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢ê‡
     if (!IsFileExist(filePath))
     {

@@ -1,6 +1,5 @@
 #include "ObjectManager.h"
 #include "Player.h"
-#include "GameData.h"
 #include "Camera.h"
 #include "game.h"
 #include "TransparentBlockChip.h"
@@ -19,7 +18,7 @@
 namespace
 {
 	// マップデータファイルパス
-	const std::string kFieldDataFilePath = "Data/mapData_";
+	const std::string kFieldDataFilePath = "Data/MapData/mapData_";
 
 	// ファイルパス拡張子
 	const std::string kFilePathExtension = ".fmf";
@@ -43,7 +42,7 @@ namespace PlayerGraph
 	// プレイヤーグラフィックデータ
 	const GraphData kPlayerGraphData[] =
 	{
-		{ "Data/Character/Marisa.png", EvoLib::Load::DivNum(3, 4) },
+		{ "Data/Graphic/Character/Marisa.png", EvoLib::Load::DivNum(3, 4) },
 	};
 }
 
@@ -170,7 +169,7 @@ void ObjectManager::StateSettingInit()
 	{
 		EvoLib::Load::DivNum divNum = EvoLib::Load::DivNum(16, 16);
 
-		m_testMapGraph = EvoLib::Load::LoadDivGraph_EvoLib_Revision("Data/mapSetting.png", divNum);
+		m_testMapGraph = EvoLib::Load::LoadDivGraph_EvoLib_Revision("Data/MapData/mapSetting.png", divNum);
 	}
 
 	// ステートを通常に変更
@@ -207,6 +206,15 @@ void ObjectManager::StatePauseDraw()
 {
 	// ポーズクラス描画
 	m_pPause->Draw();
+}
+
+void ObjectManager::SetSavePoint(const Vec2& pos, const GameData::PlayerStatus& playerStatus)
+{
+	// 座標をセルに変換
+	const Cell cell = EvoLib::Convert::PosToCell(pos, m_mapInfoData.mapChip.chipSize);
+
+	// セーブポイントデータを設定
+	GameData::GetInstance()->SetSavePointData(GameData::SavePointData(m_mapInfoData.mapNumber, cell, playerStatus));
 }
 
 void ObjectManager::SetState(const State& state)
@@ -608,23 +616,6 @@ std::vector<std::vector<int>> ObjectManager::GetMapChipNumber()
 
 	return mapChipNumber;
 }
-
-void ObjectManager::SetSavePoint(const Vec2& pos, const Direction& gravityDirection)
-{
-	// 座標からセルを求める
-	const Cell saveCell = EvoLib::Convert::PosToCell(pos, m_mapInfoData.mapChip.chipSize);
-
-
-
-	// セーブポイントのステージナンバー、セル、プレイヤーステータスを設定
-	GameData::GetInstance()->SetSavePointData
-	(GameData::SavePointData(
-		m_mapInfoData.mapNumber, 
-		saveCell, 
-		GameData::PlayerStatus(gravityDirection)));
-}
-
-
 
 std::tuple<bool, Vec2>  ObjectManager::GetSavePointPos()
 {

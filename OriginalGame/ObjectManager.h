@@ -7,6 +7,7 @@
 #include "Vec2.h"
 #include "PlatinumLoader.h"
 #include "SceneMain.h"
+#include "GameData.h"
 
 #include "EvoLib.h"
 
@@ -105,6 +106,18 @@ public:
 
 		TransparentBlock,	// 透明ブロック
 		
+		InfiniteJump,		// 無限ジャンプ
+		SecondJump,			// 二段ジャンプ
+
+		StrongJumpPower,	// 強ジャンプ
+		WeakJumpPower,		// 弱ジャンプ
+		NormalJumpPower,		// 通常ジャンプ
+
+		Acceleration,		// 加速
+		Deceleration,		// 減速
+		NormalSpeed,		// 通常速度
+
+
 		NotExists			// 存在しない
 	};
 
@@ -181,9 +194,16 @@ public:
 	void ChangeScene(const SceneMain::Scene& nextScene);
 
 
+	
+
 public:
 
-
+	/// <summary>
+	/// セーブポイント設定
+	/// </summary>
+	/// <param name="pos">座標</param>
+	/// <param name="playerStatus">プレイヤーステータス</param>
+	void SetSavePoint(const Vec2& pos, const GameData::PlayerStatus& playerStatus);
 
 	/// <summary>
 	/// ステート設定
@@ -229,11 +249,6 @@ public:
 	/// <returns></returns>
 	std::vector<std::vector<int>>GetMapChipNumber();
 
-	/// <summary>
-	/// セーブポイントを設定する
-	/// </summary>
-	/// <param name="pos">座標</param>
-	void SetSavePoint(const Vec2& pos, const Direction& gravityDirection);
 
 	/// <summary>
 	/// セーブポイントの座標を返す

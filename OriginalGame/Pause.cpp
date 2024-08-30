@@ -23,7 +23,7 @@ namespace Window
 namespace WindowNameGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/Pause/WindowName.png";
+	const char* const kFilePath = "Data/Graphic/Pause/WindowName.png";
 	// 分割数
 	const EvoLib::Load::DivNum kDivNum = { 1, 1 };
 	// 拡大率
@@ -45,7 +45,7 @@ namespace BackTitleWindow
 namespace BackTitleGraph
 {
 	// バックタイトルウィンドウのグラフィックファイルパス
-	const char* const kFilePath = "Data/Pause/BackTitle.png";
+	const char* const kFilePath = "Data/Graphic/Pause/BackTitle.png";
 	// バックタイトルウィンドウのグラフィック距離
 	const Vec2 kDistanceValue = Vec2(0, 10);
 	// バックタイトルウィンドウの分割数
@@ -59,7 +59,7 @@ namespace BackTitleGraph
 namespace Graph
 {
 	// ポーズセレクトグラフィックファイルパス
-	const char* const kPauseSelectFilePath = "Data/Pause/PauseSelect.png";
+	const char* const kPauseSelectFilePath = "Data/Graphic/Pause/PauseSelect.png";
 	// ポーズセレクトグラフィックのグラフィック距離
 	const Vec2 kPauseSelectDistanceValue = Vec2(0, 20);
 	// ポーズセレクトの縦分割数
@@ -68,7 +68,7 @@ namespace Graph
 	const Vec2 kPauseCenterPos = Vec2(Game::kWindowCenterX+20, Game::kWindowCenterY);
 
 	// バックタイトルセレクトグラフィックファイルパス
-	const char* const kBackTitleSelectFilePath = "Data/Selection/Selection.png";
+	const char* const kBackTitleSelectFilePath = "Data/Graphic/Selection/Selection.png";
 	// バックタイトルセレクトグラフィックのグラフィック距離
 	const Vec2 kBackTitleSelectDistanceValue = Vec2(80, 0);
 	// バックタイトルセレクトの縦分割数
@@ -89,7 +89,7 @@ namespace Graph
 namespace SelectTriangleGraph
 {
 	// グラフィックファイルパス
-	const char* const kFilePath = "Data/Selection/SelectTriangle.png";
+	const char* const kFilePath = "Data/Graphic/Selection/SelectTriangle.png";
 
 	// 拡大率
 	const float kScale = 0.6f;

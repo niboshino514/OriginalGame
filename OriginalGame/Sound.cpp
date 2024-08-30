@@ -9,7 +9,7 @@ namespace
 	const std::string  kDataFilePaht = "Data/Sound/";
 
 	// サウンドデータのファイルパス
-	const std::string kSoundDataFilePath = "Data/Sound/SoundSetUp/Sound.csv";
+	const std::string kSoundDataFilePath = "Data/Csv/Sound.csv";
 
 	// サウンドの最大値
 	const int kSoundMaxValue = 255;

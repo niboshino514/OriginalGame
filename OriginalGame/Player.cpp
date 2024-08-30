@@ -9,8 +9,12 @@
 
 namespace
 {
-	// 移動スピード
-	constexpr float kMoveSpeed = 5.0f;
+	// 通常移動スピード
+	constexpr float kMoveNormalSpeed = 5.0f;
+	// 速い移動スピード
+	constexpr float kMoveFastSpeed = kMoveNormalSpeed * 1.5f;
+	// 遅い移動スピード
+	constexpr float kMoveSlowSpeed = kMoveNormalSpeed * 0.7f;
 
 	// サイズ
 	const Vec2 kSize(20.0f, 30.0f);
@@ -19,17 +23,23 @@ namespace
 	constexpr float kFrictionIce = 0.98f;
 
 	// コンベアの速度
-	constexpr float kConveyorSpeed = kMoveSpeed * 0.8f;
+	constexpr float kConveyorSpeed = kMoveNormalSpeed * 0.8f;
 
 }
 
 namespace
 {
-	// ジャンプ力
-	constexpr float kJumpPower = 15.0f;
+	// 通常ジャンプ力
+	constexpr float kJumpNormalPower = 15.0f;
+	// 強ジャンプ力
+	constexpr float kJumpStrongPower = kJumpNormalPower * 1.6f;
+	// 弱ジャンプ力
+	constexpr float kJumpWeakPower = kJumpNormalPower * 0.7;
+
+
 
 	// ジャンプ回数
-	constexpr int kJumpCountMax = 5;
+	constexpr int kJumpCountMax = 2;
 
 	// 重力大
 	constexpr float kGravity = 1.5f;
@@ -38,11 +48,9 @@ namespace
 
 	// 最大移動量
 	constexpr float kMaxDir = 20.0f;
-
-
-	// 重力反転フラグ
-	constexpr bool kGravityReverseFlag = true;
 }
+
+
 namespace Graph
 {
 	// 拡大率
@@ -50,8 +58,6 @@ namespace Graph
 	// 縦幅調整値
 	const float kAdjustmentValue = (5.0f);
 	
-
-
 	// キャラクター描画の調整値を表す構造体
 	struct CharacterDrawAdjustment
 	{
@@ -98,11 +104,11 @@ Player::Player() :
 	m_vec(),
 	m_moveRect(),
 	m_rect(),
-	m_gravityDirection(),
 	m_size(),
 	m_isGround(),
 	m_isIceBlock(),
 	m_conveyor(),
+	m_playerStatus(),
 	m_pStateMachine(),
 	m_jumpInfo()
 {
@@ -167,8 +173,12 @@ void Player::StateInit()
 
 void Player::StateNormalEnter()
 {
+
+	// プレイヤーステータスを取得
+	m_playerStatus = GameData::GetInstance()->GetPlayerStatus();
+
 	// 重力方向変更
-	ChangeGravityDirection(GameData::GetInstance()->GetPlayerStatus().gravityDirection);
+	ChangeGravityDirection(m_playerStatus.gravityDirection);
 
 	// アイスブロックフラグをfalseにする
 	m_isIceBlock = false;
@@ -245,15 +255,15 @@ void Player::StateNormalDraw()
 
 
 	Vec2 pos = m_pos + offset;
-	pos += Graph::kCharacterDrawAdjustment[static_cast<int>(m_gravityDirection)].adjustmentPos;
+	pos += Graph::kCharacterDrawAdjustment[static_cast<int>(m_playerStatus.gravityDirection)].adjustmentPos;
 	
 	// 回転角度
-	const float rota = EvoLib::Convert::ConvertAngleToRadian(Graph::kCharacterDrawAdjustment[static_cast<int>(m_gravityDirection)].angle);
+	const float rota = EvoLib::Convert::ConvertAngleToRadian(Graph::kCharacterDrawAdjustment[static_cast<int>(m_playerStatus.gravityDirection)].angle);
 
 	// 反転フラグ
 	const bool isReverse = 
-		m_gravityDirection == Direction::Right ||
-		m_gravityDirection == Direction::Top;
+		m_playerStatus.gravityDirection == Direction::Right ||
+		m_playerStatus.gravityDirection == Direction::Top;
 
 	// プレイヤー描画
 	DrawRotaGraphF(
@@ -285,9 +295,6 @@ void Player::Respawn()
 		if (!isChangeStage)
 		{
 			m_pStateMachine.SetState(State::Normal);
-
-			// 重力方向変更
-			ChangeGravityDirection(GameData::GetInstance()->GetPlayerStatus().gravityDirection);
 		}
 	}
 }
@@ -305,21 +312,37 @@ void Player::Move()
 	// 移動量
 	Vec2 inputVec = Vec2();
 
+	// 移動スピード
+	float moveSpeed = 0.0f;
 
-	if (m_gravityDirection == Direction::Top ||
-		m_gravityDirection == Direction::Bottom)
+	if(m_playerStatus.moveSpeed == GameData::MoveSpeed::Normal)
+	{
+		moveSpeed = kMoveNormalSpeed;
+	}
+	else if (m_playerStatus.moveSpeed == GameData::MoveSpeed::Fast)
+	{
+		moveSpeed = kMoveFastSpeed;
+	}
+	else if (m_playerStatus.moveSpeed == GameData::MoveSpeed::Slow)
+	{
+		moveSpeed = kMoveSlowSpeed;
+	}
+
+
+	if (m_playerStatus.gravityDirection == Direction::Top ||
+		m_playerStatus.gravityDirection == Direction::Bottom)
 	{
 		// パッドを使用した移動
 		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::RIGHT))
 		{
-			inputVec.x += kMoveSpeed;
+			inputVec.x += moveSpeed;
 
 			// 向いている方向を右にする
 			m_animationDetails.direction[0] = Direction::Right;
 		}
 		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::LEFT))
 		{
-			inputVec.x -= kMoveSpeed;
+			inputVec.x -= moveSpeed;
 
 			// 向いている方向を左にする
 			m_animationDetails.direction[0] = Direction::Left;
@@ -343,14 +366,14 @@ void Player::Move()
 		// パッドを使用した移動
 		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::DOWN))
 		{
-			inputVec.y += kMoveSpeed;
+			inputVec.y += moveSpeed;
 
 			// 向いている方向を右にする
 			m_animationDetails.direction[0] = Direction::Right;
 		}
 		if (Controller::GetInstance()->IsPress(Controller::ControllerButton::UP))
 		{
-			inputVec.y -= kMoveSpeed;
+			inputVec.y -= moveSpeed;
 
 			// 向いている方向を左にする
 			m_animationDetails.direction[0] = Direction::Left;
@@ -375,8 +398,8 @@ void Player::Move()
 	if (m_isGround &&
 		m_conveyor.isFrag)
 	{
-		if (m_gravityDirection == Direction::Top ||
-			m_gravityDirection == Direction::Bottom)
+		if (m_playerStatus.gravityDirection == Direction::Top ||
+			m_playerStatus.gravityDirection == Direction::Bottom)
 		{
 			if (m_conveyor.direction == Direction::Right)
 			{
@@ -408,8 +431,8 @@ void Player::Move()
 	{
 		m_vec += inputVec;
 
-		m_vec.x = EvoLib::Calculation::Clamp(m_vec.x, -kMoveSpeed, kMoveSpeed);
-		m_vec.y = EvoLib::Calculation::Clamp(m_vec.y, -kMoveSpeed, kMoveSpeed);
+		m_vec.x = EvoLib::Calculation::Clamp(m_vec.x, -kMoveNormalSpeed, kMoveNormalSpeed);
+		m_vec.y = EvoLib::Calculation::Clamp(m_vec.y, -kMoveNormalSpeed, kMoveNormalSpeed);
 
 		m_vec *= kFrictionIce;
 
@@ -423,21 +446,46 @@ void Player::Move()
 void Player::Jump()
 {
 	// ボタンを押したとき、ジャンプカウントが0以上ならばジャンプ力を与える
-	if (Controller::GetInstance()->IsTrigger(Controller::ControllerButton::JUMP) &&
-		m_jumpInfo.jumpCount > 0)
+	if (Controller::GetInstance()->IsTrigger(Controller::ControllerButton::JUMP))
 	{
-		// ジャンプ音を再生
-		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Jump)]);
+
+		// ジャンプカウントが0以上ならばジャンプ力を与える
+		if (m_jumpInfo.jumpCount > 0 ||
+			m_playerStatus.jumpType == GameData::JumpType::Infinite)
+		{
+			// ジャンプフラグをtrueにする
+			m_jumpInfo.isJump = true;
+
+			// ジャンプ力
+			float jumpPower = 0.0f;
+
+			if(m_playerStatus.jumpPower == GameData::JumpPower::Normal)
+			{
+				jumpPower = kJumpNormalPower;
+			}
+			else if (m_playerStatus.jumpPower == GameData::JumpPower::Strong)
+			{
+				jumpPower = kJumpStrongPower;
+			}
+			else if (m_playerStatus.jumpPower == GameData::JumpPower::Weak)
+			{
+				jumpPower = kJumpWeakPower;
+			}
+
+			// ジャンプ力を与える
+			m_jumpInfo.fallSpeed = -jumpPower;
 
 
-		// ジャンプフラグをtrueにする
-		m_jumpInfo.isJump = true;
-
-		// ジャンプ力を与える
-		m_jumpInfo.fallSpeed = -kJumpPower;
-
-		// ジャンプカウントを減らす
-		m_jumpInfo.jumpCount--;
+			// ジャンプタイプがSecondならば、ジャンプカウントを減らす
+			if (m_playerStatus.jumpType == GameData::JumpType::Second)
+			{
+				// ジャンプカウントを減らす
+				m_jumpInfo.jumpCount--;
+			}
+			
+			// ジャンプ音を再生
+			Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Jump)]);
+		}
 	}
 
 	// 飛んでいた場合はボタンを押しているかどうかで落下スピードが変わる
@@ -462,14 +510,14 @@ void Player::Jump()
 	}
 
 	
-	if (m_gravityDirection == Direction::Top ||
-		m_gravityDirection == Direction::Bottom)
+	if (m_playerStatus.gravityDirection == Direction::Top ||
+		m_playerStatus.gravityDirection == Direction::Bottom)
 	{
 		// 移動量に落下スピードを代入する
 		m_vec.y = m_jumpInfo.fallSpeed;
 
 
-		if (m_gravityDirection == Direction::Top)
+		if (m_playerStatus.gravityDirection == Direction::Top)
 		{
 			// 移動量に落下スピードを代入する
 			m_vec.y = -m_jumpInfo.fallSpeed;
@@ -492,7 +540,7 @@ void Player::Jump()
 		m_vec.x = m_jumpInfo.fallSpeed;
 
 
-		if (m_gravityDirection == Direction::Left)
+		if (m_playerStatus.gravityDirection == Direction::Left)
 		{
 			// 移動量に落下スピードを代入する
 			m_vec.x = -m_jumpInfo.fallSpeed;
@@ -592,8 +640,8 @@ void Player::GroundCollision()
 	m_isGround = false;
 
 
-	if (m_gravityDirection == Direction::Top ||
-		m_gravityDirection == Direction::Bottom)
+	if (m_playerStatus.gravityDirection == Direction::Top ||
+		m_playerStatus.gravityDirection == Direction::Bottom)
 	{
 		if (m_pos.x < m_moveRect.left)
 		{
@@ -606,7 +654,7 @@ void Player::GroundCollision()
 			m_vec.x = 0.0f;
 		}
 
-		if (m_gravityDirection == Direction::Bottom)
+		if (m_playerStatus.gravityDirection == Direction::Bottom)
 		{
 
 			if (m_pos.y < m_moveRect.top)
@@ -667,7 +715,7 @@ void Player::GroundCollision()
 			m_vec.y = 0.0f;
 		}
 
-		if (m_gravityDirection == Direction::Left)
+		if (m_playerStatus.gravityDirection == Direction::Left)
 		{
 
 			if (m_pos.x < m_moveRect.left)
@@ -780,6 +828,10 @@ void Player::MapChipCollision(const Vec2& pos)
 	const int mapHeight = static_cast<int>(mapCollisionData[0].size());
 
 
+	// 座標を四角形情報に変換
+	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
+
+
 	for (int y = 0; y < mapHeight; y++)
 	{
 		for (int x = 0; x < mapWidth; x++)
@@ -790,11 +842,21 @@ void Player::MapChipCollision(const Vec2& pos)
 				continue;
 			}
 
+			// 四角形同士の当たり判定
+			if (!EvoLib::Collision::IsSquareToSquare(mapCollisionData[x][y].square, square))
+			{
+				continue;
+			}
+
+			// セーブポイントの当たり判定を行うかどうか
+			const bool isSavePointCollision =
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::Save;
+
+
 			// マップ移動フラグを行うかどうか
 			const bool isMapMove =
 				mapCollisionData[x][y].chipType == ObjectManager::ChipType::NextStage ||
-				mapCollisionData[x][y].chipType == ObjectManager::ChipType::PreviouseStage ||
-				mapCollisionData[x][y].chipType == ObjectManager::ChipType::Save;
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::PreviouseStage;
 
 
 			// 障害物の当たり判定を行うかどうか
@@ -824,40 +886,84 @@ void Player::MapChipCollision(const Vec2& pos)
 				mapCollisionData[x][y].chipType == ObjectManager::ChipType::LeftConveyor ||
 				mapCollisionData[x][y].chipType == ObjectManager::ChipType::RigthConveyor;
 
+			// ジャンプタイプブロックの当たり判定を行うかどうか
+			const bool isJumpTypeCollision =
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::InfiniteJump ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::SecondJump;
+
+			// ジャンプ力の変更の当たり判定を行うかどうか
+			const bool isJumpPowerCollision =
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::NormalJumpPower ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::StrongJumpPower ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::WeakJumpPower;
+	
+			// 加速度を変更するかどうか
+			const bool isAcceleration =
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::Acceleration ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::Deceleration ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::NormalSpeed;
+
+			// セーブポイントの当たり判定を行うかどうか
+			if (isSavePointCollision)
+			{
+				// セーブポイントの当たり判定
+				SavePointCollision();
+			}
 
 			// マップ移動の当たり判定を行うかどうか
 			if (isMapMove)
 			{
 				// マップチップの当たり判定
-				MapMove(mapCollisionData[x][y], pos);
+				MapMove(mapCollisionData[x][y]);
 			}
 			
 			// 障害物の当たり判定を行うかどうか
 			if (isObstacleCollision)
 			{
 				// 障害物の当たり判定
-				ObstacleCollision(mapCollisionData[x][y], pos);
+				ObstacleCollision(mapCollisionData[x][y], square);
 			}
 
 			// 重力方向を変更するかどうか
 			if(isGravity)
 			{
 				// 重力方向を変更する
-				Gravity(mapCollisionData[x][y], pos);
+				Gravity(mapCollisionData[x][y]);
 			}
 			
 			// アイスブロックの当たり判定を行うかどうか
 			if (isIceBlockCollision)
 			{
 				// アイスブロックの当たり判定
-				IceBlockCollision(mapCollisionData[x][y], pos);
+				IceBlockCollision();
 			}
 
 			// コンベアの当たり判定を行うかどうか
 			if(isConveyorCollision)
 			{
 				// コンベアの当たり判定
-				ConveyorCollision(mapCollisionData[x][y], pos);
+				ConveyorCollision(mapCollisionData[x][y]);
+			}
+
+			// ジャンプタイプブロックの当たり判定を行うかどうか
+			if(isJumpTypeCollision)
+			{
+				// ジャンプタイプブロックの当たり判定
+				JumpTypeCollision(mapCollisionData[x][y]);
+			}
+
+			// ジャンプ力の変更の当たり判定を行うかどうか
+			if(isJumpPowerCollision)
+			{
+				// ジャンプ力の変更の当たり判定
+				JumpPowerCollision(mapCollisionData[x][y]);
+			}
+
+			// 加速度を変更するかどうか
+			if(isAcceleration)
+			{
+				// 加速度を変更する
+				AccelerationCollision(mapCollisionData[x][y]);
 			}
 
 
@@ -870,24 +976,16 @@ void Player::MapChipCollision(const Vec2& pos)
 	}
 }
 
-void Player::ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Square& square)
 {
-	// 座標を四角形情報に変換
-	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
-
 	// 四角形と四角形の当たり判定
 	if (mapCollisionData.chipType == ObjectManager::ChipType::DiedBlock)
 	{
-		// 四角形同士の当たり判定
-		if (EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
-		{
-			// ステートをデッドにする
-			m_pStateMachine.SetState(State::Dead);
-		}
+		// ステートをデッドにする
+		m_pStateMachine.SetState(State::Dead);
 
 		return;
 	}
-
 
 	// 三角形の情報を取得
 	const Triangle needle = m_pObjectFactory->ChipTypeToTriangle(mapCollisionData.chipType, mapCollisionData.square);
@@ -900,24 +998,14 @@ void Player::ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisi
 	}
 }
 
-void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::SavePointCollision()
 {
-	// 座標を四角形情報に変換
-	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
+	// セーブポイントをセットする
+	m_pObjectFactory->SetSavePoint(m_pos, m_playerStatus);
+}
 
-
-	// 四角形同士の当たり判定
-	if (!EvoLib::Collision::IsSquareToSquare(mapCollisionData.square, square))
-	{
-		return;
-	}
-
-	// セーブポイントに当たった場合、セーブする
-	if (mapCollisionData.chipType == ObjectManager::ChipType::Save)
-	{
-		// セーブポイントをセットする
-		m_pObjectFactory->SetSavePoint(mapCollisionData.circle.centerPos, m_gravityDirection);
-	}
+void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData)
+{
 
 	// 次のステージに進む
 	if (mapCollisionData.chipType == ObjectManager::ChipType::NextStage)
@@ -936,18 +1024,8 @@ void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData, co
 	}
 }
 
-void Player::Gravity(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::Gravity(const ObjectManager::MapCollisionData& mapCollisionData)
 {
-	// 座標を四角形情報に変換
-	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
-
-	
-	// 四角形同士の当たり判定
-	if (!EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
-	{
-		return;
-	}
-
 
 	Direction gravityDirection = Direction();
 
@@ -986,33 +1064,18 @@ void Player::ChangeGravityDirection(const Direction& gravityDirection)
 	}
 
 	// 重力方向を変更する
-	m_gravityDirection = gravityDirection;
+	m_playerStatus.gravityDirection = gravityDirection;
 }
 
-void Player::IceBlockCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::IceBlockCollision()
 {
-	// 座標を四角形情報に変換
-	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
-
-	// 四角形同士の当たり判定
-	if (!EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
-	{
-		return;
-	}
-
 	m_isIceBlock = true;
 }
 
-void Player::ConveyorCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Vec2& pos)
+void Player::ConveyorCollision(const ObjectManager::MapCollisionData& mapCollisionData)
 {
-	// 座標を四角形情報に変換
-	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
 
-	// 四角形同士の当たり判定
-	if (!EvoLib::Collision::IsSquareToSquare(square, mapCollisionData.square))
-	{
-		return;
-	}
+
 
 	// コンベアの方向を取得
 	if(mapCollisionData.chipType == ObjectManager::ChipType::TopConveyor)
@@ -1034,4 +1097,48 @@ void Player::ConveyorCollision(const ObjectManager::MapCollisionData& mapCollisi
 
 	// コンベアに乗っている
 	m_conveyor.isFrag = true;
+}
+
+void Player::JumpTypeCollision(const ObjectManager::MapCollisionData& mapCollisionData)
+{
+	if(mapCollisionData.chipType == ObjectManager::ChipType::InfiniteJump)
+	{
+		m_playerStatus.jumpType = GameData::JumpType::Infinite;
+	}
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::SecondJump)
+	{
+		m_playerStatus.jumpType = GameData::JumpType::Second;
+	}
+}
+
+void Player::JumpPowerCollision(const ObjectManager::MapCollisionData& mapCollisionData)
+{
+	if (mapCollisionData.chipType == ObjectManager::ChipType::StrongJumpPower)
+	{
+		m_playerStatus.jumpPower = GameData::JumpPower::Strong;
+	}
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::WeakJumpPower)
+	{
+		m_playerStatus.jumpPower = GameData::JumpPower::Weak;
+	}
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::NormalJumpPower)
+	{
+		m_playerStatus.jumpPower = GameData::JumpPower::Normal;
+	}
+}
+
+void Player::AccelerationCollision(const ObjectManager::MapCollisionData& mapCollisionData)
+{
+	if(mapCollisionData.chipType == ObjectManager::ChipType::NormalSpeed)
+	{
+		m_playerStatus.moveSpeed = GameData::MoveSpeed::Normal;
+	}
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::Acceleration)
+	{
+		m_playerStatus.moveSpeed = GameData::MoveSpeed::Fast;
+	}
+	else if(mapCollisionData.chipType == ObjectManager::ChipType::Deceleration)
+	{
+		m_playerStatus.moveSpeed = GameData::MoveSpeed::Slow;
+	}
 }
