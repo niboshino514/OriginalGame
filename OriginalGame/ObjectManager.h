@@ -59,6 +59,7 @@ class ObjectBase;
 class PlatinumLoader;
 class Camera;
 class Pause;
+class MessageWindow;
 
 class ObjectManager : public std::enable_shared_from_this<ObjectManager>
 {
@@ -117,6 +118,9 @@ public:
 		Deceleration,		// 減速
 		NormalSpeed,		// 通常速度
 
+		BossSpawnFrag,		// ボススポーンフラグ
+		BossSpawnPos,		// ボススポーン座標
+		
 
 		NotExists			// 存在しない
 	};
@@ -154,8 +158,6 @@ public:
 		// マップナンバー
 		int mapNumber = 0;
 	};
-
-
 public:
 
 	// ステート
@@ -163,8 +165,12 @@ public:
 	{
 		// 設定
 		Setting,
+		// オープニング
+		Opening,
 		// 通常
 		Normal,
+		// ボス
+		SpawnBoss,
 		// ポーズ画面
 		Pause,
 	};
@@ -280,6 +286,12 @@ public:
 	/// <returns>オブジェクト情報</returns>
 	std::vector<std::shared_ptr<ObjectBase>> GetObjectInfo() { return m_object; }
 	
+
+	/// <summary>
+	/// スポーンボスステートになったかどうかを返す
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsSpawnBossState() { return m_isSpawnBossState; }
 private:
 
 	/// <summary>
@@ -290,9 +302,21 @@ private:
 	// 設定ステート処理
 	void StateSettingInit();
 
+	// オープニングステート処理
+	void StateOpeningEnter();
+	void StateOpeningUpdate();
+	void StateOpeningDraw();
+	void StateOpeningExit();
+
 	// ノーマルステート処理
 	void StateNormalUpdate();
 	void StateNormalDraw();
+
+	// ボス登場ステート処理
+	void StateSpawnBossEnter();
+	void StateSpawnBossUpdate();
+	void StateSpawnBossDraw();
+	void StateSpawnBossExit();
 
 	// ポーズステート処理
 	void StatePauseUpdate();
@@ -300,6 +324,7 @@ private:
 
 
 private:
+
 	/// <summary>
 	/// マップ関連初期設定
 	/// </summary>
@@ -337,7 +362,8 @@ private:
 	/// <summary>
 	/// オブジェクト更新
 	/// </summary>
-	void ObjectUpdate();
+	/// <param name="isStopPlayer">プレイヤーを止めるかどうか</param>
+	void ObjectUpdate(const bool isStopPlayer = false);
 
 	/// <summary>
 	/// オブジェクト描画
@@ -378,6 +404,9 @@ private:
 	// ステートマシン
 	StateMachine<State>m_pStateMachine;
 
+	// ボスステートシーンに移行したかどうか
+	bool m_isSpawnBossState;
+	
 
 	////////////////////
 	// クラスポインタ //
@@ -394,4 +423,7 @@ private:
 
 	// ポーズ
 	std::shared_ptr<Pause>m_pPause;
+
+	// メッセージウィンドウ
+	std::shared_ptr<MessageWindow>m_pMessageWindow;
 };

@@ -14,15 +14,14 @@ TransparentBlockChip::~TransparentBlockChip()
 
 void TransparentBlockChip::Init()
 {
+	// オブジェクトIDを設定
 	m_objectID = ObjectID::TransparentBlockChip;
-
 }
 
 void TransparentBlockChip::Update()
 {
 	// 衝突処理
 	Collision();
-
 }
 
 void TransparentBlockChip::Draw()
@@ -47,30 +46,4 @@ void TransparentBlockChip::Draw()
 	// 透明ブロック描画
 	DrawBoxAA(drawSquare.A.x, drawSquare.A.y, drawSquare.C.x, drawSquare.C.y, 0xffffff, TRUE);
 	
-}
-
-void TransparentBlockChip::Collision()
-{
-	const auto& objectData = m_pObjectFactory->GetObjectInfo();
-
-	for (auto& object : objectData)
-	{
-
-		ObjectID objectID = object->GetObjectID();
-
-		if (object->GetObjectID() != ObjectID::Player)
-		{
-			continue;
-		}
-
-		// プレイヤーとの当たり判定
-		if (EvoLib::Collision::IsSquareToSquare(m_square, object->GetSquare()))
-		{
-			m_isGimmick = true;
-
-			return;
-		}
-	}
-
-
 }

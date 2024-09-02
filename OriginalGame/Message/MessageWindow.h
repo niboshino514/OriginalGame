@@ -77,6 +77,7 @@ public:
 	void Update();
 	void Draw();
 
+
 	// テキスト表示情報
 	struct TextDisplayInfo
 	{
@@ -191,6 +192,8 @@ public:
 	/// <returns>テキストが終了フラグを返す</returns>
 	bool IsAllTextEnd() { return m_isAllTextEnd; }
 
+	// データの初期化
+	void InitData();
 
 private:
 

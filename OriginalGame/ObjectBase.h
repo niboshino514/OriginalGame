@@ -25,6 +25,7 @@ public:
 		Player,					// プレイヤー
 
 		TransparentBlockChip,	// 透明ブロックチップ
+		BossSpawnFlagChip,		// ボススポーンフラグチップ
 	};
 
 
@@ -88,7 +89,7 @@ public:
 	/// オブジェクトファクトリークラスをコピー
 	/// </summary>
 	/// <param name="objectFactory">オブジェクトファクトリー</param>
-	void SetObjectFactory(std::shared_ptr<ObjectManager>objectFactory) { m_pObjectFactory = objectFactory; }
+	void SetObjectFactory(std::shared_ptr<ObjectManager>objectFactory) { m_pObjectManager = objectFactory; }
 
 	/// <summary>
 	/// 存在フラグ代入
@@ -189,6 +190,9 @@ protected:
 	// 座標
 	Vec2 m_pos;
 
+	// 移動量
+	Vec2 m_vec;
+
 	// 四角形情報
 	Square m_square;
 
@@ -216,5 +220,5 @@ protected:
 	// クラスポインタ //
 	////////////////////
 
-	std::shared_ptr<ObjectManager>m_pObjectFactory;// オブジェクトファクトリー
+	std::shared_ptr<ObjectManager>m_pObjectManager;// オブジェクトマネージャー
 };

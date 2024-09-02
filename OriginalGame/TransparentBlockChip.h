@@ -1,7 +1,7 @@
 #pragma once
-#include "ObjectBase.h"
+#include "MapChipBase.h"
 
-class TransparentBlockChip : public ObjectBase
+class TransparentBlockChip : public MapChipBase
 {
 public:
 	TransparentBlockChip();
@@ -10,14 +10,6 @@ public:
 	void Init()override;
 	void Update()override;
 	void Draw()override;
-
-private:
-
-	/// <summary>
-	/// Õ“Ëˆ—
-	/// </summary>
-	void Collision();
-
 
 private:
 

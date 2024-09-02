@@ -143,6 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BossEnemy.cpp" />
+    <ClCompile Include="BossSpawnFlagChip.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="ControllerOption.cpp" />
@@ -157,6 +159,7 @@
     <ClCompile Include="Library\Load.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainScreen.cpp" />
+    <ClCompile Include="MapChipBase.cpp" />
     <ClCompile Include="Message\MessageTextLoader.cpp" />
     <ClCompile Include="Message\MessageWindow.cpp" />
     <ClCompile Include="ObjectBase.cpp" />
@@ -180,6 +183,8 @@
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BossEnemy.h" />
+    <ClInclude Include="BossSpawnFlagChip.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="ControllerOption.h" />
@@ -194,6 +199,7 @@
     <ClInclude Include="Library\FPS.h" />
     <ClInclude Include="Library\Load.h" />
     <ClInclude Include="MainScreen.h" />
+    <ClInclude Include="MapChipBase.h" />
     <ClInclude Include="Message\MessageTextLoader.h" />
     <ClInclude Include="Message\MessageWindow.h" />
     <ClInclude Include="ObjectBase.h" />

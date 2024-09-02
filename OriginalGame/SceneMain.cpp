@@ -12,7 +12,7 @@
 namespace
 {
 	// フェードインアウトのスピード
-	constexpr int kFadeSpeed = 10;
+	constexpr int kFadeSpeed = 255;
 
 	// フェードのカラー
 	constexpr int kFadeColor = 0x000000;

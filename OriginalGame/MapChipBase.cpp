@@ -8,18 +8,27 @@ MapChipBase::~MapChipBase()
 {
 }
 
-void MapChipBase::Init()
-{
-}
 
-void MapChipBase::Update()
+void MapChipBase::Collision()
 {
-}
+	const auto& objectData = m_pObjectManager->GetObjectInfo();
 
-void MapChipBase::Draw()
-{
-	// セル描画
-	DrawQuadrangleAA
-	(m_square.A.x, m_square.A.y, m_square.B.x, m_square.B.y,
-		m_square.C.x, m_square.C.y, m_square.D.x, m_square.D.y, m_color, false);
+	for (auto& object : objectData)
+	{
+
+		ObjectID objectID = object->GetObjectID();
+
+		if (object->GetObjectID() != ObjectID::Player)
+		{
+			continue;
+		}
+
+		// プレイヤーとの当たり判定
+		if (EvoLib::Collision::IsSquareToSquare(m_square, object->GetSquare()))
+		{
+			m_isGimmick = true;
+
+			return;
+		}
+	}
 }

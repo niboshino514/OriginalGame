@@ -345,6 +345,25 @@ void MessageWindow::LoadData(const std::string& talkDataCsvFilePath)
 	}
 }
 
+void MessageWindow::InitData()
+{
+	// データのアンロード
+	UnloadData();
+
+	// テキスト情報
+	m_textInfo = TextDisplayInfo();
+
+	// ウィンドウ情報
+	m_windowInfo = MessageWindowInfo();
+
+	// メッセージ要素
+	m_messageElement.clear();
+
+	// すべてのテキストが終了したかどうか
+	m_isAllTextEnd = false;
+	
+}
+
 void MessageWindow::UnloadData()
 {
 	// グラフィックハンドルの解放

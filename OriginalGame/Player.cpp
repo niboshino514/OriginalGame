@@ -100,7 +100,6 @@ namespace Anime
 
 
 Player::Player() :
-	m_vec(),
 	m_moveRect(),
 	m_rect(),
 	m_size(),
@@ -288,7 +287,11 @@ void Player::Respawn()
 		bool isChangeStage = false;
 
 		// セーブポイント座標を取得する
-		std::tie(isChangeStage, m_pos) = m_pObjectFactory->GetSavePointPos();
+		std::tie(isChangeStage, m_pos) = m_pObjectManager->GetSavePointPos();
+
+		// 座標を四角形情報に変換
+		m_square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(m_pos, m_size));
+
 
 		// ステージを変更しない場合、ステートをノーマルにする
 		if (!isChangeStage)
@@ -601,10 +604,10 @@ void Player::GroundCollision()
 	m_rect = EvoLib::Convert::PosToRect(m_pos, m_size);
 
 	// マップチップのサイズを取得
-	const float mapChipSize = m_pObjectFactory->GetMapInfoData().mapChip.chipSize;
+	const float mapChipSize = m_pObjectManager->GetMapInfoData().mapChip.chipSize;
 
 	// マップチップの最大セルを取得
-	const Cell maxCell = Cell(m_pObjectFactory->GetMapInfoData().mapChip.mapWidth, m_pObjectFactory->GetMapInfoData().mapChip.mapHeight);
+	const Cell maxCell = Cell(m_pObjectManager->GetMapInfoData().mapChip.mapWidth, m_pObjectManager->GetMapInfoData().mapChip.mapHeight);
 
 	// 地面セル番号
 	std::vector<int>groundCellNumber;
@@ -619,7 +622,7 @@ void Player::GroundCollision()
 
 	// 移動可能範囲の矩形を取得
 	m_moveRect = EvoLib::Calculation::CalculateRectangleMovementRange
-	(m_rect, maxCell, mapChipSize, m_pObjectFactory->GetMapChipNumber(), groundCellNumber);
+	(m_rect, maxCell, mapChipSize, m_pObjectManager->GetMapChipNumber(), groundCellNumber);
 
 
 
@@ -820,7 +823,7 @@ void Player::MapChipCollision(const Vec2& pos)
 
 	// マップ判定データを取得
 	std::vector<std::vector<ObjectManager::MapCollisionData>> mapCollisionData =
-		m_pObjectFactory->GetMapInfoData().mapCollisionData;
+		m_pObjectManager->GetMapInfoData().mapCollisionData;
 
 	// マップの幅と高さを取得
 	const int mapWidth = static_cast<int>(mapCollisionData.size());
@@ -987,7 +990,7 @@ void Player::ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisi
 	}
 
 	// 三角形の情報を取得
-	const Triangle needle = m_pObjectFactory->ChipTypeToTriangle(mapCollisionData.chipType, mapCollisionData.square);
+	const Triangle needle = m_pObjectManager->ChipTypeToTriangle(mapCollisionData.chipType, mapCollisionData.square);
 
 	// 三角形と四角形の当たり判定
 	if (EvoLib::Collision::IsTriangleToSquare(needle, square))
@@ -1000,7 +1003,7 @@ void Player::ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisi
 void Player::SavePointCollision()
 {
 	// セーブポイントをセットする
-	m_pObjectFactory->SetSavePoint(m_pos, m_playerStatus);
+	m_pObjectManager->SetSavePoint(m_pos, m_playerStatus);
 }
 
 void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData)
@@ -1009,7 +1012,7 @@ void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData)
 	// 次のステージに進む
 	if (mapCollisionData.chipType == ObjectManager::ChipType::NextStage)
 	{
-		m_pObjectFactory->StageMove(ObjectManager::MapSwitchType::NextStage);
+		m_pObjectManager->StageMove(ObjectManager::MapSwitchType::NextStage);
 
 		return;
 	}
@@ -1017,7 +1020,7 @@ void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData)
 	// 前のステージに戻る
 	if (mapCollisionData.chipType == ObjectManager::ChipType::PreviouseStage)
 	{
-		m_pObjectFactory->StageMove(ObjectManager::MapSwitchType::PreviouseStage);
+		m_pObjectManager->StageMove(ObjectManager::MapSwitchType::PreviouseStage);
 
 		return;
 	}

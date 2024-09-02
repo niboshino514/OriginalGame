@@ -7,13 +7,14 @@ public:
 	MapChipBase();
 	virtual ~MapChipBase();
 
-	void Init()override;
-	void Update()override;
-	void Draw()override;
+	void Init()override = 0;
+	void Update()override = 0;
+	void Draw()override = 0;
 
 protected:
 
-	// ƒJƒ‰[
-	int m_color;
+	/// <summary>
+	/// Õ“Ëˆ—
+	/// </summary>
+	void Collision();
 };
-
