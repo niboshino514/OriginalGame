@@ -7,6 +7,10 @@
 #include "GameData.h"
 #include <vector>
 
+
+
+
+
 class ObjectManager;
 
 class ObjectBase
@@ -26,6 +30,9 @@ public:
 
 		TransparentBlockChip,	// 透明ブロックチップ
 		BossSpawnFlagChip,		// ボススポーンフラグチップ
+		BossEnemy,				// ボスエネミー
+
+		PlayerShot,				// プレイヤーショット
 	};
 
 
@@ -83,6 +90,8 @@ public:
 
 
 
+
+
 public:
 
 	/// <summary>
@@ -132,10 +141,17 @@ public:
 
 
 	/// <summary>
+	/// オブジェクト
+	/// </summary>
+	/// <param name="objectID"></param>
+	void SetObjectID(const ObjectID& objectID) { m_objectID = objectID; }
+
+	/// <summary>
 	/// オブジェクトIDを返す
 	/// </summary>
 	/// <returns>オブジェクトID</returns>
 	ObjectID GetObjectID() { return m_objectID; }
+
 
 	/// <summary>
 	/// 描画優先順位を返す
@@ -160,6 +176,13 @@ public:
 	/// </summary>
 	/// <param name="graphicHandle">グラフィックハンドル</param>
 	void SetGraphicHandle(const std::vector<int>& graphicHandle) { m_graphicHandle = graphicHandle; }
+
+
+	/// <summary>
+	/// ショットデータをセット
+	/// </summary>
+	/// <param name="shotData">ショットデータ</param>
+	void SetShotData(const GameData::ShotData& shotData) { m_shotData = shotData; }
 
 protected:
 
@@ -198,6 +221,9 @@ protected:
 
 	// 描画の優先順位
 	DrawRank m_drawRank;
+
+	// ショットデータ
+	GameData::ShotData m_shotData;
 
 	//////////////////////
 	// グラフィック関連 //

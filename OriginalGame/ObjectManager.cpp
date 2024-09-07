@@ -8,6 +8,9 @@
 #include "MainScreen.h"
 #include "Sound.h"
 #include "MessageWindow.h"
+#include "Controller.h"
+#include "BossEnemy.h"
+#include "PlayerShot.h"
 
 #include <cassert>
 #include <string>
@@ -24,6 +27,7 @@ namespace
 	// ファイルパス拡張子
 	const std::string kFilePathExtension = ".fmf";
 }
+
 
 namespace
 {
@@ -56,14 +60,17 @@ ObjectManager::ObjectManager() :
 	m_object(),
 	m_mapInfoData(),
 	m_screenCircle(),
+	m_shotData(),
 	m_testMapGraph(),
 	m_pStateMachine(),
+	m_isSpawnBossStateEnd(),
 	m_isSpawnBossState(),
 	m_playerGraphHandle(),
 	m_pPlatinumLoader(std::make_shared<PlatinumLoader>()),
 	m_pCamera(std::make_shared<Camera>()),
 	m_pPause(std::make_shared<Pause>()),
-	m_pMessageWindow(std::make_shared<MessageWindow>())
+	m_pOpeningMessageWindow(std::make_shared<MessageWindow>()),
+	m_pBossTalkMessageWindow(std::make_shared<MessageWindow>())
 {
 }
 
@@ -88,24 +95,22 @@ void ObjectManager::Init()
 
 void ObjectManager::Update()
 {
-	
-
 	// ポーズクラス更新
 	m_pPause->Update();
 
 	// ステートマシンの更新
 	m_pStateMachine.Update();
+
+
 }
 
 void ObjectManager::Draw()
 {
-
 	// オブジェクト描画
 	ObjectDraw();
 	
 	// マップ描画
 	TestMapDraw();
-
 
 	// ステートマシンの描画
 	m_pStateMachine.Draw();
@@ -115,6 +120,13 @@ void ObjectManager::ChangeScene(const SceneMain::Scene& nextScene)
 {
 	// シーン変更
 	m_pMainScreen->ChangeScene(nextScene);
+}
+
+
+
+void ObjectManager::SetShotCount(const GameData::ShotData& shotData)
+{
+	m_shotData.push_back(shotData);
 }
 
 void ObjectManager::StateInit()
@@ -160,6 +172,17 @@ void ObjectManager::StateInit()
 		m_pStateMachine.AddState(State::SpawnBoss, enter, update, draw, exit);
 	}
 
+	// ボス会話ステート
+	{
+		auto enter = [this]() { StateBossTalkEnter(); };
+		auto update = [this]() { StateBossTalkUpdate(); };
+		auto draw = [this]() { StateBossTalkDraw(); };
+		auto exit = [this]() { StateBossTalkExit(); };
+		
+
+		m_pStateMachine.AddState(State::BossTalk, enter, update, draw, exit);
+	}
+
 	// ポーズステート
 	{	
 		auto update = [this]() { StatePauseUpdate(); };
@@ -184,7 +207,10 @@ void ObjectManager::StateSettingInit()
 	// スクリーンサークル初期化
 	InitScreenCircle();
 
-	// ボススポーンステートフラグをfalseにする
+	// ボススポーンステート終了フラグをfalseにする
+	m_isSpawnBossStateEnd = false;
+
+	// ボススポーンフラグ初期化
 	m_isSpawnBossState = false;
 
 	// カメラクラスにオブジェクトファクトリークラスポインタを送る
@@ -192,6 +218,7 @@ void ObjectManager::StateSettingInit()
 
 	// ポーズクラスにオブジェクトファクトリークラスポインタを送る
 	m_pPause->SetObjectFactoryPointer(shared_from_this());
+
 	// ポーズクラス初期化
 	m_pPause->Init();
 
@@ -203,17 +230,26 @@ void ObjectManager::StateSettingInit()
 		m_testMapGraph = EvoLib::Load::LoadDivGraph_EvoLib_Revision("Data/MapData/mapSetting.png", divNum);
 	}
 
-	// ステートを通常に変更
-	SetState(State::Opening);
+	
+
+
+	// メッセージウィンドウデータロード
+	m_pBossTalkMessageWindow->LoadData(TalkData::kDataFilePath);
+
 
 	// BGM再生
 	Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::BGM)]);
+
+
+	// ステートを通常に変更
+	SetState(State::Normal);
+
 }
 
 void ObjectManager::StateOpeningEnter()
 {
 	// メッセージウィンドウデータロード
-	m_pMessageWindow->LoadData(TalkData::kDataFilePath);
+	m_pOpeningMessageWindow->LoadData(TalkData::kDataFilePath);
 }
 
 void ObjectManager::StateOpeningUpdate()
@@ -226,13 +262,13 @@ void ObjectManager::StateOpeningUpdate()
 	ScreenCheck();
 
 	// カメラ更新
-	m_pCamera->Update();
+	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
 
 	// メッセージウィンドウ更新
-	m_pMessageWindow->Update();
+	m_pOpeningMessageWindow->Update();
 
 	// メッセージウィンドウが終了したら次のステートに変更
-	if (m_pMessageWindow->IsAllTextEnd())
+	if (m_pOpeningMessageWindow->IsAllTextEnd())
 	{
 		SetState(State::Normal);
 	}
@@ -241,13 +277,13 @@ void ObjectManager::StateOpeningUpdate()
 void ObjectManager::StateOpeningDraw()
 {
 	// メッセージウィンドウ描画
-	m_pMessageWindow->Draw();
+	m_pOpeningMessageWindow->Draw();
 }
 
 void ObjectManager::StateOpeningExit()
 {
 	// メッセージウィンドウ初期化
-	m_pMessageWindow->InitData();
+	m_pOpeningMessageWindow->InitData();
 }
 
 void ObjectManager::StateNormalUpdate()
@@ -259,10 +295,15 @@ void ObjectManager::StateNormalUpdate()
 	ScreenCheck();
 
 	// カメラ更新
-	m_pCamera->Update();
+	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
 
 	// オブジェクト削除
 	ObjectErase();
+	
+	if(m_isSpawnBossState)
+	{
+		SetState(State::SpawnBoss);
+	}
 }
 
 void ObjectManager::StateNormalDraw()
@@ -271,44 +312,73 @@ void ObjectManager::StateNormalDraw()
 
 void ObjectManager::StateSpawnBossEnter()
 {
-	// ボススポーンステートフラグをtrueにする
-	m_isSpawnBossState = true;
+	// ボススポーンステートに移行したかどうかのフラグをtrueにする
+	m_isSpawnBossStateEnd = true;
 
-	// メッセージウィンドウデータロード
-	m_pMessageWindow->LoadData(TalkData::kDataFilePath);
+	// ボススポーンステートフラグをfalseにする
+	m_isSpawnBossState = false;
+
+	// コントローラー操作を無効にする
+	Controller::GetInstance()->SetAcceptInput(false);
+
+	// ボス生成
+	BossEnemyCreate(GameData::GetInstance()->GetBossEnemySpawnPos());
 }
 
 void ObjectManager::StateSpawnBossUpdate()
 {
 	// オブジェクト更新
-	ObjectUpdate(true);
+	ObjectUpdate();
 
 	// スクリーン内かどうかを調べる
 	ScreenCheck();
 
 	// カメラ更新
-	m_pCamera->Update();
+	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
+}
+
+void ObjectManager::StateSpawnBossDraw()
+{
+}
+
+void ObjectManager::StateSpawnBossExit()
+{
+	// コントローラー操作を有効にする
+	Controller::GetInstance()->SetAcceptInput(true);
+}
+
+void ObjectManager::StateBossTalkEnter()
+{
+
+	m_pBossTalkMessageWindow->ResetData();
+}
+
+void ObjectManager::StateBossTalkUpdate()
+{
+	// スクリーン内かどうかを調べる
+	ScreenCheck();
+
+	// カメラ更新
+	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
 
 	// メッセージウィンドウ更新
-	m_pMessageWindow->Update();
+	m_pBossTalkMessageWindow->Update();
 
 	// メッセージウィンドウが終了したら次のステートに変更
-	if (m_pMessageWindow->IsAllTextEnd())
+	if (m_pBossTalkMessageWindow->IsAllTextEnd())
 	{
 		SetState(State::Normal);
 	}
 }
 
-void ObjectManager::StateSpawnBossDraw()
+void ObjectManager::StateBossTalkDraw()
 {
 	// メッセージウィンドウ描画
-	m_pMessageWindow->Draw();
+	m_pBossTalkMessageWindow->Draw();
 }
 
-void ObjectManager::StateSpawnBossExit()
+void ObjectManager::StateBossTalkExit()
 {
-	// メッセージウィンドウ初期化
-	m_pMessageWindow->InitData();
 }
 
 void ObjectManager::StatePauseUpdate()
@@ -353,9 +423,9 @@ void ObjectManager::Load()
 	}
 }
 
-void ObjectManager::CharacterCreate(const Vec2& pos)
+void ObjectManager::PlayerCreate(const Vec2& pos)
 {
-	// キャラクター生成
+	// プレイヤー生成
 	m_object.push_back(std::make_shared<Player>());
 
 	// ポインタを送る
@@ -369,6 +439,24 @@ void ObjectManager::CharacterCreate(const Vec2& pos)
 
 	// グラフィックハンドルを代入
 	m_object.back()->SetGraphicHandle(m_playerGraphHandle);
+
+	// 初期化処理
+	m_object.back()->Init();
+}
+
+void ObjectManager::BossEnemyCreate(const Vec2& pos)
+{
+	// ボスエネミー生成
+	m_object.push_back(std::make_shared<BossEnemy>());
+
+	// ポインタを送る
+	m_object.back()->SetObjectFactory(shared_from_this());
+
+	// 描画ランクを代入
+	m_object.back()->SetDrawRank(ObjectBase::DrawRank::Rank_1);
+
+	// グラフィックハンドルを代入
+	//m_object.back()->SetGraphicHandle(m_playerGraphHandle);
 
 	// 初期化処理
 	m_object.back()->Init();
@@ -401,6 +489,13 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 
 	// 前のステージ座標チップ個数
 	int previousePosChip = 0;
+
+	// ボススポーンフラグチップ個数
+	int bossSpawnFragChip = 0;
+
+	// ボススポーン座標チップ個数
+	int bossSpawnPosChip = 0;
+
 
 
 	// すべてのセルを見る
@@ -440,6 +535,18 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 
 					// スポーンチップ個数を増やす
 					spawnChip++;
+					break;
+				case ObjectManager::ChipType::BossSpawnFrag:
+
+					// ボススポーンフラグチップ個数を増やす
+					bossSpawnFragChip++;
+
+					break;
+				case ObjectManager::ChipType::BossSpawnPos:
+
+					// ボススポーン座標チップ個数を増やす
+					bossSpawnPosChip++;
+
 					break;
 				default:
 					break;
@@ -493,7 +600,7 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 					isPreviouseStagePos)
 				{
 					// キャラクター生成
-					CharacterCreate(EvoLib::Convert::CellToPos(Cell(x, y), m_mapInfoData.mapChip.chipSize));
+					PlayerCreate(EvoLib::Convert::CellToPos(Cell(x, y), m_mapInfoData.mapChip.chipSize));
 
 					
 
@@ -516,6 +623,18 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 					MapChipCreate(mapCollisionData[x][y]);
 				}
 			}
+
+			// ボスエネミー登場座標取得
+			{
+				if (mapCollisionData[x][y].chipType == ChipType::BossSpawnPos)
+				{
+					const Vec2 pos = EvoLib::Convert::CellToPos(Cell(x, y), m_mapInfoData.mapChip.chipSize);
+
+					// ボスエネミー座標を設定
+					GameData::GetInstance()->SetBossEnemySpawnPos(pos);
+				}
+			}
+
 		}
 	}
 
@@ -523,7 +642,7 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 	if (mapSwitchType == MapSwitchType::Respawn)
 	{
 		// キャラクター生成
-		CharacterCreate(EvoLib::Convert::CellToPos(GameData::GetInstance()->GetSavePointData().cell, m_mapInfoData.mapChip.chipSize));
+		PlayerCreate(EvoLib::Convert::CellToPos(GameData::GetInstance()->GetSavePointData().cell, m_mapInfoData.mapChip.chipSize));
 
 		// プレイヤー生成フラグ
 		isPlayerCreate = true;
@@ -536,14 +655,14 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 		if (mapSwitchType == MapSwitchType::NextStage)
 		{
 			// キャラクター生成
-			CharacterCreate(EvoLib::Convert::CellToPos(previouseStageCell, m_mapInfoData.mapChip.chipSize));
+			PlayerCreate(EvoLib::Convert::CellToPos(previouseStageCell, m_mapInfoData.mapChip.chipSize));
 		}
 
 		// ステージ変更タイプが前のステージの場合、次のステージセル座標を代入してキャラクター生成
 		if (mapSwitchType == MapSwitchType::PreviouseStage)
 		{
 			// キャラクター生成
-			CharacterCreate(EvoLib::Convert::CellToPos(nextStageCell, m_mapInfoData.mapChip.chipSize));
+			PlayerCreate(EvoLib::Convert::CellToPos(nextStageCell, m_mapInfoData.mapChip.chipSize));
 		}
 	}
 
@@ -566,8 +685,8 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 
 
 		// 現在のfmfファイル名
-		std::string fmfFileName = m_mapInfoData.filePath[m_mapInfoData.mapNumber];
-		fmfFileName = "[ fmfFileName ]の";
+		std::string fmfFileName = "[ " + m_mapInfoData.filePath[m_mapInfoData.mapNumber] + " ]の";
+
 
 		// エラーメッセージ
 		std::string errorMessage = "";
@@ -647,6 +766,30 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 				isErrorMessage = true;
 			}
 		}
+
+
+	
+		if (bossSpawnFragChip > 0)
+		{
+			if(bossSpawnPosChip <=0)
+			{
+				// エラーメッセージ生成
+				errorMessage = fmfFileName + chipName + noChip;
+
+				// エラーメッセージフラグ
+				isErrorMessage = true;
+			}
+			else if (bossSpawnPosChip > 1)
+			{
+				// エラーメッセージ生成
+				errorMessage = fmfFileName + chipName + overChip;
+
+				// エラーメッセージフラグ
+				isErrorMessage = true;
+			}
+		}
+
+
 
 		// エラーメッセージを出すかどうか
 		if (isErrorMessage)
@@ -736,6 +879,19 @@ std::tuple<bool, Vec2>  ObjectManager::GetSavePointPos()
 	// セーブポイントデータを取得
 	const GameData::SavePointData savePointData = GameData::GetInstance()->GetSavePointData();
 
+
+	// ボスを削除する
+	for (auto& object : m_object)
+	{
+		if (object->GetObjectID() == ObjectBase::ObjectID::BossEnemy)
+		{
+			object->SetIsExlist(false);
+		}
+	}
+
+
+
+
 	// セーブポイントデータのステージナンバーと現在のステージナンバーが異なる場合、マップ生成を行う
 	if (savePointData.stageNumber != m_mapInfoData.mapNumber)
 	{
@@ -747,13 +903,12 @@ std::tuple<bool, Vec2>  ObjectManager::GetSavePointPos()
 
 
 	// ボススポーンステートフラグをfalseにする
-	m_isSpawnBossState = false;
+	m_isSpawnBossStateEnd = false;
 
 	// ギミックリセット
 	GimmickReset();
 
 	
-
 	// セルから変換した座標を返す
 	return std::tuple<bool, Vec2>(false, EvoLib::Convert::CellToPos(savePointData.cell, m_mapInfoData.mapChip.chipSize));
 }
@@ -831,9 +986,6 @@ void ObjectManager::MapChipCreate(const MapCollisionData& mapCollisionData)
 		m_object.push_back(std::make_shared<BossSpawnFlagChip>());
 	}
 
-
-
-
 	// 描画ランクを代入
 	m_object.back()->SetDrawRank(ObjectBase::DrawRank::Rank_2);
 
@@ -868,6 +1020,7 @@ bool ObjectManager::IsCellCheckOutOfRange(const Cell& cell)
 
 void ObjectManager::ObjectUpdate(const bool isStopPlayer)
 {
+
 	for(auto& object : m_object)
 	{
 		// プレイヤーの更新を止める
@@ -875,9 +1028,16 @@ void ObjectManager::ObjectUpdate(const bool isStopPlayer)
 		{
 			continue;
 		}
-
 		object->Update();
 	}
+
+	// ショット生成
+	CreateShot();
+
+
+	// ショットデータ初期化
+	m_shotData.clear();
+
 }
 
 void ObjectManager::ObjectDraw()
@@ -1003,9 +1163,7 @@ void ObjectManager::TestMapDraw()
 			{
 				continue;
 			}
-
-	
-
+			
 			// 座標の代入
 			pos1 = Vec2(x * m_mapInfoData.mapChip.chipSize, y * m_mapInfoData.mapChip.chipSize);
 			pos2 = Vec2(pos1.x + m_mapInfoData.mapChip.chipSize, pos1.y + m_mapInfoData.mapChip.chipSize);
@@ -1013,8 +1171,6 @@ void ObjectManager::TestMapDraw()
 			// カメラ座標を足す
 			pos1 += GameData::GetInstance()->GetCameraPos();
 			pos2 += GameData::GetInstance()->GetCameraPos();
-
-
 
 
 			int color = 0x00ff00;
@@ -1066,9 +1222,46 @@ void ObjectManager::TestMapDraw()
 			DrawGraphF(pos1.x, pos1.y, m_testMapGraph[static_cast<int>(m_mapInfoData.mapCollisionData[x][y].chipType)], true);
 
 			// マップの描画
-			//DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
+			DrawBoxAA(pos1.x, pos1.y, pos2.x, pos2.y, color, false);
 		}
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND,255);
+
+}
+
+void ObjectManager::CreateShot()
+{
+	for(auto& shot:m_shotData)
+	{
+
+		switch (shot.type)
+		{
+		case GameData::ShotType::PlayerShot:
+			
+			// ショット生成
+			m_object.push_back(std::make_shared<PlayerShot>());
+
+			break;
+		default:
+			break;
+		}
+
+		
+		// ポインタを送る
+		m_object.back()->SetObjectFactory(shared_from_this());
+
+		// 描画ランクを代入
+		m_object.back()->SetDrawRank(ObjectBase::DrawRank::Rank_1);
+
+
+		// ショットデータを代入
+		m_object.back()->SetShotData(shot);
+
+		// 座標代入
+		m_object.back()->SetPos(shot.pos);
+
+		// 初期化処理
+		m_object.back()->Init();
+	}
 }

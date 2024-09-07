@@ -11,7 +11,6 @@ public:
 	Camera();
 	virtual ~Camera();
 
-	void Update();
 
 	/// <summary>
 	/// オブジェクトファクトリークラスポインタを取得

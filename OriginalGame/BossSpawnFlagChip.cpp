@@ -22,8 +22,8 @@ void BossSpawnFlagChip::Update()
 
 	// ギミックフラグが立っていれば、ステートをボススポーンに変更
 	if (m_isGimmick &&
-		!m_pObjectManager->GetIsSpawnBossState())
+		!m_pObjectManager->GetIsSpawnBossStateEnd())
 	{
-		m_pObjectManager->SetState(ObjectManager::State::SpawnBoss);
+		m_pObjectManager->SetIsSpawnBossState(true);
 	}
 }

@@ -7,6 +7,8 @@
 #include <string>
 #include "Sound.h"
 
+
+
 namespace
 {
 	// 通常移動スピード
@@ -94,6 +96,16 @@ namespace Anime
 
 	// アニメーション速度
 	constexpr int kAnimeSpeed = 5;
+}
+
+namespace Shot
+{
+	// ショットのスピード
+	constexpr float kSpeed = 10.0f;
+
+
+
+
 }
 
 
@@ -221,6 +233,12 @@ void Player::StateNormalUpdate()
 
 	// アニメーション処理
 	Animation();
+
+	// ショット処理
+	Shot();
+
+
+
 }
 
 void Player::StateNormalDraw()
@@ -1143,4 +1161,47 @@ void Player::AccelerationCollision(const ObjectManager::MapCollisionData& mapCol
 	{
 		m_playerStatus.moveSpeed = GameData::MoveSpeed::Slow;
 	}
+}
+
+void Player::Shot()
+{
+
+	if (!Pad::IsTrigger(PAD_INPUT_2))
+	{
+		return;
+	}
+
+
+	// 方向
+	Direction direction = m_animationDetails.direction[0];
+
+
+
+	if (m_playerStatus.gravityDirection == Direction::Left ||
+		m_playerStatus.gravityDirection == Direction::Right)
+	{
+		if (m_animationDetails.direction[0] == Direction::Left)
+		{
+			direction = Direction::Top;
+		}
+		else if(m_animationDetails.direction[0] == Direction::Right)
+		{
+			direction = Direction::Bottom;
+		}
+	}
+
+	// ショットデータを代入
+	GameData::ShotData shotData =
+	{
+		GameData::ShotType::PlayerShot,
+		m_pos,
+		EvoLib::Convert::ConvertDirectionToAngle(direction),
+		Shot::kSpeed,
+	};
+
+
+
+	m_pObjectManager->SetShotCount(shotData);
+	
+
 }

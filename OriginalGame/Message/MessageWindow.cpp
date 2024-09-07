@@ -364,6 +364,33 @@ void MessageWindow::InitData()
 	
 }
 
+void MessageWindow::ResetData()
+{
+	m_textInfo.currentNumber = 0;
+
+	// 表示する文字数を初期化
+	m_textInfo.dispCharCount = 0;
+
+	// 文章の表示終了フラグをfalseにする
+	m_textInfo.isEndText = false;
+
+	// 文字列を早く描画するフラグをfalseにする
+	m_textInfo.isFastDraw = false;
+
+	// フレームカウントをテキストスピードに代入
+	m_textInfo.frameCount = m_messageElement[m_textInfo.currentNumber].drawCharFrame;
+
+	// 文字列を挿入する
+	m_textInfo.m_temp = m_messageElement[m_textInfo.currentNumber].talkText;
+
+	// キャラクター座標初期化
+	InitCharacterPos(m_messageElement[m_textInfo.currentNumber].isRight);
+
+
+	// すべてのテキストが終了したかどうか
+	m_isAllTextEnd = false;
+}
+
 void MessageWindow::UnloadData()
 {
 	// グラフィックハンドルの解放
@@ -461,7 +488,7 @@ void MessageWindow::UpdateTextDisplay()
 		unsigned char charData = m_textInfo.m_temp[currentByte]; 
 		
 		// チェックする文字
-		if (charData == '\\')
+		if (charData == '\n')
 		{
 			// 改行文字の場合
 			currentByte += 2; // 改行文字をスキップ
@@ -876,11 +903,21 @@ void MessageWindow::UpdateCharacterPos()
 
 
 	// キャラクターの座標を移動
-	m_characterInfo[characterNumber].vec = EvoLib::Calculation::TargetMoveValue(m_characterInfo[characterNumber].pos, m_characterInfo[characterNumber].targetPos, m_moveSpeed);
+	{
+		m_characterInfo[characterNumber].vec = EvoLib::Calculation::TargetMoveValue(m_characterInfo[characterNumber].pos, m_characterInfo[characterNumber].targetPos, m_moveSpeed);
 
+		m_characterInfo[characterNumber].pos += m_characterInfo[characterNumber].vec;
 
-	m_characterInfo[characterNumber].pos += m_characterInfo[characterNumber].vec;
+		if(EvoLib::Calculation::IsTargetRangeValue(m_characterInfo[characterNumber].pos.x, m_characterInfo[characterNumber].targetPos.x, m_moveSpeed))
+		{
+			m_characterInfo[characterNumber].pos.x = m_characterInfo[characterNumber].targetPos.x;
+		}
 
+		if(EvoLib::Calculation::IsTargetRangeValue(m_characterInfo[characterNumber].pos.y, m_characterInfo[characterNumber].targetPos.y, m_moveSpeed))
+		{
+			m_characterInfo[characterNumber].pos.y = m_characterInfo[characterNumber].targetPos.y;
+		}
+	}
 
 	// 一つ前のテキスト番号
 	const int beforeTextNumber = m_textInfo.currentNumber - 1;
@@ -896,9 +933,22 @@ void MessageWindow::UpdateCharacterPos()
 
 
 	// キャラクターの座標を移動
-	m_characterInfo[characterBeforeNumber].vec = EvoLib::Calculation::TargetMoveValue(m_characterInfo[characterBeforeNumber].pos, m_characterInfo[characterBeforeNumber].targetPos, 0.1f);
+	{
+		m_characterInfo[characterBeforeNumber].vec = EvoLib::Calculation::TargetMoveValue(m_characterInfo[characterBeforeNumber].pos, m_characterInfo[characterBeforeNumber].targetPos, m_moveSpeed);
 
-	m_characterInfo[characterBeforeNumber].pos += m_characterInfo[characterBeforeNumber].vec;
+		m_characterInfo[characterBeforeNumber].pos += m_characterInfo[characterBeforeNumber].vec;
+
+
+		if (EvoLib::Calculation::IsTargetRangeValue(m_characterInfo[characterBeforeNumber].pos.x, m_characterInfo[characterBeforeNumber].targetPos.x, m_moveSpeed))
+		{
+			m_characterInfo[characterBeforeNumber].pos.x = m_characterInfo[characterBeforeNumber].targetPos.x;
+		}
+
+		if (EvoLib::Calculation::IsTargetRangeValue(m_characterInfo[characterBeforeNumber].pos.y, m_characterInfo[characterBeforeNumber].targetPos.y, m_moveSpeed))
+		{
+			m_characterInfo[characterBeforeNumber].pos.y = m_characterInfo[characterBeforeNumber].targetPos.y;
+		}
+	}
 }
 
 void MessageWindow::DrawCharacter()

@@ -530,7 +530,7 @@ Vec2 EvoLib::Calculation::TargetMoveValue(const Vec2& pos, const Vec2& targetPos
     Vec2 vel = targetPos - pos;
 
     // 求めた距離をノマライズすることにより距離の長さを１とみる
-    vel.normalize();
+    vel = vel.normalize();
 
     // ノーマライズされた距離に移動速度をかける
     vel *= moveSpeed;

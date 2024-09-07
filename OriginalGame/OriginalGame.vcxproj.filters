@@ -67,6 +67,12 @@
     <Filter Include="ヘッダー ファイル\message">
       <UniqueIdentifier>{52dc67bb-990b-498f-a1d5-b143f9a4e9eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\screenMain\Object\Shot">
+      <UniqueIdentifier>{1ccd2438-b77c-481c-9a96-5b325251afc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\mainScreen\Object\Shot">
+      <UniqueIdentifier>{809fe415-78cc-4b2c-b844-db98f5e3a82f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -156,12 +162,6 @@
     <ClCompile Include="ControllerOption.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundOption.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="OpeningScreen.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -180,7 +180,19 @@
     <ClCompile Include="MapChipBase.cpp">
       <Filter>ソース ファイル\screenMain\Object\MapChip</Filter>
     </ClCompile>
+    <ClCompile Include="SoundOption.cpp">
+      <Filter>ソース ファイル\setting</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>ソース ファイル\setting</Filter>
+    </ClCompile>
     <ClCompile Include="BossEnemy.cpp">
+      <Filter>ソース ファイル\screenMain\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ShotBase.cpp">
+      <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerShot.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -278,12 +290,6 @@
     <ClInclude Include="ControllerOption.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Sound.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundOption.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="SceneOpening.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -302,7 +308,19 @@
     <ClInclude Include="MapChipBase.h">
       <Filter>ヘッダー ファイル\mainScreen\Object\MapChip</Filter>
     </ClInclude>
+    <ClInclude Include="ShotBase.h">
+      <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundOption.h">
+      <Filter>ヘッダー ファイル\setting</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>ヘッダー ファイル\setting</Filter>
+    </ClInclude>
     <ClInclude Include="BossEnemy.h">
+      <Filter>ヘッダー ファイル\mainScreen\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerShot.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

@@ -175,6 +175,11 @@ private:
 	/// <param name="mapCollisionData">マップ判定データ</param>
 	void AccelerationCollision(const ObjectManager::MapCollisionData& mapCollisionData);
 
+	/// <summary>
+	/// ショット処理
+	/// </summary>
+	void Shot();
+
 private:
 
 	//////////////

@@ -195,6 +195,9 @@ public:
 	// データの初期化
 	void InitData();
 
+	// データのリセット
+	void ResetData();
+
 private:
 
 	/// <summary>

@@ -95,6 +95,34 @@ public:
 	}; 
 
 
+
+
+
+	// ショットの種類
+	enum class ShotType
+	{
+		// プレイヤーショット
+		PlayerShot,
+	};
+
+
+	// ショットデータ
+	struct ShotData
+	{
+		// ショットの種類
+		ShotType type = ShotType::PlayerShot;
+
+		// 座標
+		Vec2 pos = Vec2(0.0f, 0.0f);
+
+		// ショットアングル
+		float angle = 0.0f;
+
+		// ショットスピード
+		float speed = 0.0f;
+	};
+
+
 public:
 
 
@@ -121,6 +149,34 @@ public:
 	/// </summary>
 	/// <returns>プレイヤー座標</returns>
 	Vec2 GetPlayerPos() { return m_playerPos; }
+
+
+
+	/// <summary>
+	/// ボスエネミー座標を設定
+	/// </summary>
+	/// <param name="enemyBossPos">ボスエネミー座標</param>
+	void SetBossEnemyPos(const Vec2& bossEnemyPos) { m_bossEnemyPos = bossEnemyPos; }
+
+	/// <summary>
+	/// ボスエネミー座標を返す
+	/// </summary>
+	/// <returns>ボスエネミー座標</returns>
+	Vec2 GetBossEnemyPos() { return m_bossEnemyPos; }
+
+	/// <summary>
+	/// ボスエネミースポーン座標を設定
+	/// </summary>
+	/// <param name="bossEnemySpawnPos">ボスエネミースポーン座標</param>
+	void SetBossEnemySpawnPos(const Vec2& bossEnemySpawnPos) { m_bossEnemySpawnPos = bossEnemySpawnPos; }
+
+	/// <summary>
+	/// ボスエネミースポーン座標を返す
+	/// </summary>
+	/// <returns>ボスエネミースポーン座標</returns>
+	Vec2 GetBossEnemySpawnPos() { return m_bossEnemySpawnPos; }
+
+
 
 	/// <summary>
 	/// カメラ座標を設定
@@ -155,6 +211,14 @@ private:
 	// プレイヤー座標
 	Vec2 m_playerPos = Vec2();
 
+	// ボスエネミー座標
+	Vec2 m_bossEnemyPos = Vec2();
+
+	// ボスエネミースポーン座標
+	Vec2 m_bossEnemySpawnPos = Vec2();
+
+
 	// カメラ座標
 	Vec2 m_cameraPos = Vec2();
+
 };

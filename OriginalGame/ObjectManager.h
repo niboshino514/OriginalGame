@@ -158,6 +158,8 @@ public:
 		// マップナンバー
 		int mapNumber = 0;
 	};
+
+
 public:
 
 	// ステート
@@ -169,8 +171,10 @@ public:
 		Opening,
 		// 通常
 		Normal,
-		// ボス
+		// ボス登場
 		SpawnBoss,
+		// ボス会話
+		BossTalk,
 		// ポーズ画面
 		Pause,
 	};
@@ -225,7 +229,14 @@ public:
 	/// <summary>
 	/// キャラクター生成
 	/// </summary>
-	void CharacterCreate(const Vec2& pos);
+	void PlayerCreate(const Vec2& pos);
+
+	/// <summary>
+	/// ボスエネミー生成
+	/// </summary>
+	/// <param name="pos">座標</param>
+	void BossEnemyCreate(const Vec2& pos);
+
 
 	/// <summary>
 	/// マップ生成
@@ -288,10 +299,24 @@ public:
 	
 
 	/// <summary>
-	/// スポーンボスステートになったかどうかを返す
+	/// スポーンボスステートが終わったかどうかを返す
 	/// </summary>
 	/// <returns></returns>
-	bool GetIsSpawnBossState() { return m_isSpawnBossState; }
+	bool GetIsSpawnBossStateEnd() { return m_isSpawnBossStateEnd; }
+
+	/// <summary>
+	/// ボスステートにするかどうかを渡す
+	/// </summary>
+	/// <param name="isSpawnBossState"></param>
+	void SetIsSpawnBossState(const bool& isSpawnBossState) { m_isSpawnBossState = isSpawnBossState; }
+
+	/// <summary>
+	/// ショット生成個数を設定
+	/// </summary>
+	void SetShotCount(const GameData::ShotData& shotData);
+
+
+
 private:
 
 	/// <summary>
@@ -317,6 +342,15 @@ private:
 	void StateSpawnBossUpdate();
 	void StateSpawnBossDraw();
 	void StateSpawnBossExit();
+
+	// ボス会話ステート処理
+	void StateBossTalkEnter();
+	void StateBossTalkUpdate();
+	void StateBossTalkDraw();
+	void StateBossTalkExit();
+
+
+
 
 	// ポーズステート処理
 	void StatePauseUpdate();
@@ -359,7 +393,7 @@ private:
 	bool IsCellCheckOutOfRange(const Cell& cell);
 
 
-	/// <summary>
+	/// <summary>d
 	/// オブジェクト更新
 	/// </summary>
 	/// <param name="isStopPlayer">プレイヤーを止めるかどうか</param>
@@ -376,6 +410,15 @@ private:
 	/// </summary>
 	void TestMapDraw();
 
+
+	/// <summary>
+	/// ショット生成
+	/// </summary>
+	void CreateShot();
+
+
+
+
 private:
 
 	// オブジェクト
@@ -389,6 +432,13 @@ private:
 
 	// マップグラフィック
 	std::vector<int>m_testMapGraph;
+
+	//////////////////
+	// ショット関連 //
+	//////////////////
+
+	// ショットデータ
+	std::vector<GameData::ShotData> m_shotData;
 
 	//////////////////////
 	// グラフィック関連 //
@@ -405,8 +455,11 @@ private:
 	StateMachine<State>m_pStateMachine;
 
 	// ボスステートシーンに移行したかどうか
-	bool m_isSpawnBossState;
+	bool m_isSpawnBossStateEnd;
 	
+	// ボスステートに移行するかどうか
+	bool m_isSpawnBossState;
+
 
 	////////////////////
 	// クラスポインタ //
@@ -424,6 +477,9 @@ private:
 	// ポーズ
 	std::shared_ptr<Pause>m_pPause;
 
-	// メッセージウィンドウ
-	std::shared_ptr<MessageWindow>m_pMessageWindow;
+	// オープニングメッセージウィンドウ
+	std::shared_ptr<MessageWindow>m_pOpeningMessageWindow;
+
+	// ボス会話メッセージウィンドウ
+	std::shared_ptr<MessageWindow>m_pBossTalkMessageWindow;
 };

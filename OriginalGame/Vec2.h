@@ -76,20 +76,28 @@ public:
 		return temp;
 	}
 
-	// 長さの取得
-	float length()
+
+
+	// ベクトルの長さを計算するメソッド
+	float length() const
 	{
-		return sqrtf((x * x) + (y * y));
+		return std::sqrt(x * x + y * y);
 	}
 
-	// 正規化 Vec2 = Vec2.normalize()
-	Vec2 normalize()
+
+
+	// ベクトルの正規化を行うメソッド
+	Vec2 normalize() const
 	{
-		float len = length();
+		// ベクトルの長さを計算
+		float len = std::sqrt(x * x + y * y);
+
+		// 長さが0の場合は正規化できないのでそのまま返す
 		if (len == 0)
 		{
 			return *this;
 		}
-		return (*this) / len;
+
+		return Vec2(x / len, y / len);
 	}
 };

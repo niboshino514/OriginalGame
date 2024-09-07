@@ -34,11 +34,14 @@ public :
 	void StateSpawnUpdate();
 	void StateSpawnExit();
 
+	// 通常ステート処理
+	void StateNormalEnter();
+	void StateNormalUpdate();
+	void StateNormalExit();
 
 
 
 private:
-
 
 
 

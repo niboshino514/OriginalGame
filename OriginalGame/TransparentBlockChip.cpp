@@ -45,5 +45,4 @@ void TransparentBlockChip::Draw()
 
 	// “§–¾ƒuƒƒbƒN•`‰æ
 	DrawBoxAA(drawSquare.A.x, drawSquare.A.y, drawSquare.C.x, drawSquare.C.y, 0xffffff, TRUE);
-	
 }

@@ -12,11 +12,6 @@ Camera::~Camera()
 {
 }
 
-void Camera::Update()
-{
-	// オフセット値を求める
-	OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
-}
 
 void Camera::OffsetCalculation(const Vec2& targetPos)
 {
