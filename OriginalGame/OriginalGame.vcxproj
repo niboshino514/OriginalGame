@@ -114,6 +114,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -169,7 +170,7 @@
     <ClCompile Include="Pause.cpp" />
     <ClCompile Include="PlatinumLoader.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerShot.cpp" />
+    <ClCompile Include="NormalShot.cpp" />
     <ClCompile Include="SaveDataSelectScreen.cpp" />
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMain.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="SceneSaveDataSelect.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="ShotBase.cpp" />
+    <ClCompile Include="SineCurveShot.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundOption.cpp" />
     <ClCompile Include="TitleScreen.cpp" />
@@ -211,7 +213,7 @@
     <ClInclude Include="Pause.h" />
     <ClInclude Include="PlatinumLoader.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerShot.h" />
+    <ClInclude Include="NormalShot.h" />
     <ClInclude Include="SaveDataSelectScreen.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneMain.h" />
@@ -220,6 +222,7 @@
     <ClInclude Include="SceneSaveDataSelect.h" />
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="ShotBase.h" />
+    <ClInclude Include="SineCurveShot.h" />
     <ClInclude Include="Sort.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundOption.h" />

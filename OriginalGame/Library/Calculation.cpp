@@ -1,29 +1,5 @@
 #include "Calculation.h"
 
-int EvoLib::Calculation::SineCurve(int currentFrame, int maxFrame, int maxValue, bool isAbs)
-{
-    // ABSを使用する場合、最大フレームを２倍する
-    if (isAbs)
-    {
-        maxFrame *= 2;
-    }
-
-    // 現在のフレームを最大フレームで割る
-    currentFrame %= maxFrame;
-
-    // サイン値を求める
-    int sinValue = static_cast<int>(sin(DX_PI_F * 2.0f / maxFrame * currentFrame) * maxValue);
-
-    // ABSを使用する場合、絶対値を求める
-    if (isAbs)
-    {
-        // 絶対値を求める
-        sinValue = std::abs(sinValue);
-    }
-
-    // サイン値を返す
-    return sinValue;
-}
 
 Vec2 EvoLib::Calculation::VibrationValue(int currentFrame, const int& maxFrame, const int& vibrationWidth)
 {
@@ -584,3 +560,29 @@ float EvoLib::Calculation::Atan2_Lib(const Vec2& targetPos, const Vec2& startPos
     return radian;
 }
 
+Vec2 EvoLib::Calculation::NormalVector(const Vec2& p1, const Vec2& p2)
+{
+    // 2点間の方向ベクトルを計算
+    Vec2 directinVec = directinVec.directionVector(p1, p2);
+
+    // 方向ベクトルを正規化
+    directinVec = directinVec.normalize();
+
+    // 方向ベクトルに対する右向きの法線ベクトルを計算
+    Vec2 normal = normal.rightNormal(directinVec);
+
+    // 法線ベクトルを返す
+    return normal;
+}
+
+Vec2 EvoLib::Calculation::ReflectVector(const Vec2& vec, const Vec2& p1, const Vec2& p2)
+{
+    // 法線ベクトルを求める
+    const Vec2 normal = NormalVector(p1, p2);
+
+    // 反射ベクトルを計算
+    Vec2 reflect = reflect.reflect(vec, normal);
+
+    // 反射ベクトルを返す
+    return reflect;
+}

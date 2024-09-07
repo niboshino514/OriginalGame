@@ -14,6 +14,14 @@ public:
 
 protected:
 
+	// 地面判定初期化
+	void GroundCollisionInit();
+
+	// ショットの初期化
+	virtual void ShotInit() = 0;
+
+
+
 	// 地面の当たり判定
 	void GroundCollision();
 
@@ -22,6 +30,15 @@ protected:
 
 protected:
 
+	// ベース座標
+	Vec2 m_basePos;
+
+	// 移動矩形
+	Rect m_moveRect;
+
+
 	// 地面に当たったか
 	bool m_isHitGround;
+
+
 };

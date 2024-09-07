@@ -103,17 +103,22 @@ public:
 	{
 		// プレイヤーショット
 		PlayerShot,
+		// エネミーショット
+		EnemyShot,
+		// サインカーブショット
+		SineCurveShot,
 	};
 
 
 	// ショットデータ
 	struct ShotData
 	{
+	
 		// ショットの種類
 		ShotType type = ShotType::PlayerShot;
 
 		// 座標
-		Vec2 pos = Vec2(0.0f, 0.0f);
+		Vec2 startPos = Vec2(0.0f, 0.0f);
 
 		// ショットアングル
 		float angle = 0.0f;

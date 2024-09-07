@@ -1193,7 +1193,7 @@ void Player::Shot()
 	// ショットデータを代入
 	GameData::ShotData shotData =
 	{
-		GameData::ShotType::PlayerShot,
+		GameData::ShotType::SineCurveShot,
 		m_pos,
 		EvoLib::Convert::ConvertDirectionToAngle(direction),
 		Shot::kSpeed,

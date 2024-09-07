@@ -1,19 +1,18 @@
-#include "PlayerShot.h"
+#include "NormalShot.h"
 
-PlayerShot::PlayerShot()
+NormalShot::NormalShot()
 {
 }
 
-PlayerShot::~PlayerShot()
+NormalShot::~NormalShot()
 {
 }
 
-void PlayerShot::Init()
+void NormalShot::ShotInit()
 {
-	m_objectID = ObjectID::PlayerShot;
 }
 
-void PlayerShot::Update()
+void NormalShot::Update()
 {
 	// ˆÚ“®
 	Move();

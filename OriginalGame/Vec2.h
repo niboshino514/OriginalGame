@@ -77,27 +77,69 @@ public:
 	}
 
 
-
-	// ベクトルの長さを計算するメソッド
-	float length() const
+	// 2点間の方向ベクトルを計算
+	Vec2 directionVector(const Vec2& p1, const Vec2& p2)
 	{
-		return std::sqrt(x * x + y * y);
+		return { p2.x - p1.x, p2.y - p1.y };
+	}
+
+	// 右向き（時計回り）の法線ベクトルを計算
+	Vec2 rightNormal(const Vec2& v)
+	{
+		return { -v.y, v.x };
+	}
+
+	// 左向き（反時計回り）の法線ベクトルを計算
+	Vec2 leftNormal(const Vec2& v)
+	{
+		return { v.y, -v.x };
+	}
+
+
+	// ベクトルの内積を計算
+	float dot(const Vec2& v1, const Vec2& v2)
+	{
+		return v1.x * v2.x + v1.y * v2.y;
+	}
+
+	// ベクトルのスカラー倍
+	Vec2 scalarMultiply(const Vec2& v, float scalar)
+	{
+		return { v.x * scalar, v.y * scalar };
+	}
+
+
+	/// <summary>
+	/// 反射ベクトルを計算
+	/// </summary>
+	/// <param name="v">移動ベクトル</param>
+	/// <param name="n">法線ベクトル</param>
+	/// <returns></returns>
+	Vec2 reflect(const Vec2& v, const Vec2& n)
+	{
+		float dotProduct = dot(v, n);
+		Vec2 scalarPart = scalarMultiply(n, 2 * dotProduct);
+		return (v - scalarPart);
 	}
 
 
 
-	// ベクトルの正規化を行うメソッド
-	Vec2 normalize() const
-	{
-		// ベクトルの長さを計算
-		float len = std::sqrt(x * x + y * y);
 
-		// 長さが0の場合は正規化できないのでそのまま返す
+
+	// 長さの取得
+	float length()
+	{
+		return sqrtf((x * x) + (y * y));
+	}
+
+	// 正規化 Vec2 = Vec2.normalize()
+	Vec2 normalize()
+	{
+		float len = length();
 		if (len == 0)
 		{
 			return *this;
 		}
-
-		return Vec2(x / len, y / len);
+		return (*this) / len;
 	}
 };

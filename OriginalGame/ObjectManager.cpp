@@ -10,7 +10,8 @@
 #include "MessageWindow.h"
 #include "Controller.h"
 #include "BossEnemy.h"
-#include "PlayerShot.h"
+#include "NormalShot.h"
+#include "SineCurveShot.h"
 
 #include <cassert>
 #include <string>
@@ -1240,9 +1241,17 @@ void ObjectManager::CreateShot()
 		case GameData::ShotType::PlayerShot:
 			
 			// ショット生成
-			m_object.push_back(std::make_shared<PlayerShot>());
-
+			m_object.push_back(std::make_shared<NormalShot>());
 			break;
+		case GameData::ShotType::EnemyShot:
+			break;
+
+		case GameData::ShotType::SineCurveShot:
+
+			// ショット生成
+			m_object.push_back(std::make_shared<SineCurveShot>());
+			break;
+
 		default:
 			break;
 		}
@@ -1259,7 +1268,7 @@ void ObjectManager::CreateShot()
 		m_object.back()->SetShotData(shot);
 
 		// 座標代入
-		m_object.back()->SetPos(shot.pos);
+		m_object.back()->SetPos(shot.startPos);
 
 		// 初期化処理
 		m_object.back()->Init();

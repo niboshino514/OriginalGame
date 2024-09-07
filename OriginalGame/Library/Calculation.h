@@ -16,18 +16,44 @@ namespace EvoLib
 			Subtraction,// 引き算
 		};
 
+		// テンプレート
+		template <typename T>
+		struct SineCurveData
+		{
+			// サインカーブフレーム
+			int sineCurrentFrame = 0;
+			// サインカーブフレームの最大値
+			int sineMaxFrame = 0;
+
+			// サインカーブの最大値
+			T sineMaxValue = 0;
+		};
 
 	public:
+
+
 
 		/// <summary>
 		/// サインカーブ値を求める
 		/// </summary>
-		/// <param name="currentFrame">現在のフレーム</param>
-		/// <param name="maxFrame">最大フレーム</param>
-		/// <param name="maxValue">サインカーブの最大値</param>
-		/// <param name="isAbs">absを使用するかどうか</param>
-		/// <returns>サインカーブ値</returns>
-		static int SineCurve(int currentFrame, int maxFrame, int maxValue, bool isAbs = false);
+		/// <typeparam name="T">float,int</typeparam>
+		/// <param name="sineCurveData">サインカーブデータ</param>
+		/// <param name="isAbs">ABSを使用するかどうか(未使用：-1~1 使用：0~1)</param>
+		/// <returns></returns>
+		template <typename T>
+		static T SineCurve(SineCurveData<T>& sineCurveData, bool isAbs = false);
+
+		/// <summary>
+		/// 角度を基準にサインカーブ値を求める
+		/// </summary>
+		/// <typeparam name="T">float,int</typeparam>
+		/// <param name="sineCurveData">サインカーブデータ</param>
+		/// <param name="angle">角度</param>
+		/// <param name="isAbs">ABSを使用するかどうか(未使用：-1~1 使用：0~1)</param>
+		/// <param name="isHorizontally">横方向にサインカーブするかどうか</param>
+		/// <returns>角度を基準のサインカーブ値</returns>
+		template <typename T>
+		static Vec2 SineCurveAngle(SineCurveData<T>& sineCurveData, const float& angle, bool isAbs = false, const bool& isHorizontally = false);
 
 
 		/// <summary>
@@ -206,8 +232,94 @@ namespace EvoLib
 		/// <returns>ターゲット座標を向くラジアン</returns>
 		static float Atan2_Lib(const Vec2& targetPos, const Vec2& startPos);
 
+		/// <summary>
+		/// 二点の座標空法線ベクトルを求める
+		/// </summary>
+		/// <param name="p1">座標1</param>
+		/// <param name="p2">座標2</param>
+		/// <returns>二点の座標の法線ベクトルを求める</returns>
+		static Vec2 NormalVector(const Vec2& p1, const Vec2& p2);
+
+		/// <summary>
+		/// 反射ベクトルを求める
+		/// </summary>
+		/// <param name="vec">移動量</param>
+		/// <param name="p1">壁となる座標1</param>
+		/// <param name="p2">壁となる座標2</param>
+		/// <returns>反射ベクトル</returns>
+		static Vec2 ReflectVector(const Vec2& vec, const Vec2& p1, const Vec2& p2);
 
 	};
+	template<typename T>
+	inline T Calculation::SineCurve(SineCurveData<T>& sineCurveData, bool isAbs)
+	{
+		// サインフレームを増やす
+		sineCurveData.sineCurrentFrame++;
+		// サインフレームが最大値を超えたらリセット
+		sineCurveData.sineCurrentFrame %= sineCurveData.sineMaxFrame;
+
+		// サインカーブの値
+		T sineValue = {};
+
+		// 絶対値を取るかどうか
+		if (isAbs)
+		{
+			sineValue = static_cast<float>(abs(sin(DX_PI * 2.0f / sineCurveData.sineMaxFrame * sineCurveData.sineCurrentFrame) * sineCurveData.sineMaxValue));
+		}
+		else
+		{
+			sineValue = static_cast<float>(sin(DX_PI * 2.0f / sineCurveData.sineMaxFrame * sineCurveData.sineCurrentFrame) * sineCurveData.sineMaxValue);
+		}
+
+		// サイン値を返す
+		return sineValue;
+	}
+	template<typename T>
+	inline Vec2 Calculation::SineCurveAngle(SineCurveData<T>& sineCurveData, const float& angle, bool isAbs, const bool& isHorizontally)
+	{
+		// サインフレームを増やす
+		sineCurveData.sineCurrentFrame++;
+		// サインフレームが最大値を超えたらリセット
+		sineCurveData.sineCurrentFrame %= sineCurveData.sineMaxFrame;
+
+		// サインカーブの値
+		T sineValue = {};
+
+		// 絶対値を取るかどうか
+		if (isAbs)
+		{
+			sineValue = static_cast<float>(abs(sin(DX_PI * 2.0f / sineCurveData.sineMaxFrame * sineCurveData.sineCurrentFrame) * sineCurveData.sineMaxValue));
+		}
+		else
+		{
+			sineValue = static_cast<float>(sin(DX_PI * 2.0f / sineCurveData.sineMaxFrame * sineCurveData.sineCurrentFrame) * sineCurveData.sineMaxValue);
+		}
+
+
+
+		// 角度をラジアンに変換
+		float radian = angle * (DX_PI_F / 180.0f);
+
+
+
+
+
+		Vec2 rotated = Vec2();
+
+		if(isHorizontally)
+		{
+			rotated.x = sineValue * cos(radian);
+			rotated.y = sineValue * sin(radian);
+		}
+		else
+		{
+			rotated.x = sineValue * sin(-radian);
+			rotated.y = sineValue * cos(-radian);
+		}
+
+
+		return rotated;
+	}
 	template<typename T>
 	inline bool Calculation::IsValueNegativeCount(T& value)
 	{
