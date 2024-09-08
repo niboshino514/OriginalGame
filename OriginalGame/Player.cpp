@@ -1211,30 +1211,31 @@ void Player::Shot()
 
 	// 分割する個数
 	const int splitCount = 5;
-
-	float angle = 360.0f / splitCount;
-
 	// 基準角度
-	float baseAngle = 270.0f;
+	const float baseAngle = 270.0f;
 
-	for(int i = 0; i < splitCount; i++)
+
+
+	// ショットデータを代入
+	GameData::ShotData shotData =
 	{
-		float tempAngle = baseAngle + (angle * i);
+		GameData::ShotType::ReflectionShot,
+		m_pos,
+		0.0f,
+		Shot::kSpeed,
+	};
 
+	// 角度リスト
+	std::vector<float> angleList = 
+		EvoLib::Calculation::AngleDivision(splitCount, baseAngle);
+	
 
-		// ショットデータを代入
-		GameData::ShotData shotData =
-		{
-			GameData::ShotType::ReflectionShot,
-			m_pos,
-			tempAngle,
-			Shot::kSpeed,
-		};
+	for(auto shot: angleList)
+	{
+		shotData.angle = shot;
 
 		m_pObjectManager->SetShotCount(shotData);
 	}
-
-
 
 
 }

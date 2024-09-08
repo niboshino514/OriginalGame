@@ -586,3 +586,26 @@ Vec2 EvoLib::Calculation::ReflectVector(const Vec2& vec, const Vec2& p1, const V
     // 反射ベクトルを返す
     return reflect;
 }
+
+std::vector<float> EvoLib::Calculation::AngleDivision(const int& divisionNumber, const float& baseAngle)
+{
+
+    // 1つの角度を求める
+    const float divAngle = 360.0f / static_cast<float>(divisionNumber);
+
+    // 角度リスト
+    std::vector<float> angleList;
+
+
+    for(int i = 0; i < divisionNumber; i++)
+	{
+		// 角度を求める
+		const float tempAngle = baseAngle + (divAngle * static_cast<float>(i));
+
+		// 角度をリストに追加
+		angleList.push_back(tempAngle);
+	}
+
+    // 角度リストを返す
+    return angleList;
+}

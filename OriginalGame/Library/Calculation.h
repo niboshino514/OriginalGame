@@ -249,6 +249,15 @@ namespace EvoLib
 		/// <returns>反射ベクトル</returns>
 		static Vec2 ReflectVector(const Vec2& vec, const Vec2& p1, const Vec2& p2);
 
+
+		/// <summary>
+		/// 角度を指定した個数分、均等に分割する
+		/// </summary>
+		/// <param name="divisionNumber">分割数</param>
+		/// <param name="baseAngle">基準とする座標</param>
+		/// <returns>分割された角度</returns>
+		static std::vector<float> AngleDivision(const int& divisionNumber, const float& baseAngle = 0.0f);
+
 	};
 	template<typename T>
 	inline T Calculation::SineCurve(SineCurveData<T>& sineCurveData, bool isAbs)
