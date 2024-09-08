@@ -3,11 +3,11 @@
 namespace
 {
 	// 最大フレーム
-	constexpr int kMaxFrame = 10;
+	constexpr int kMaxFrame = 20;
 
 	constexpr int kSineCurveSpeed = 2;
 
-	constexpr float kMaxSineCurveValue = 10.0f;
+	constexpr float kMaxSineCurveValue = 50.0f;
 }
 
 
@@ -26,22 +26,12 @@ void SineCurveShot::ShotInit()
 	m_sineCurveData.sineCurrentFrame = 0;
 	m_sineCurveData.sineMaxFrame = kMaxFrame;
 	m_sineCurveData.sineMaxValue = kMaxSineCurveValue;
-
-
-	m_shotData.angle = 300.0f;
-
-	// ベース座標の初期化
-	m_basePos = m_shotData.startPos;
 }
 
-void SineCurveShot::Update()
+void SineCurveShot::ShotUpdate()
 {
-
-
+	// サインカーブのデータの更新
 	SineCurveMove();
-
-	// 当たり判定
-	GroundCollision();
 
 	// 地面に当たっていたら削除フラグをfalseにする
 	if (m_isHitGround)

@@ -171,6 +171,7 @@
     <ClCompile Include="PlatinumLoader.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="NormalShot.cpp" />
+    <ClCompile Include="ReflectionShot.cpp" />
     <ClCompile Include="SaveDataSelectScreen.cpp" />
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMain.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="PlatinumLoader.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="NormalShot.h" />
+    <ClInclude Include="ReflectionShot.h" />
     <ClInclude Include="SaveDataSelectScreen.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneMain.h" />

@@ -20,13 +20,15 @@ protected:
 	// ショットの初期化
 	virtual void ShotInit() = 0;
 
+	// ショットの更新
+	virtual void ShotUpdate();
 
+	// 移動
+	void Move();
 
 	// 地面の当たり判定
 	void GroundCollision();
 
-	// 移動
-	void Move();
 
 protected:
 

@@ -26,9 +26,11 @@ ShotBase::~ShotBase()
 
 void ShotBase::Init()
 {
+	// ベース座標の初期化
+	m_basePos = m_shotData.startPos;
+
 	// 地面判定初期化
 	GroundCollisionInit();
-
 
 	// ショットの初期化
 	ShotInit();
@@ -36,8 +38,8 @@ void ShotBase::Init()
 
 void ShotBase::Update()
 {
-	// ショットの移動
-	m_pos.x += kShotSpeed;
+	// ショットの更新
+	ShotUpdate();
 
 	// 当たり判定
 	GroundCollision();
@@ -54,9 +56,6 @@ void ShotBase::Draw()
 
 void ShotBase::GroundCollisionInit()
 {
-
-
-
 	// マップチップのサイズを取得
 	float mapChipSize = m_pObjectManager->GetMapInfoData().mapChip.chipSize;
 
@@ -85,6 +84,18 @@ void ShotBase::GroundCollisionInit()
 	m_moveRect = EvoLib::Calculation::CalculateRectangleMovementRange
 	(shotRect, maxCell, mapChipSize, m_pObjectManager->GetMapChipNumber(), groundCellNumber);
 
+}
+
+void ShotBase::ShotUpdate()
+{
+	// 移動
+	Move();
+
+	// 地面に当たっていたら削除フラグをfalseにする
+	if (m_isHitGround)
+	{
+		m_isExlist = false;
+	}
 }
 
 void ShotBase::GroundCollision()
@@ -152,7 +163,7 @@ void ShotBase::GroundCollision()
 
 
 	// 壁に当たった
-	//m_isHitGround = true;
+	m_isHitGround = true;
 
 	// 反射ベクトルを計算
 	const Vec2 reflection = EvoLib::Calculation::ReflectVector(m_vec, temp[0], temp[1]);
@@ -163,9 +174,8 @@ void ShotBase::GroundCollision()
 	// ラジアンを角度に変換
 	m_shotData.angle = EvoLib::Convert::ConvertRadianToAngle(rad);
 
-
-
-
+	// 反射回数をカウント
+	m_shotData.reflect.count++;
 }
 
 void ShotBase::Move()

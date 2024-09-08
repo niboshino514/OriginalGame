@@ -3,18 +3,18 @@
 #include "GameData.h"
 #include <DxLib.h>
 #include "EvoLib.h"
-
+#include "game.h"
 
 namespace
 {
 	// 初期座標
-	const Vec2 kInitPos = Vec2(100, 100);
+	const Vec2 kInitPos = Vec2(Game::kScreenWidth, 0.0f);
 }
 
 namespace Move
 {
 	// スポーン移動速度
-	constexpr float kSpawnSpeed = 10.0f;
+	constexpr float kSpawnSpeed = 30.0f;
 }
 
 BossEnemy::BossEnemy()

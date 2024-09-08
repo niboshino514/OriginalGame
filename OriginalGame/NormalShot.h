@@ -8,6 +8,5 @@ public:
 	virtual ~NormalShot();
 
 	void ShotInit() override;
-	void Update() override;
 
 };

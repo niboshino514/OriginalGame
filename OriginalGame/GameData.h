@@ -107,13 +107,23 @@ public:
 		EnemyShot,
 		// サインカーブショット
 		SineCurveShot,
+		// 反射ショット
+		ReflectionShot
 	};
 
+	// 反射データ
+	struct Reflect
+	{
+		// 反射最大数
+		int maxCount = 2;
+
+		// 反射回数
+		int count = 0;
+	};
 
 	// ショットデータ
 	struct ShotData
 	{
-	
 		// ショットの種類
 		ShotType type = ShotType::PlayerShot;
 
@@ -125,6 +135,9 @@ public:
 
 		// ショットスピード
 		float speed = 0.0f;
+
+		// 反射データ
+		Reflect reflect = Reflect();
 	};
 
 

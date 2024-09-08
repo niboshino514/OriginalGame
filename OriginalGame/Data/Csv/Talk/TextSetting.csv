@@ -10,7 +10,7 @@
 ,キャラクター名のフォントタイプ,0,,
 キャラクター関連,※画像ファイルパス（Data/Graphic/Character/Talk）,Data/Graphic/Character/Talk/Koishi.png,Data/Graphic/Character/Talk/Satori.png,Data/Graphic/Character/Talk/Furan.png
 ,↑※キャラクター名,こいし,さとり,フランドール
-,↑※画像拡大率（小数第一位まで可）,0.8,0.8,1.1
+,↑※画像拡大率（小数第一位まで可）,0.8,0.8,1
 ,↑※画像の縦分割数（キャラクターが縦に何人連なっているか）,4,4,1
 ,↑※画像の横分割数（キャラクターが横に何人連なっているか）,4,4,2
 ,↑※自分からみて、画像が右向きかどうか（TRUE or FALSE）,FALSE,TRUE,FALSE

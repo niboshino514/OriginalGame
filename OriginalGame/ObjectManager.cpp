@@ -12,6 +12,7 @@
 #include "BossEnemy.h"
 #include "NormalShot.h"
 #include "SineCurveShot.h"
+#include "ReflectionShot.h"
 
 #include <cassert>
 #include <string>
@@ -1251,6 +1252,11 @@ void ObjectManager::CreateShot()
 			// ショット生成
 			m_object.push_back(std::make_shared<SineCurveShot>());
 			break;
+
+		case GameData::ShotType::ReflectionShot:
+
+			// ショット生成
+			m_object.push_back(std::make_shared<ReflectionShot>());
 
 		default:
 			break;

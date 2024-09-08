@@ -1190,18 +1190,51 @@ void Player::Shot()
 		}
 	}
 
-	// ショットデータを代入
-	GameData::ShotData shotData =
-	{
-		GameData::ShotType::SineCurveShot,
-		m_pos,
-		EvoLib::Convert::ConvertDirectionToAngle(direction),
-		Shot::kSpeed,
-	};
 
 
 
-	m_pObjectManager->SetShotCount(shotData);
+
+	//// ショットデータを代入
+	//GameData::ShotData shotData =
+	//{
+	//	GameData::ShotType::ReflectionShot,
+	//	m_pos,
+	//	EvoLib::Convert::ConvertDirectionToAngle(direction),
+	//	Shot::kSpeed,
+	//};
+
+
+
+	//m_pObjectManager->SetShotCount(shotData);
 	
+
+
+	// 分割する個数
+	const int splitCount = 5;
+
+	float angle = 360.0f / splitCount;
+
+	// 基準角度
+	float baseAngle = 270.0f;
+
+	for(int i = 0; i < splitCount; i++)
+	{
+		float tempAngle = baseAngle + (angle * i);
+
+
+		// ショットデータを代入
+		GameData::ShotData shotData =
+		{
+			GameData::ShotType::ReflectionShot,
+			m_pos,
+			tempAngle,
+			Shot::kSpeed,
+		};
+
+		m_pObjectManager->SetShotCount(shotData);
+	}
+
+
+
 
 }

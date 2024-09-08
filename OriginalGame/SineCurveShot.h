@@ -8,7 +8,7 @@ public:
 	virtual ~SineCurveShot();
 	
 	void ShotInit() override;
-	void Update() override;
+	void ShotUpdate() override;
 
 private:
 

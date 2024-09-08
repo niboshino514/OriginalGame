@@ -192,11 +192,14 @@
     <ClCompile Include="ShotBase.cpp">
       <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
     </ClCompile>
-    <ClCompile Include="NormalShot.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="SineCurveShot.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectionShot.cpp">
+      <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
+    </ClCompile>
+    <ClCompile Include="NormalShot.cpp">
+      <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -323,11 +326,14 @@
     <ClInclude Include="BossEnemy.h">
       <Filter>ヘッダー ファイル\mainScreen\Object</Filter>
     </ClInclude>
-    <ClInclude Include="NormalShot.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="SineCurveShot.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
+    </ClInclude>
+    <ClInclude Include="ReflectionShot.h">
+      <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalShot.h">
+      <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
