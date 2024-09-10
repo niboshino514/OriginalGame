@@ -335,5 +335,8 @@
     <ClInclude Include="NormalShot.h">
       <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
     </ClInclude>
+    <ClInclude Include="Easing.h">
+      <Filter>ヘッダー ファイル\setting</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

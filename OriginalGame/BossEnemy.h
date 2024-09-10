@@ -1,5 +1,6 @@
 #pragma once
 #include "ObjectBase.h"
+#include "GameData.h"
 
 template <class TState> class StateMachine;
 
@@ -18,11 +19,62 @@ public :
 	{
 		// スポーン
 		Spawn,
-		// 通常状態
-		Normal,
+
+		// フェーズ移行
+		Phase,
+
+		// 移動
+		Move,
+
+		// 攻撃
+		Attack,
+
 		// 死亡
 		Dead,
 	};
+
+	// ショットタイプ
+	enum class ShotType
+	{
+		// 通常
+		Normal,
+	};
+
+
+	// 攻撃データ
+	struct AttackData
+	{
+		// ショットを撃つ準備時間
+		int shotSetupTime = 0;
+
+		// ショットの最大回数
+		int shotMaxCountNum = 0;
+		
+		// ショットの個数
+		int shotNum = 0;
+
+		// ショットデータ
+		GameData::ShotData shotData = GameData::ShotData();
+	};
+
+
+
+	
+
+
+	
+
+
+
+
+
+
+
+
+	// ステート変更
+	void ChangeState(const State& state);
+
+private:
 
 	/// <summary>
 	/// ステート初期化
@@ -34,18 +86,52 @@ public :
 	void StateSpawnUpdate();
 	void StateSpawnExit();
 
-	// 通常ステート処理
-	void StateNormalEnter();
-	void StateNormalUpdate();
-	void StateNormalExit();
+	
+	// フェーズ移行ステート処理
+	void StatePhaseEnter();
+	
+	// 移動ステート処理
+	void StateMoveEnter();
+	void StateMoveUpdate();
+	void StateMoveExit();
 
+	// 攻撃ステート処理
+	void StateAttackEnter();
+	void StateAttackUpdate();
+	void StateAttackExit();
 
 
 private:
 
+	// ショット攻撃
+	void ShotAttack();
 
 
+private:
 
+	//////////////
+	// 攻撃関連 //
+	//////////////
+
+	// 攻撃データ
+	AttackData m_attackData;
+
+	// ショットのフレームカウント
+	int m_shotFrameCount;
+
+	// ショットのカウント
+	int m_shotCount;
+	
+
+	//////////////
+	// 移動関連 //
+	//////////////
+
+	// イージングデータ
+	EvoLib::Calculation::EasingData m_easingData;
+
+
+	int m_count;
 
 	//////////////////
 	// ステート関連 //

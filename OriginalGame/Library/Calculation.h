@@ -29,6 +29,23 @@ namespace EvoLib
 			T sineMaxValue = 0;
 		};
 
+
+		// イージングデータ
+		struct EasingData
+		{
+			// 現在のフレーム
+			float currentFrame = 0.0f;
+
+			// 移動に掛かる総フレーム
+			float totalFrame = 0.0f;
+
+			// 開始座標
+			Vec2 startPos = Vec2();
+
+			// 終了座標
+			Vec2 endPos = Vec2();
+		};
+
 	public:
 
 
@@ -257,6 +274,15 @@ namespace EvoLib
 		/// <param name="baseAngle">基準とする座標</param>
 		/// <returns>分割された角度</returns>
 		static std::vector<float> AngleDivision(const int& divisionNumber, const float& baseAngle = 0.0f);
+
+
+		/// <summary>
+		/// イージング移動
+		/// </summary>
+		/// <param name="easingData">イージングデータ</param>
+		/// <returns>現在の座標</returns>
+		static Vec2 EasingInOutSine(EasingData& easingData);
+
 
 	};
 	template<typename T>

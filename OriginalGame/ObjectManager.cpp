@@ -381,6 +381,15 @@ void ObjectManager::StateBossTalkDraw()
 
 void ObjectManager::StateBossTalkExit()
 {
+
+	// ボスエネミーのステートをフェイズ移行に変更
+	for (auto& object : m_object)
+	{
+		if (object->GetObjectID() == ObjectBase::ObjectID::BossEnemy)
+		{
+			std::dynamic_pointer_cast<BossEnemy>(object)->ChangeState(BossEnemy::State::Phase);
+		}
+	}
 }
 
 void ObjectManager::StatePauseUpdate()

@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "Vec2.h"
+#include "Easing.h"
 
 /// <summary>
 /// Œü‚«

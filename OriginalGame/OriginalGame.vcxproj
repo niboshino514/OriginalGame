@@ -193,6 +193,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="ControllerOption.h" />
+    <ClInclude Include="Easing.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameData.h" />
     <ClInclude Include="Library\Calculation.h" />

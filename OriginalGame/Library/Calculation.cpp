@@ -609,3 +609,22 @@ std::vector<float> EvoLib::Calculation::AngleDivision(const int& divisionNumber,
     // 角度リストを返す
     return angleList;
 }
+
+Vec2 EvoLib::Calculation::EasingInOutSine(EasingData& easingData)
+{
+    // 現在のフレーム数を増やす
+    easingData.currentFrame++;
+
+    // 現在のフレーム数が総フレーム数を超えたら、総フレーム数にする
+    easingData.currentFrame = min(easingData.currentFrame, easingData.totalFrame);
+
+    // 現在の座標
+    Vec2 pos = Vec2();
+
+    // 現在の座標をイージングで求める
+    pos.x = Easing::InOutSine(easingData.currentFrame, easingData.totalFrame, easingData.endPos.x, easingData.startPos.x);
+    pos.y = Easing::InOutSine(easingData.currentFrame, easingData.totalFrame, easingData.endPos.y, easingData.startPos.y);
+
+    // 現在のフレーム数を進める
+    return pos;
+}
