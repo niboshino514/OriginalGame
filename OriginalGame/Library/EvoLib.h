@@ -4,6 +4,22 @@
 #include <string>
 #include "Vec2.h"
 #include "Easing.h"
+#include <iostream>
+#include <fstream>
+#include <typeinfo>  // typeidを使うために必要
+
+/// <summary>
+/// 時間
+/// </summary>
+struct Time
+{
+	int hour = 0;		// 時間
+	int minute = 0;		// 分
+	int second = 0;		// 秒
+	int millisecond = 0;// ミリ秒
+};
+
+
 
 /// <summary>
 /// 向き

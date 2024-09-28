@@ -7,7 +7,6 @@
 #include <string>
 #include "Sound.h"
 
-
 namespace
 {
 	// 通常移動スピード
@@ -150,7 +149,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-	DrawFormatString(0, 15 * 1, 0xffffff, "座標X:%f,座標Y:%f,", m_pos.x, m_pos.y);
+	
 
 	// ステートマシンの描画
 	m_pStateMachine.Draw();
@@ -238,9 +237,6 @@ void Player::StateNormalUpdate()
 
 	// ショット処理
 	Shot();
-
-
-
 }
 
 void Player::StateNormalDraw()
@@ -248,8 +244,35 @@ void Player::StateNormalDraw()
 	// オフセット値を取得
 	const Vec2 offset = GameData::GetInstance()->GetCameraPos();
 
+	Vec2 pos = m_pos + offset;
+	pos += Graph::kCharacterDrawAdjustment[static_cast<int>(m_playerStatus.gravityDirection)].adjustmentPos;
+
+	// 回転角度
+	const float rota = EvoLib::Convert::ConvertAngleToRadian(Graph::kCharacterDrawAdjustment[static_cast<int>(m_playerStatus.gravityDirection)].angle);
+
+	// 反転フラグ
+	const bool isReverse =
+		m_playerStatus.gravityDirection == Direction::Right ||
+		m_playerStatus.gravityDirection == Direction::Top;
+
+	// プレイヤー描画
+	DrawRotaGraphF(
+		pos.x,
+		pos.y,
+		Graph::kScale, rota,
+		m_graphicHandle[m_animationDetails.number], true, isReverse);
+
+
+
+	// プレイヤーの当たり判定半径を描画
+	DrawCircle(pos.x, pos.y, kCollisionRadius, 0xff0000, false);
+
+
 	// デバッグ描画
-#if(true)
+#if(false)
+	// プレイヤー座標
+	DrawFormatString(0, 15 * 1, 0xffffff, "座標X:%f,座標Y:%f,", m_pos.x, m_pos.y);
+
 	// 描画座標を計算
 	const Rect drawRect = EvoLib::Convert::PosToRect(m_pos + offset, m_size);
 
@@ -270,25 +293,6 @@ void Player::StateNormalDraw()
 	DrawBoxAA(drawMoveRect.left, drawMoveRect.top, drawMoveRect.right, drawMoveRect.bottom,
 		0x0000ff, false);
 #endif
-
-
-	Vec2 pos = m_pos + offset;
-	pos += Graph::kCharacterDrawAdjustment[static_cast<int>(m_playerStatus.gravityDirection)].adjustmentPos;
-	
-	// 回転角度
-	const float rota = EvoLib::Convert::ConvertAngleToRadian(Graph::kCharacterDrawAdjustment[static_cast<int>(m_playerStatus.gravityDirection)].angle);
-
-	// 反転フラグ
-	const bool isReverse = 
-		m_playerStatus.gravityDirection == Direction::Right ||
-		m_playerStatus.gravityDirection == Direction::Top;
-
-	// プレイヤー描画
-	DrawRotaGraphF(
-		pos.x,
-		pos.y,
-		Graph::kScale, rota,
-		m_graphicHandle[m_animationDetails.number], true, isReverse);
 }
 
 void Player::StateNormalExit()
@@ -298,6 +302,12 @@ void Player::StateNormalExit()
 
 	// プレイヤーが生きているかどうかを設定
 	GameData::GetInstance()->SetIsPlayerAlive(false);
+
+	// 死亡回数カウントアップ
+	m_playerStatus.deathCount++;
+
+	// 死亡回数を設定
+	GameData::GetInstance()->SetDeathCount(m_playerStatus.deathCount);
 }
 
 
@@ -604,10 +614,6 @@ void Player::Collision()
 
 void Player::Animation()
 {
-
-	DrawFormatString(0, 15 * 4, 0xffffff, "アニメーション番号:%d", m_animationDetails.number);
-
-
 	if (m_animationDetails.direction[0] != m_animationDetails.direction[1])
 	{
 		m_animationDetails.number = Anime::kAnimationRange[static_cast<int>(m_animationDetails.direction[0])].dirNo;
@@ -826,7 +832,6 @@ void Player::PosLinearInterpolation()
 		EvoLib::Calculation::InearInterpolationPos(beforePos, m_vec, iinearInterpolationCount);
 
 	
-
 	// 線形補間数が0ならば、座標に移動量を足したものを配列に入れる
 	if (iinearInterpolationCount == 0)
 	{
@@ -864,8 +869,8 @@ void Player::MapChipCollision(const Vec2& pos)
 	{
 		for (int x = 0; x < mapWidth; x++)
 		{
-			//マップ判定データが画面外の場合、次のループに移る
-			if (!mapCollisionData[x][y].screenFlag)
+			//マップ判定データがプレイヤーの判定範囲外の場合、次のループに移る
+			if (!mapCollisionData[x][y].playerRangeFlag)
 			{
 				continue;
 			}
@@ -1034,6 +1039,9 @@ void Player::SavePointCollision()
 
 void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData)
 {
+
+	// プレイヤーステータス代入
+	GameData::GetInstance()->SetPlayerStatus(m_playerStatus);
 
 	// 次のステージに進む
 	if (mapCollisionData.chipType == ObjectManager::ChipType::NextStage)

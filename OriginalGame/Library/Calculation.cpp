@@ -73,7 +73,6 @@ Vec2 EvoLib::Calculation::GetGraphSize_EvoLib(std::vector<int> graphHandle, cons
 
     // プレイヤーのグラフィックサイズを取得
     {
-  
         GetGraphSize(graph, &wide, &height);
     }
 

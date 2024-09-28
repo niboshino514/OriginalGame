@@ -177,7 +177,8 @@ void Pause::Draw()
 	DrawPauseWindow();
 
 	// 選択描画
-	PauseSelectDraw();
+	DrawPauseSelect();
+
 
 	// ステートマシンの描画
 	m_pStateMachine.Draw();
@@ -367,7 +368,7 @@ void Pause::StateBackTitleDraw()
 	DrawBackTitleWindow();
 
 	// バックタイトル選択描画
-	BackTitleSelectDraw();
+	DrawBackTitleSelect();
 }
 
 void Pause::Load()
@@ -598,7 +599,7 @@ void Pause::DrawPauseWindow()
 	DrawRotaGraphF(m_windowNameGraph.pos[0].x, m_windowNameGraph.pos[0].y, WindowNameGraph::kScale, 0.0, m_windowNameGraph.handle[0], true);
 }
 
-void Pause::PauseSelectDraw()
+void Pause::DrawPauseSelect()
 {
 
 	// ポーズ選択描画
@@ -648,7 +649,7 @@ void Pause::PauseSelectDraw()
 	SetDrawBright(255, 255, 255);
 }
 
-void Pause::BackTitleSelectDraw()
+void Pause::DrawBackTitleSelect()
 {
 
 	// バックタイトル描画

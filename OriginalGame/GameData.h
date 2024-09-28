@@ -1,7 +1,7 @@
 #pragma once
 #include "EvoLib.h"
-
 #include "Vec2.h"
+#include <tuple>
 
 // シングルトン
 class GameData
@@ -78,12 +78,21 @@ public:
 
 		// 加速フラグ
 		MoveSpeed moveSpeed = MoveSpeed::Normal;
+
+		// 死亡回数
+		int deathCount = 0;
 	};
 
 
 	// セーブポイントデータ
-	struct SavePointData
+	struct SaveData
 	{
+		// 初期化状態のデータかどうか
+		bool isInit = true;
+
+		// 時間
+		Time time = Time();
+
 		// ステージナンバー
 		int stageNumber = 0;
 
@@ -92,11 +101,7 @@ public:
 
 		// プレイヤーステータス
 		PlayerStatus playerStatus = PlayerStatus();
-
 	}; 
-
-
-
 
 
 	// ショットの種類
@@ -146,16 +151,34 @@ public:
 
 
 	/// <summary>
-	/// セーブポイントデータを設定
+	/// セーブデータの読み込み
+	/// </summary>
+	void LoadSaveData();
+
+	/// <summary>
+	/// セーブデータの書き込み
+	/// </summary>
+	void WriteSaveData();
+
+	/// <summary>
+	/// セーブデータを設定
 	/// </summary>
 	/// <param name="savePointData">セーブポイントデータ</param>
-	void SetSavePointData(const SavePointData& savePointData) { m_savePointData = savePointData; }
+	void SetSaveData(const SaveData& savePointData) { m_saveData = savePointData; }
 
 	/// <summary>
 	/// セーブポイントデータを返す
 	/// </summary>
 	/// <returns>セーブポイントデータ</returns>
-	SavePointData GetSavePointData() { return m_savePointData; }
+	SaveData GetSaveData() { return m_saveData; }
+
+	/// <summary>
+	/// セーブポイントデータを設定
+	/// </summary>
+	/// <param name="stageNumber">ステージ番号</param>
+	/// <param name="cell">セル</param>
+	/// <param name="playerStatus">プレイヤーステータス</param>
+	void SetSavePointData(const int& stageNumber = 0, const Cell& cell = Cell(), const PlayerStatus& playerStatus = PlayerStatus());
 
 	/// <summary>
 	/// プレイヤー座標設定
@@ -168,20 +191,6 @@ public:
 	/// </summary>
 	/// <returns>プレイヤー座標</returns>
 	Vec2 GetPlayerPos() { return m_playerPos; }
-
-
-
-	/// <summary>
-	/// ボスエネミー座標を設定
-	/// </summary>
-	/// <param name="enemyBossPos">ボスエネミー座標</param>
-	void SetBossEnemyPos(const Vec2& bossEnemyPos) { m_bossEnemyPos = bossEnemyPos; }
-
-	/// <summary>
-	/// ボスエネミー座標を返す
-	/// </summary>
-	/// <returns>ボスエネミー座標</returns>
-	Vec2 GetBossEnemyPos() { return m_bossEnemyPos; }
 
 	/// <summary>
 	/// ボスエネミースポーン座標を設定
@@ -214,13 +223,13 @@ public:
 	/// プレイヤーステータスを返す
 	/// </summary>
 	/// <returns>プレイヤーステータスの取得</returns>
-	PlayerStatus GetPlayerStatus() { return m_savePointData.playerStatus; }
+	PlayerStatus GetPlayerStatus() { return m_saveData.playerStatus; }
 
 	/// <summary>
 	/// プレイヤーステータスを設定
 	/// </summary>
 	/// <param name="playerStatus">プレイヤーのステータスを設定</param>
-	void SetPlayerStatus(const PlayerStatus& playerStatus) { m_savePointData.playerStatus = playerStatus; }
+	void SetPlayerStatus(const PlayerStatus& playerStatus) { m_saveData.playerStatus = playerStatus; }
 
 	/// <summary>
 	/// プレイヤーが生きているかどうかを設定
@@ -234,17 +243,33 @@ public:
 	/// <returns>プレイヤーが生きているかどうか</returns>
 	bool GetIsPlayerAlive() { return m_isPlayerAlive; }
 
+	/// <summary>
+	/// 死亡回数を設定
+	/// </summary>
+	/// <param name="deathCount">死亡回数</param>
+	void SetDeathCount(const int& deathCount) { m_saveData.playerStatus.deathCount = deathCount; }
+
+	/// <summary>
+	/// 時間計測
+	/// </summary>
+	void TimeCount();
+
+	// 60カウントしたかどうか
+	bool IsTimeCount60(const int& count);
+
+	/// <summary>
+	/// 時間を返す
+	/// </summary>
+	/// <returns>時間</returns>
+	Time GetTime() { return m_saveData.time; }
 
 private:
 
 	// セーブポイントデータ
-	SavePointData m_savePointData = SavePointData();
+	SaveData m_saveData = SaveData();
 
 	// プレイヤー座標
 	Vec2 m_playerPos = Vec2();
-
-	// ボスエネミー座標
-	Vec2 m_bossEnemyPos = Vec2();
 
 	// ボスエネミースポーン座標
 	Vec2 m_bossEnemySpawnPos = Vec2();

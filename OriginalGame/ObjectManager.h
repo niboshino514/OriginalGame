@@ -72,6 +72,7 @@ public:
 	enum class MapSwitchType
 	{
 		Spawn,			// スポーン
+		SaveData,		// セーブデータ
 		Respawn,		// リスポーン
 		NextStage,		// 次のステージ
 		PreviouseStage	// 前のステージ
@@ -144,6 +145,9 @@ public:
 
 		// 画面内フラグ
 		bool screenFlag = false;
+
+		// プレイヤー範囲内フラグ
+		bool playerRangeFlag = false;
 	};
 
 	// マップ情報データ
@@ -285,9 +289,9 @@ public:
 	Triangle ChipTypeToTriangle(const ChipType& needleDirection, const Square& square);
 
 	/// <summary>
-	/// スクリーン内かどうかを調べる
+	/// フィールドを確認する
 	/// </summary>
-	void ScreenCheck();
+	void FieldCheck();
 
 	/// <summary>
 	/// マップ当たり判定データを返す
@@ -418,9 +422,6 @@ private:
 	/// ショット生成
 	/// </summary>
 	void CreateShot();
-
-
-
 
 private:
 

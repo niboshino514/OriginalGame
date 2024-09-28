@@ -283,7 +283,14 @@ namespace EvoLib
 		/// <returns>Œ»İ‚ÌÀ•W</returns>
 		static Vec2 EasingInOutSine(EasingData& easingData);
 
-
+		/// <summary>
+		/// Œ^‚ªˆê’v‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
+		/// </summary>
+		/// <typeparam name="T">’²‚×‚é•Ï”</typeparam>
+		/// <typeparam name="U">Œ^</typeparam>
+		/// <returns></returns>
+		template <typename T, typename U>
+		bool IsSameType(const U& value);
 	};
 	template<typename T>
 	inline T Calculation::SineCurve(SineCurveData<T>& sineCurveData, bool isAbs)
@@ -379,5 +386,11 @@ namespace EvoLib
 		}
 
 		return x;
+	}
+	template<typename T, typename U>
+	inline bool Calculation::IsSameType(const U& value)
+	{
+		// typeid‚ğg‚Á‚ÄŒ^‚ğ’²‚×‚é
+		return std::is_same<T, U>::value;
 	}
 }

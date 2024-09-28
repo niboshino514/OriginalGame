@@ -139,7 +139,8 @@ private:
 	/// </summary>
 	void BackTitleSelectDecision();
 
-
+	// ゲーム再開処理
+	void ResumeProcess();
 
 	/// <summary>
 	/// ポーズウィンドウ描画
@@ -149,7 +150,7 @@ private:
 	/// <summary>
 	/// ポーズ選択描画
 	/// </summary>
-	void PauseSelectDraw();
+	void DrawPauseSelect();
 
 	// タイトルに戻るウィンドウ描画
 	void DrawBackTitleWindow();
@@ -157,11 +158,7 @@ private:
 	/// <summary>
 	/// バックタイトル選択描画
 	/// </summary>
-	void BackTitleSelectDraw();
-
-
-	// ゲーム再開処理
-	void ResumeProcess();
+	void DrawBackTitleSelect();
 	
 
 

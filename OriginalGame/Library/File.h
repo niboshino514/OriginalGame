@@ -36,8 +36,6 @@ namespace EvoLib
 		/// <returns>そのファイルが存在するかどうかを返す</returns>
 		static bool IsFileExist(const std::string& name);
 
-
-	
 		/// <summary>
 		/// CSVファイルを読み込む
 		/// </summary>
@@ -57,13 +55,54 @@ namespace EvoLib
 		/// <returns>読み込んだ文字列を返す</returns>
 		static std::vector<std::vector<std::string>> CsvFileLoading_Revision(const std::string& filePath, const bool& isSkipOneArray = false, const int& skipColumnNum = 0, const bool& isDeleteEmptyCell = false);
 
-
-
 		/// <summary>
 		/// 簡易CSVファイル書き込み
 		/// </summary>
 		/// <param name="fileName">ファイル名</param>
 		/// <param name="writingText">書き込むテキスト</param>
 		static void SimpleCsvFileWriting(const std::string& fileName, const std::string& writingText);
+
+		/// <summary>
+		/// バイナリファイルを書き込む(生成も可能)※テキストの場合、char[]型に変換してください
+		/// </summary>
+		/// <typeparam name="T">struct</typeparam>
+		/// <param name="filename">書き込むファイル名</param>
+		/// <param name="data">書き込むデータ</param>
+		template<typename T>
+		static void WriteBinaryFile(const std::string& filename, const T& data);
+
+		/// <summary>
+		/// バイナリファイルを読み込む※テキストの場合、char[]型でしか読み込む事ができません
+		/// </summary>
+		/// <typeparam name="T">struct</typeparam>
+		/// <param name="filename">読み込むファイル名</param>
+		/// <param name="data">読み込むデータ関数</param>
+		template<typename T>
+		static void ReadBinaryFile(const std::string& filename, T& data);
 	};
+
+	template<typename T>
+	inline void File::WriteBinaryFile(const std::string& filename, const T& data)
+	{
+		std::ofstream outFile(filename, std::ios::binary);
+		if (!outFile) {
+			std::cerr << "ファイルを開けませんでした: " << filename << std::endl;
+			return;
+		}
+		outFile.write(reinterpret_cast<const char*>(&data), sizeof(T));
+		outFile.close();
+	}
+
+	template<typename T>
+	inline void File::ReadBinaryFile(const std::string& filename, T& data)
+	{
+		std::ifstream inFile(filename, std::ios::binary);
+		if (!inFile) {
+			std::cerr << "ファイルを開けませんでした: " << filename << std::endl;
+			return;
+		}
+		inFile.read(reinterpret_cast<char*>(&data), sizeof(T));
+		inFile.close();
+	}
+
 }

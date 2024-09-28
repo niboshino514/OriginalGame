@@ -118,6 +118,15 @@ void ObjectManager::Draw()
 	// マップ描画
 	TestMapDraw();
 
+	// 時間取得
+	Time time = GameData::GetInstance()->GetTime();
+	// 時間描画
+	DrawFormatString(0, 15*0, GetColor(255, 255, 255), "%d:%d:%d:%d", time.hour, time.minute, time.second, time.millisecond);
+	// 死亡回数取得
+	int deathCount = GameData::GetInstance()->GetPlayerStatus().deathCount;
+	// 死亡回数描画
+	DrawFormatString(0, 15*1, GetColor(255, 255, 255), "DeathCount:%d", deathCount);
+
 	// ステートマシンの描画
 	m_pStateMachine.Draw();
 }
@@ -276,7 +285,7 @@ void ObjectManager::StateOpeningUpdate()
 	ObjectUpdate(true);
 
 	// スクリーン内かどうかを調べる
-	ScreenCheck();
+	FieldCheck();
 
 	// メッセージウィンドウ更新
 	m_pOpeningMessageWindow->Update();
@@ -306,11 +315,14 @@ void ObjectManager::StateNormalUpdate()
 	ObjectUpdate();
 
 	// スクリーン内かどうかを調べる
-	ScreenCheck();
+	FieldCheck();
 
 	// オブジェクト削除
 	ObjectErase();
 	
+	// 時間計測
+	GameData::GetInstance()->TimeCount();
+
 	if(m_isSpawnBossState)
 	{
 		SetState(State::SpawnBoss);
@@ -344,7 +356,7 @@ void ObjectManager::StateSpawnBossUpdate()
 	ObjectUpdate();
 
 	// スクリーン内かどうかを調べる
-	ScreenCheck();
+	FieldCheck();
 }
 
 void ObjectManager::StateSpawnBossDraw()
@@ -366,7 +378,7 @@ void ObjectManager::StateBossTalkEnter()
 void ObjectManager::StateBossTalkUpdate()
 {
 	// スクリーン内かどうかを調べる
-	ScreenCheck();
+	FieldCheck();
 
 	// カメラ更新
 	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
@@ -415,7 +427,7 @@ void ObjectManager::SetSavePoint(const Vec2& pos, const GameData::PlayerStatus& 
 	const Cell cell = EvoLib::Convert::PosToCell(pos, m_mapInfoData.mapChip.chipSize);
 
 	// セーブポイントデータを設定
-	GameData::GetInstance()->SetSavePointData(GameData::SavePointData(m_mapInfoData.mapNumber, cell, playerStatus));
+	GameData::GetInstance()->SetSavePointData(m_mapInfoData.mapNumber, cell, playerStatus);
 }
 
 void ObjectManager::SetState(const State& state)
@@ -487,7 +499,6 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 		m_mapInfoData.mapChip.mapWidth, 
 		std::vector<MapCollisionData>(m_mapInfoData.mapChip.mapHeight));
 
-
 	// 次のステージセル
 	Cell nextStageCell = Cell();
 
@@ -496,8 +507,6 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 
 	// プレイヤーが生成されたかどうか
 	bool isPlayerCreate = false;
-
-
 
 	// スポーンチップ個数
 	int spawnChip = 0;
@@ -609,7 +618,7 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 				if (isSpwan)
 				{
 					// セーブ情報を送る
-					GameData::GetInstance()->SetSavePointData(GameData::SavePointData(m_mapInfoData.mapNumber, Cell(x, y)));
+					GameData::GetInstance()->SetSaveData(GameData::SaveData(false, Time(), m_mapInfoData.mapNumber, Cell(x, y)));
 				}
 
 				// プレイヤー生成
@@ -619,8 +628,6 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 				{
 					// キャラクター生成
 					PlayerCreate(EvoLib::Convert::CellToPos(Cell(x, y), m_mapInfoData.mapChip.chipSize));
-
-					
 
 					// プレイヤー生成フラグ
 					isPlayerCreate = true;
@@ -656,11 +663,21 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 		}
 	}
 
+	if (mapSwitchType == MapSwitchType::SaveData)
+	{
+		// キャラクター生成
+		PlayerCreate(EvoLib::Convert::CellToPos(GameData::GetInstance()->GetSaveData().cell, m_mapInfoData.mapChip.chipSize));
+
+		// プレイヤー生成フラグ
+		isPlayerCreate = true;
+	}
+
+
 	// リスポーン
 	if (mapSwitchType == MapSwitchType::Respawn)
 	{
 		// キャラクター生成
-		PlayerCreate(EvoLib::Convert::CellToPos(GameData::GetInstance()->GetSavePointData().cell, m_mapInfoData.mapChip.chipSize));
+		PlayerCreate(EvoLib::Convert::CellToPos(GameData::GetInstance()->GetSaveData().cell, m_mapInfoData.mapChip.chipSize));
 
 		// プレイヤー生成フラグ
 		isPlayerCreate = true;
@@ -848,7 +865,7 @@ void ObjectManager::StageMove(const MapSwitchType& mapSwitchType)
 	else if (mapSwitchType == MapSwitchType::Respawn)
 	{
 		// セーブポイントデータのステージナンバーをステージナンバーの数字に代入
-		m_mapInfoData.mapNumber = GameData::GetInstance()->GetSavePointData().stageNumber;
+		m_mapInfoData.mapNumber = GameData::GetInstance()->GetSaveData().stageNumber;
 	}
 
 
@@ -895,8 +912,7 @@ std::vector<std::vector<int>> ObjectManager::GetMapChipNumber()
 std::tuple<bool, Vec2>  ObjectManager::GetSavePointPos()
 {
 	// セーブポイントデータを取得
-	const GameData::SavePointData savePointData = GameData::GetInstance()->GetSavePointData();
-
+	const GameData::SaveData savePointData = GameData::GetInstance()->GetSaveData();
 
 	// ボスを削除する
 	for (auto& object : m_object)
@@ -906,9 +922,6 @@ std::tuple<bool, Vec2>  ObjectManager::GetSavePointPos()
 			object->SetIsExlist(false);
 		}
 	}
-
-
-
 
 	// セーブポイントデータのステージナンバーと現在のステージナンバーが異なる場合、マップ生成を行う
 	if (savePointData.stageNumber != m_mapInfoData.mapNumber)
@@ -939,8 +952,21 @@ void ObjectManager::InitMap()
 	// マップナンバーを初期化
 	m_mapInfoData.mapNumber = 0;
 
+	// ステージ移動タイプを初期化
+	MapSwitchType mapSwitchType = MapSwitchType::Spawn;
+
+	// セーブデータが初期化されていない場合
+	if(!GameData::GetInstance()->GetSaveData().isInit)
+	{
+		// ステージ移動タイプをセーブデータにする
+		mapSwitchType = MapSwitchType::SaveData;
+
+		// ステージナンバーをセーブデータにある数値にする
+		m_mapInfoData.mapNumber = GameData::GetInstance()->GetSaveData().stageNumber;
+	}
+
 	// マップ生成
-	StageMove(MapSwitchType::Spawn);
+	StageMove(mapSwitchType);
 }
 
 void ObjectManager::InitScreenCircle()
@@ -1141,24 +1167,43 @@ Triangle ObjectManager::ChipTypeToTriangle(const ChipType& needleDirection, cons
 	return triangle;
 }
 
-void ObjectManager::ScreenCheck()
+void ObjectManager::FieldCheck()
 {
 	// 判定用の円情報
 	Circle collisionMapCircle = Circle();
+
+	// プレイヤーの座標を取得
+	Vec2 playerPos = GameData::GetInstance()->GetPlayerPos();
+	playerPos += GameData::GetInstance()->GetCameraPos();
+
+	// プレイヤーの判定円情報
+	const Circle playerCircle = Circle(playerPos, Player::kCollisionRadius);
 
 	// マップの範囲内であるかどうかを調べる
 	for (int y = 0; y < m_mapInfoData.mapChip.mapHeight; y++)
 	{
 		for (int x = 0; x < m_mapInfoData.mapChip.mapWidth; x++)
 		{
+
 			// 円情報をコピー
 			collisionMapCircle = m_mapInfoData.mapCollisionData[x][y].circle;
 
 			// 座標にオフセット値を加える
 			collisionMapCircle.centerPos += GameData::GetInstance()->GetCameraPos();
 
-			// 円の判定
-			m_mapInfoData.mapCollisionData[x][y].screenFlag = EvoLib::Collision::IsCircleToCircle(collisionMapCircle, m_screenCircle);
+
+			// スクリーン外であるかどうかを調べる
+			{
+				// 円の判定
+				m_mapInfoData.mapCollisionData[x][y].screenFlag = EvoLib::Collision::IsCircleToCircle(collisionMapCircle, m_screenCircle);
+			}
+
+			// プレイヤーの範囲内であるかどうかを調べる
+			{
+				// 円の判定
+				m_mapInfoData.mapCollisionData[x][y].playerRangeFlag = EvoLib::Collision::IsCircleToCircle(collisionMapCircle, playerCircle);
+			}
+		
 		}
 	}
 }

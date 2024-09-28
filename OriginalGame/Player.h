@@ -9,6 +9,10 @@ class Player : public ObjectBase
 {
 public:
 
+	// プレイヤーの当たり判定半径サイズ
+	static constexpr float kCollisionRadius = 120.0f;
+
+
 	// ジャンプ情報
 	struct JumpInfo
 	{

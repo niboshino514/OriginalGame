@@ -350,10 +350,10 @@
     <ClInclude Include="SceneOpening.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
-    <ClInclude Include="GameOver.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="OpeningScreen.h">
+      <Filter>ヘッダー ファイル\mainScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOver.h">
       <Filter>ヘッダー ファイル\mainScreen</Filter>
     </ClInclude>
   </ItemGroup>
