@@ -1,10 +1,9 @@
+#include "SceneEnding.h"
+#include "Sound.h"
 #include "SceneTitle.h"
+#include "EndingScreen.h"
 
-#include "TitleScreen.h"
 
-#include "SceneSaveDataSelect.h"
-#include "SceneMain.h"
-#include "Controller.h"
 namespace
 {
 	// フェードインアウトのスピード
@@ -14,38 +13,36 @@ namespace
 	constexpr int kFadeColor = 0x000000;
 }
 
-SceneTitle::SceneTitle():
-	m_pTitleScreen(std::make_shared<TitleScreen>())
+SceneEnding::SceneEnding() :
+	m_pEndingScreen(std::make_shared<EndingScreen>())
 {
 }
 
-SceneTitle::~SceneTitle()
+SceneEnding::~SceneEnding()
 {
 }
 
-void SceneTitle::Init()
+void SceneEnding::Init()
 {
 	// フェードイン設定
 	SetFadeIn(kFadeSpeed, kFadeColor);
 
+	// エンディングスクリーンに自身のポインタを渡す
+	m_pEndingScreen->SetSceneEndingPointer(this);
 
-
-	// タイトルスクリーンに自身のポインタを渡す
-	m_pTitleScreen->SetSceneTitle(this);
 	// 初期化処理
-	m_pTitleScreen->Init();
+	m_pEndingScreen->Init();
 
-	// 操作受付を有効にする
-	Controller::GetInstance()->SetAcceptInput(true);
 }
 
-SceneBase* SceneTitle::Update()
+SceneBase* SceneEnding::Update()
 {
 	// フェード処理
 	UpdateFade();
 
 	// フェードアウト時、だんだん音が小さくなるサウンド処理
 	FadeOutSound();
+
 
 	// フェードアウトが終了していたらシーン遷移する
 	if (IsFadeOutEnd())
@@ -55,37 +52,34 @@ SceneBase* SceneTitle::Update()
 	}
 
 	// 更新処理
-	m_pTitleScreen->Update();	
-
-
+	m_pEndingScreen->Update();
 
 	return this;
 }
 
-void SceneTitle::Draw()
+void SceneEnding::Draw()
 {
 	// 描画処理
-	m_pTitleScreen->Draw();
+	m_pEndingScreen->Draw();
 
 	// フェード描画(一番下に来るようにする)
 	DrawFade();
 }
 
-void SceneTitle::ChangeScene(const Scene& nextScene)
+void SceneEnding::ChangeScene(const Scene& nextScene)
 {
 	// 次のシーンを設定
 	switch (nextScene)
 	{
-	case SceneTitle::Scene::SaveDataSelect:
+	case SceneEnding::Scene::Title:
 
-		// セーブデータ選択シーン
-		m_nextScene = new SceneSaveDataSelect();
+		// タイトルシーン
+		m_nextScene = new SceneTitle();
 
 		break;
 	default:
 		break;
 	}
-
 
 	// フェードアウト設定
 	SetFadeOut(kFadeSpeed, kFadeColor);

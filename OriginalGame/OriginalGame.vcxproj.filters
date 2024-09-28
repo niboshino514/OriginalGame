@@ -201,6 +201,15 @@
     <ClCompile Include="NormalShot.cpp">
       <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
     </ClCompile>
+    <ClCompile Include="SceneEnding.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="EndingScreen.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="GameOver.cpp">
+      <Filter>ソース ファイル\screenMain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneManager.h">
@@ -296,12 +305,6 @@
     <ClInclude Include="ControllerOption.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="SceneOpening.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="OpeningScreen.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Message\MessageTextLoader.h">
       <Filter>ヘッダー ファイル\message</Filter>
     </ClInclude>
@@ -337,6 +340,21 @@
     </ClInclude>
     <ClInclude Include="Easing.h">
       <Filter>ヘッダー ファイル\setting</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneEnding.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="EndingScreen.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneOpening.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOver.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="OpeningScreen.h">
+      <Filter>ヘッダー ファイル\mainScreen</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

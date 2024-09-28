@@ -1,12 +1,11 @@
 #include "DxLib.h"
-
 #include "game.h"
-
 #include "SceneManager.h"
-
 #include <crtdbg.h>
-
 #include "Sound.h"
+#include "crtdbg.h"
+#include "Controller.h"
+#include "GameData.h"
 
 
 // プログラムは WinMain から始まります
@@ -14,6 +13,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	// メモリをすべて解放しているかどうかを調べる
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	// リークが発生しているメモリ確保回数を引数にすることで、
+    // その個所にデバッグブレークをかけてくれる
+//	_CrtSetBreakAlloc(756);
+
 
 	// 出力ログtxtを出さないようにする
 	SetOutApplicationLogValidFlag(false);
@@ -67,6 +71,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	scene.End();
+
+
+	// シングルトン解放
+	{
+		// サウンドシングルトン解放
+		Sound::GetInstance()->DeleteInstance();
+
+		// コントローラー解放
+		Controller::GetInstance()->DeleteInstance();
+
+		// ゲームデータ解放
+		GameData::GetInstance()->DeleteInstance();
+	}
+
+	
+
+
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 

@@ -92,6 +92,11 @@ protected:
 	/// <returns>フェードアルファ値</returns>
 	int GetFadeAlpha() { return m_fade.alpha; }
 
+	/// <summary>
+	/// フェードアウト時、だんだん音が小さくなる処理
+	/// </summary>
+	void FadeOutSound();
+
 protected:
 
 	// 次のシーン

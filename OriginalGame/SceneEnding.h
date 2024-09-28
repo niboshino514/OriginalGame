@@ -2,16 +2,14 @@
 #include "SceneBase.h"
 #include <memory>
 
+class EndingScreen;
 
-class MainScreen;
-
-class SceneMain : public SceneBase
+class SceneEnding : public SceneBase
 {
 public:
-	SceneMain();
+	SceneEnding();
 
-	virtual ~SceneMain();
-
+	virtual ~SceneEnding();
 
 	virtual void Init() override;
 	virtual void End() override {}
@@ -26,8 +24,7 @@ public:
 	{
 		// タイトルシーン
 		Title,
-		// エンディングシーン
-		Ending,
+
 	};
 
 	/// <summary>
@@ -35,17 +32,9 @@ public:
 	/// </summary>
 	void ChangeScene(const Scene& nextScene);
 
-
 private:
 
-	////////////////////
-	// クラスポインタ //
-	////////////////////
-
-	// メインスクリーン
-	std::shared_ptr<MainScreen>m_pMainScreen;
-
-
-
-
+	// エンディングスクリーンポインタ
+	std::shared_ptr<EndingScreen> m_pEndingScreen;
 };
+

@@ -48,6 +48,13 @@ namespace EvoLib
 	public:
 
 		/// <summary>
+		/// グラフィックの読み込み
+		/// </summary>
+		/// <param name="filePath">グラフィックのファイルパス</param>
+		/// <returns>ロードしたグラフィックハンドル</returns>
+		static int LoadGraph_EvoLib(const char* filePath);
+
+		/// <summary>
 		/// グラフィックの分割
 		/// </summary>
 		/// <param name="filePath">グラフィックのファイルパス</param>

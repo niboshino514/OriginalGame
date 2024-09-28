@@ -33,6 +33,7 @@ namespace
 
 		"Jump",			// ジャンプ音
 		"Dead",			// 死亡音
+		"Restart",		// リスタート音
 	};
 
 	// サウンド名
@@ -48,6 +49,7 @@ namespace
 
 		Jump,			// ジャンプ音
 		Dead,			// 死亡音
+		Restart,		// リスタート音
 	};
 
 }
@@ -60,6 +62,7 @@ class PlatinumLoader;
 class Camera;
 class Pause;
 class MessageWindow;
+class GameOver;
 
 class ObjectManager : public std::enable_shared_from_this<ObjectManager>
 {
@@ -177,6 +180,8 @@ public:
 		BossTalk,
 		// ポーズ画面
 		Pause,
+		// エンディング
+		Ending,
 	};
 
 
@@ -203,8 +208,6 @@ public:
 	/// <param name="nextScene">次のシーン</param>
 	void ChangeScene(const SceneMain::Scene& nextScene);
 
-
-	
 
 public:
 
@@ -349,12 +352,12 @@ private:
 	void StateBossTalkDraw();
 	void StateBossTalkExit();
 
-
-
-
 	// ポーズステート処理
 	void StatePauseUpdate();
 	void StatePauseDraw();
+
+	// エンディングステート処理
+	void StateEndingEnter();
 
 
 private:
@@ -482,4 +485,7 @@ private:
 
 	// ボス会話メッセージウィンドウ
 	std::shared_ptr<MessageWindow>m_pBossTalkMessageWindow;
+
+	// ゲームオーバー
+	std::shared_ptr<GameOver>m_pGameOver;
 };

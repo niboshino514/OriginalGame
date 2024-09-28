@@ -2,6 +2,27 @@
 
 
 
+int EvoLib::Load::LoadGraph_EvoLib(const char* filePath)
+{
+    // ファイルが存在しない場合、エラーメッセージを表示
+    if (!EvoLib::File::IsFileExist(filePath))
+    {
+        // ファイルが存在しない場合、エラーメッセージを表示
+        std::string errorMsg = "[" + static_cast<std::string>(filePath) + "]" +
+            " のグラフィックファイルは存在しないようです。";
+
+        // ファイル読込エラー処理
+        EvoLib::Assert::ErrorMessageBox(errorMsg);
+    }
+
+
+    // グラフィックハンドルのロード
+    const int graphic = LoadGraph(filePath);
+
+    // グラフィックハンドルを返す
+    return graphic;
+}
+
 EvoLib::Load::DivGraphInfo EvoLib::Load::LoadDivGraph_EvoLib(const char* filePath, const int& div_x, const int& div_y)
 {
 

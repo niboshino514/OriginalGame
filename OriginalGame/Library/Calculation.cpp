@@ -316,11 +316,6 @@ Rect EvoLib::Calculation::CalculateRectangleMovementRange(const Rect& rect, cons
 	{
 		for (int x = indexMinX; x <= indexMaxX; x++)
 		{
-			if (!IsCellRange(Cell(x, y), Cell(maxCell.x, maxCell.x), Cell(0, 0)))
-			{
-				return Rect();
-			}
-
             if (cellData[x][y] == 0)
             {
 				continue;
@@ -357,10 +352,6 @@ Rect EvoLib::Calculation::CalculateRectangleMovementRange(const Rect& rect, cons
 	{
 		for (int x = indexMinX; x <= indexMaxX; x++)
 		{
-			if (!IsCellRange(Cell(x, y), Cell(maxCell.x, maxCell.x), Cell(0, 0)))
-			{
-				return Rect();
-			}
 
             if (cellData[x][y] == 0)
             {
@@ -397,10 +388,6 @@ Rect EvoLib::Calculation::CalculateRectangleMovementRange(const Rect& rect, cons
 	{
 		for (int y = indexMinY; y <= indexMaxY; y++)
 		{
-			if (!IsCellRange(Cell(x, y), maxCell, Cell(0, 0)))
-			{
-				return Rect();
-			}
 
             if (cellData[x][y] == 0)
             {
@@ -437,11 +424,6 @@ Rect EvoLib::Calculation::CalculateRectangleMovementRange(const Rect& rect, cons
 	{
 		for (int y = indexMinY; y <= indexMaxY; y++)
 		{
-			if (!IsCellRange(Cell(x, y), maxCell, Cell(0, 0)))
-			{
-				return Rect();
-			}
-
 
             if (cellData[x][y] == 0)
             {

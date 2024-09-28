@@ -6,19 +6,17 @@
 #include "MainScreen.h"
 #include "SceneTitle.h"
 #include "Sound.h"
-
+#include "SceneEnding.h"
 
 
 namespace
 {
 	// フェードインアウトのスピード
-	constexpr int kFadeSpeed = 255;
+	constexpr int kFadeSpeed = 5;
 
 	// フェードのカラー
 	constexpr int kFadeColor = 0x000000;
 }
-
-
 
 SceneMain::SceneMain():
 	m_pMainScreen(std::make_shared<MainScreen>())
@@ -58,7 +56,7 @@ SceneBase* SceneMain::Update()
 
 	// 更新処理
 	m_pMainScreen->Update();
-
+	
 
 	return this;
 }
@@ -81,27 +79,18 @@ void SceneMain::ChangeScene(const Scene& nextScene)
 
 		// タイトルシーン
 		m_nextScene = new SceneTitle();
-
 		break;
 
-		// タイトルシーン
-		m_nextScene = new SceneTitle();
+	case SceneMain::Scene::Ending:
+
+		// エンディングシーン
+		m_nextScene = new SceneEnding();
+		break;
+
 	default:
 		break;
 	}
 
 	// フェードアウト設定
 	SetFadeOut(kFadeSpeed, kFadeColor);
-}
-
-void SceneMain::FadeOutSound()
-{
-	// フェードアウト中で無ければ処理をしない
-	if (!GetIsFadeOut())
-	{
-		return;
-	}
-
-	// フェードに合わせてBGMの音量を下げる
-	Sound::GetInstance()->ScreenFadeBGMStop(GetFadeAlpha());
 }

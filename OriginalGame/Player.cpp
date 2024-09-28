@@ -8,7 +8,6 @@
 #include "Sound.h"
 
 
-
 namespace
 {
 	// 通常移動スピード
@@ -184,6 +183,9 @@ void Player::StateInit()
 void Player::StateNormalEnter()
 {
 
+	// プレイヤーが生きているかどうかを設定
+	GameData::GetInstance()->SetIsPlayerAlive(true);
+
 	// プレイヤーステータスを取得
 	m_playerStatus = GameData::GetInstance()->GetPlayerStatus();
 
@@ -293,6 +295,9 @@ void Player::StateNormalExit()
 {
 	// 死亡音を再生
 	Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Dead)]);
+
+	// プレイヤーが生きているかどうかを設定
+	GameData::GetInstance()->SetIsPlayerAlive(false);
 }
 
 
@@ -316,6 +321,9 @@ void Player::Respawn()
 		{
 			m_pStateMachine.SetState(State::Normal);
 		}
+
+		// リスタート音を再生
+		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Restart)]);
 	}
 }
 
@@ -1210,16 +1218,16 @@ void Player::Shot()
 
 
 	// 分割する個数
-	const int splitCount = 5;
+	const int splitCount = 2;
 	// 基準角度
-	const float baseAngle = 270.0f;
+	const float baseAngle = 300.0f;
 
 
 
 	// ショットデータを代入
 	GameData::ShotData shotData =
 	{
-		GameData::ShotType::ReflectionShot,
+		GameData::ShotType::SineCurveShot,
 		m_pos,
 		0.0f,
 		Shot::kSpeed,

@@ -9,6 +9,8 @@
 #include <DxLib.h>
 #include "game.h"
 #include "Controller.h"
+#include "Sound.h"
+
 
 SceneManager::SceneManager()
 {
@@ -31,6 +33,7 @@ void SceneManager::End()
 
 	m_pScene->End();
 	delete m_pScene;
+	m_pScene = nullptr;
 }
 
 void SceneManager::Update()
@@ -54,6 +57,10 @@ void SceneManager::Update()
 		// 前のシーンの終了処理
 		m_pScene->End();
 		delete m_pScene;
+
+		// サウンドの削除
+		Sound::GetInstance()->UnLoad();
+
 
 		m_pScene = pScene;
 		m_pScene->Init();

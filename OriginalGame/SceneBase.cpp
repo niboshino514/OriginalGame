@@ -1,6 +1,7 @@
 #include "SceneBase.h"
 #include <DxLib.h>
 #include "game.h"
+#include "Sound.h"
 
 void SceneBase::SetFadeIn(const int& fadeSpeed, const int& fadeColor)
 {
@@ -16,7 +17,6 @@ void SceneBase::SetFadeIn(const int& fadeSpeed, const int& fadeColor)
 	// フェードアルファ値を設定
 	m_fade.alpha = 255;
 }
-
 
 void SceneBase::SetFadeOut(const int& fadeSpeed, const int& fadeColor)
 {
@@ -83,4 +83,16 @@ void SceneBase::DrawFade()
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fade.alpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, m_fade.color, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void SceneBase::FadeOutSound()
+{
+	// フェードアウト中で無ければ処理をしない
+	if (m_fade.state != Fade::Out)
+	{
+		return;
+	}
+
+	// フェードに合わせてBGMの音量を下げる
+	Sound::GetInstance()->ScreenFadeBGMStop(GetFadeAlpha());
 }

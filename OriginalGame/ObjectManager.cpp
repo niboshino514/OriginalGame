@@ -13,6 +13,7 @@
 #include "NormalShot.h"
 #include "SineCurveShot.h"
 #include "ReflectionShot.h"
+#include "GameOver.h"
 
 #include <cassert>
 #include <string>
@@ -72,7 +73,8 @@ ObjectManager::ObjectManager() :
 	m_pCamera(std::make_shared<Camera>()),
 	m_pPause(std::make_shared<Pause>()),
 	m_pOpeningMessageWindow(std::make_shared<MessageWindow>()),
-	m_pBossTalkMessageWindow(std::make_shared<MessageWindow>())
+	m_pBossTalkMessageWindow(std::make_shared<MessageWindow>()),
+	m_pGameOver(std::make_shared<GameOver>())
 {
 }
 
@@ -97,12 +99,14 @@ void ObjectManager::Init()
 
 void ObjectManager::Update()
 {
+	// カメラ更新
+	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
+
 	// ポーズクラス更新
 	m_pPause->Update();
 
 	// ステートマシンの更新
 	m_pStateMachine.Update();
-
 
 }
 
@@ -143,6 +147,7 @@ void ObjectManager::StateInit()
 		
 		m_pStateMachine.AddState(State::Setting, enter, dummy, dummy, dummy);
 	}
+
 	// オープニングステート
 	{
 		auto enter = [this]() { StateOpeningEnter(); };
@@ -194,6 +199,14 @@ void ObjectManager::StateInit()
 		m_pStateMachine.AddState(State::Pause, dummy, update, draw, dummy);
 	}
 
+	// エンディングステート
+	{
+		auto enter = [this]() { StateEndingEnter(); };
+
+
+		m_pStateMachine.AddState(State::Ending, enter, dummy, dummy, dummy);
+	}
+
 	// 初期ステートを設定
 	SetState(State::Setting);
 }
@@ -224,6 +237,9 @@ void ObjectManager::StateSettingInit()
 	// ポーズクラス初期化
 	m_pPause->Init();
 
+	// ゲームオーバークラス初期化
+	m_pGameOver->Init();
+
 
 	// マップグラフィック代入
 	{
@@ -245,7 +261,6 @@ void ObjectManager::StateSettingInit()
 
 	// ステートを通常に変更
 	SetState(State::Normal);
-
 }
 
 void ObjectManager::StateOpeningEnter()
@@ -262,9 +277,6 @@ void ObjectManager::StateOpeningUpdate()
 
 	// スクリーン内かどうかを調べる
 	ScreenCheck();
-
-	// カメラ更新
-	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
 
 	// メッセージウィンドウ更新
 	m_pOpeningMessageWindow->Update();
@@ -296,9 +308,6 @@ void ObjectManager::StateNormalUpdate()
 	// スクリーン内かどうかを調べる
 	ScreenCheck();
 
-	// カメラ更新
-	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
-
 	// オブジェクト削除
 	ObjectErase();
 	
@@ -310,6 +319,8 @@ void ObjectManager::StateNormalUpdate()
 
 void ObjectManager::StateNormalDraw()
 {
+	// ゲームオーバークラス描画
+	m_pGameOver->Draw();
 }
 
 void ObjectManager::StateSpawnBossEnter()
@@ -334,9 +345,6 @@ void ObjectManager::StateSpawnBossUpdate()
 
 	// スクリーン内かどうかを調べる
 	ScreenCheck();
-
-	// カメラ更新
-	m_pCamera->OffsetCalculation(GameData::GetInstance()->GetPlayerPos());
 }
 
 void ObjectManager::StateSpawnBossDraw()
@@ -369,7 +377,7 @@ void ObjectManager::StateBossTalkUpdate()
 	// メッセージウィンドウが終了したら次のステートに変更
 	if (m_pBossTalkMessageWindow->IsAllTextEnd())
 	{
-		SetState(State::Normal);
+		SetState(State::Ending);
 	}
 }
 
@@ -381,15 +389,8 @@ void ObjectManager::StateBossTalkDraw()
 
 void ObjectManager::StateBossTalkExit()
 {
+	
 
-	// ボスエネミーのステートをフェイズ移行に変更
-	for (auto& object : m_object)
-	{
-		if (object->GetObjectID() == ObjectBase::ObjectID::BossEnemy)
-		{
-			std::dynamic_pointer_cast<BossEnemy>(object)->ChangeState(BossEnemy::State::Phase);
-		}
-	}
 }
 
 void ObjectManager::StatePauseUpdate()
@@ -400,6 +401,12 @@ void ObjectManager::StatePauseDraw()
 {
 	// ポーズクラス描画
 	m_pPause->Draw();
+}
+
+void ObjectManager::StateEndingEnter()
+{
+	// エンディングシーンに変更
+	m_pMainScreen->ChangeScene(SceneMain::Scene::Ending);
 }
 
 void ObjectManager::SetSavePoint(const Vec2& pos, const GameData::PlayerStatus& playerStatus)
@@ -1266,7 +1273,7 @@ void ObjectManager::CreateShot()
 
 			// ショット生成
 			m_object.push_back(std::make_shared<ReflectionShot>());
-
+			break;
 		default:
 			break;
 		}

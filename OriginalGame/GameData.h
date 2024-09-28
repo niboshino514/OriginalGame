@@ -92,6 +92,7 @@ public:
 
 		// プレイヤーステータス
 		PlayerStatus playerStatus = PlayerStatus();
+
 	}; 
 
 
@@ -221,6 +222,19 @@ public:
 	/// <param name="playerStatus">プレイヤーのステータスを設定</param>
 	void SetPlayerStatus(const PlayerStatus& playerStatus) { m_savePointData.playerStatus = playerStatus; }
 
+	/// <summary>
+	/// プレイヤーが生きているかどうかを設定
+	/// </summary>
+	/// <param name="isPlayerAlive">プレイヤーが生きているかどうか</param>
+	void SetIsPlayerAlive(const bool& isPlayerAlive) { m_isPlayerAlive = isPlayerAlive; }
+
+	/// <summary>
+	/// プレイヤーが生きているかどうかを返す
+	/// </summary>
+	/// <returns>プレイヤーが生きているかどうか</returns>
+	bool GetIsPlayerAlive() { return m_isPlayerAlive; }
+
+
 private:
 
 	// セーブポイントデータ
@@ -235,8 +249,10 @@ private:
 	// ボスエネミースポーン座標
 	Vec2 m_bossEnemySpawnPos = Vec2();
 
-
 	// カメラ座標
 	Vec2 m_cameraPos = Vec2();
 
+
+	// プレイヤーが生きているかどうか
+	bool m_isPlayerAlive = true;
 };

@@ -12,7 +12,6 @@ namespace
 	constexpr int kFadeColor = 0x000000;
 }
 
-
 SceneOpening::SceneOpening():
 	m_pOpeningScreen(std::make_shared<OpeningScreen>())
 {

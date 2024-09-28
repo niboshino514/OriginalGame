@@ -149,7 +149,9 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="ControllerOption.cpp" />
+    <ClCompile Include="EndingScreen.cpp" />
     <ClCompile Include="GameData.cpp" />
+    <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="Library\Calculation.cpp" />
     <ClCompile Include="Library\Collision.cpp" />
     <ClCompile Include="Library\Convert.cpp" />
@@ -174,6 +176,7 @@
     <ClCompile Include="ReflectionShot.cpp" />
     <ClCompile Include="SaveDataSelectScreen.cpp" />
     <ClCompile Include="SceneBase.cpp" />
+    <ClCompile Include="SceneEnding.cpp" />
     <ClCompile Include="SceneMain.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneOpening.cpp" />
@@ -194,8 +197,10 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="ControllerOption.h" />
     <ClInclude Include="Easing.h" />
+    <ClInclude Include="EndingScreen.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameData.h" />
+    <ClInclude Include="GameOver.h" />
     <ClInclude Include="Library\Calculation.h" />
     <ClInclude Include="Library\Collision.h" />
     <ClInclude Include="Library\Convert.h" />
@@ -219,6 +224,7 @@
     <ClInclude Include="ReflectionShot.h" />
     <ClInclude Include="SaveDataSelectScreen.h" />
     <ClInclude Include="SceneBase.h" />
+    <ClInclude Include="SceneEnding.h" />
     <ClInclude Include="SceneMain.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneOpening.h" />
