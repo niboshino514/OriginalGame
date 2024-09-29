@@ -161,6 +161,12 @@ public:
 	void WriteSaveData();
 
 	/// <summary>
+	/// セーブデータが初期化されているかどうかを返す
+	/// </summary>
+	/// <returns>セーブデータの初期化状態</returns>
+	bool IsSaveDataInit() { return m_saveData.isInit; }
+
+	/// <summary>
 	/// セーブデータを設定
 	/// </summary>
 	/// <param name="savePointData">セーブポイントデータ</param>

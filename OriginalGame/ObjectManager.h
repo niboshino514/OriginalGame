@@ -218,9 +218,9 @@ public:
 	/// <summary>
 	/// セーブポイント設定
 	/// </summary>
-	/// <param name="pos">座標</param>
+	/// <param name="cell">セル</param>
 	/// <param name="playerStatus">プレイヤーステータス</param>
-	void SetSavePoint(const Vec2& pos, const GameData::PlayerStatus& playerStatus);
+	void SetSavePoint(const Cell& cell, const GameData::PlayerStatus& playerStatus);
 
 	/// <summary>
 	/// ステート設定

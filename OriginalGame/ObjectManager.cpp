@@ -269,7 +269,7 @@ void ObjectManager::StateSettingInit()
 
 
 	// ステートを通常に変更
-	SetState(State::Normal);
+	SetState(State::Opening);
 }
 
 void ObjectManager::StateOpeningEnter()
@@ -421,11 +421,8 @@ void ObjectManager::StateEndingEnter()
 	m_pMainScreen->ChangeScene(SceneMain::Scene::Ending);
 }
 
-void ObjectManager::SetSavePoint(const Vec2& pos, const GameData::PlayerStatus& playerStatus)
+void ObjectManager::SetSavePoint(const Cell& cell, const GameData::PlayerStatus& playerStatus)
 {
-	// 座標をセルに変換
-	const Cell cell = EvoLib::Convert::PosToCell(pos, m_mapInfoData.mapChip.chipSize);
-
 	// セーブポイントデータを設定
 	GameData::GetInstance()->SetSavePointData(m_mapInfoData.mapNumber, cell, playerStatus);
 }

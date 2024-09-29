@@ -23,7 +23,7 @@ int EvoLib::Load::LoadGraph_EvoLib(const char* filePath)
     return graphic;
 }
 
-EvoLib::Load::DivGraphInfo EvoLib::Load::LoadDivGraph_EvoLib(const char* filePath, const int& div_x, const int& div_y)
+EvoLib::Load::DivGraphInfo_Old_Type EvoLib::Load::LoadDivGraph_EvoLib(const char* filePath, const int& div_x, const int& div_y)
 {
 
     int wide = 0;       // グラフィックの横幅
@@ -42,7 +42,7 @@ EvoLib::Load::DivGraphInfo EvoLib::Load::LoadDivGraph_EvoLib(const char* filePat
     const int divNum = div_x * div_y;
 
     // グラフィック情報
-    DivGraphInfo graphInfo;
+    DivGraphInfo_Old_Type graphInfo;
 
     // スケールを代入
     graphInfo.scale.x = static_cast<float>(wide);

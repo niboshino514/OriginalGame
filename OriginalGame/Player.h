@@ -130,7 +130,7 @@ private:
 	/// <summary>
 	/// セーブポイントの衝突処理
 	/// </summary>
-	void SavePointCollision();
+	void SavePointCollision(const Cell& savePointCell);
 
 	/// <summary>
 	/// マップ移動

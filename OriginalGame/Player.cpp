@@ -100,13 +100,7 @@ namespace Shot
 {
 	// ショットのスピード
 	constexpr float kSpeed = 10.0f;
-
-
-
-
 }
-
-
 
 
 Player::Player() :
@@ -264,12 +258,14 @@ void Player::StateNormalDraw()
 
 
 
-	// プレイヤーの当たり判定半径を描画
-	DrawCircle(pos.x, pos.y, kCollisionRadius, 0xff0000, false);
-
 
 	// デバッグ描画
 #if(false)
+		// プレイヤーの当たり判定半径を描画
+	DrawCircle(pos.x, pos.y, kCollisionRadius, 0xff0000, false);
+
+
+
 	// プレイヤー座標
 	DrawFormatString(0, 15 * 1, 0xffffff, "座標X:%f,座標Y:%f,", m_pos.x, m_pos.y);
 
@@ -940,7 +936,7 @@ void Player::MapChipCollision(const Vec2& pos)
 			if (isSavePointCollision)
 			{
 				// セーブポイントの当たり判定
-				SavePointCollision();
+				SavePointCollision(Cell(x, y));
 			}
 
 			// マップ移動の当たり判定を行うかどうか
@@ -1031,10 +1027,10 @@ void Player::ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisi
 	}
 }
 
-void Player::SavePointCollision()
+void Player::SavePointCollision(const Cell& savePointCell)
 {
 	// セーブポイントをセットする
-	m_pObjectManager->SetSavePoint(m_pos, m_playerStatus);
+	m_pObjectManager->SetSavePoint(savePointCell, m_playerStatus);
 }
 
 void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData)

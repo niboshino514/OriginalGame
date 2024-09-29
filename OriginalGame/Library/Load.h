@@ -28,21 +28,34 @@ namespace EvoLib
 			Vec2 pos = Vec2(0.0f, 0.0f);
 
 			// グラフィックスケール
-			float scale = 1.0f;
+			double scale = 1.0;
 
 			// グラフィックの分割数
 			DivNum div = DivNum();
 		};
 
 
-		// グラフィック分割情報
-		struct DivGraphInfo
+		// グラフィック分割情報(旧バージョン)
+		struct DivGraphInfo_Old_Type
 		{
 			// ハンドル
 			std::vector<int>handle;
 
 			// グラフィックのスケール
 			Vec2 scale = Vec2(0.0f, 0.0f);
+		};
+
+		// グラフィック分割情報
+		struct DivGraphInfo
+		{
+			// ハンドル
+			std::vector<int> handle;
+
+			// 座標
+			std::vector<Vec2> pos;
+
+			// スケール
+			std::vector<double> scale;
 		};
 
 	public:
@@ -61,7 +74,7 @@ namespace EvoLib
 		/// <param name="div_x">横向きに対する分割数</param>
 		/// <param name="div_y">縦向きに対する分割数</param>
 		/// <returns></returns>
-		static DivGraphInfo LoadDivGraph_EvoLib(const char* filePath, const int& div_x, const int& div_y);
+		static DivGraphInfo_Old_Type LoadDivGraph_EvoLib(const char* filePath, const int& div_x, const int& div_y);
 
 		/// <summary>
 		/// グラフィックの分割　改定版
