@@ -48,6 +48,10 @@ public:
 	// シーン終了
 	virtual bool isEnd() { return false; }
 
+	// フェードインが終了しているかどうか
+	bool IsFadeInEnd() { return m_fade.state == Fade::InEnd; }
+
+
 protected:
 
 	/// <summary>

@@ -144,8 +144,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BossEnemy.cpp" />
-    <ClCompile Include="BossSpawnFlagChip.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="ControllerOption.cpp" />
@@ -167,23 +165,15 @@
     <ClCompile Include="Message\MessageWindow.cpp" />
     <ClCompile Include="ObjectBase.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
-    <ClCompile Include="OpeningScreen.cpp" />
     <ClCompile Include="Pad.cpp" />
     <ClCompile Include="Pause.cpp" />
     <ClCompile Include="PlatinumLoader.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="NormalShot.cpp" />
-    <ClCompile Include="ReflectionShot.cpp" />
-    <ClCompile Include="SaveDataSelectScreen.cpp" />
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneEnding.cpp" />
     <ClCompile Include="SceneMain.cpp" />
     <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="SceneOpening.cpp" />
-    <ClCompile Include="SceneSaveDataSelect.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
-    <ClCompile Include="ShotBase.cpp" />
-    <ClCompile Include="SineCurveShot.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundOption.cpp" />
     <ClCompile Include="TitleScreen.cpp" />
@@ -191,7 +181,6 @@
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BossEnemy.h" />
     <ClInclude Include="BossSpawnFlagChip.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Controller.h" />
@@ -215,23 +204,15 @@
     <ClInclude Include="Message\MessageWindow.h" />
     <ClInclude Include="ObjectBase.h" />
     <ClInclude Include="ObjectManager.h" />
-    <ClInclude Include="OpeningScreen.h" />
     <ClInclude Include="Pad.h" />
     <ClInclude Include="Pause.h" />
     <ClInclude Include="PlatinumLoader.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="NormalShot.h" />
-    <ClInclude Include="ReflectionShot.h" />
-    <ClInclude Include="SaveDataSelectScreen.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneEnding.h" />
     <ClInclude Include="SceneMain.h" />
     <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="SceneOpening.h" />
-    <ClInclude Include="SceneSaveDataSelect.h" />
     <ClInclude Include="SceneTitle.h" />
-    <ClInclude Include="ShotBase.h" />
-    <ClInclude Include="SineCurveShot.h" />
     <ClInclude Include="Sort.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundOption.h" />

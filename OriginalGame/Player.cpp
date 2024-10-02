@@ -228,9 +228,6 @@ void Player::StateNormalUpdate()
 
 	// アニメーション処理
 	Animation();
-
-	// ショット処理
-	Shot();
 }
 
 void Player::StateNormalDraw()
@@ -299,11 +296,20 @@ void Player::StateNormalExit()
 	// プレイヤーが生きているかどうかを設定
 	GameData::GetInstance()->SetIsPlayerAlive(false);
 
-	// 死亡回数カウントアップ
-	m_playerStatus.deathCount++;
+	// プレイヤーの死亡回数をカウントアップ
+	{
+		// 死亡回数カウントアップ
+		m_playerStatus.deathCount++;
 
-	// 死亡回数を設定
-	GameData::GetInstance()->SetDeathCount(m_playerStatus.deathCount);
+		// プレイヤーの死亡回数が999を超えたら999にする
+		if (m_playerStatus.deathCount > 999)
+		{
+			m_playerStatus.deathCount = 999;
+		}
+
+		// 死亡回数を設定
+		GameData::GetInstance()->SetDeathCount(m_playerStatus.deathCount);
+	}
 }
 
 
@@ -932,6 +938,11 @@ void Player::MapChipCollision(const Vec2& pos)
 				mapCollisionData[x][y].chipType == ObjectManager::ChipType::Deceleration ||
 				mapCollisionData[x][y].chipType == ObjectManager::ChipType::NormalSpeed;
 
+			// ゲームを終了するかどうか
+			const bool isEndGame =
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::EndGame;
+
+
 			// セーブポイントの当たり判定を行うかどうか
 			if (isSavePointCollision)
 			{
@@ -995,6 +1006,12 @@ void Player::MapChipCollision(const Vec2& pos)
 				AccelerationCollision(mapCollisionData[x][y]);
 			}
 
+			// ゲームを終了するかどうか
+			if (isEndGame)
+			{
+				// 終了会話にステートを変更
+				m_pObjectManager->SetState(ObjectManager::State::EndTalk);
+			}
 
 			// 存在しない場合、ループを抜ける
 			if (!m_isExlist)
@@ -1173,81 +1190,4 @@ void Player::AccelerationCollision(const ObjectManager::MapCollisionData& mapCol
 	{
 		m_playerStatus.moveSpeed = GameData::MoveSpeed::Slow;
 	}
-}
-
-void Player::Shot()
-{
-
-	if (!Pad::IsTrigger(PAD_INPUT_2))
-	{
-		return;
-	}
-
-
-	// 方向
-	Direction direction = m_animationDetails.direction[0];
-
-
-
-	if (m_playerStatus.gravityDirection == Direction::Left ||
-		m_playerStatus.gravityDirection == Direction::Right)
-	{
-		if (m_animationDetails.direction[0] == Direction::Left)
-		{
-			direction = Direction::Top;
-		}
-		else if(m_animationDetails.direction[0] == Direction::Right)
-		{
-			direction = Direction::Bottom;
-		}
-	}
-
-
-
-
-
-	//// ショットデータを代入
-	//GameData::ShotData shotData =
-	//{
-	//	GameData::ShotType::ReflectionShot,
-	//	m_pos,
-	//	EvoLib::Convert::ConvertDirectionToAngle(direction),
-	//	Shot::kSpeed,
-	//};
-
-
-
-	//m_pObjectManager->SetShotCount(shotData);
-	
-
-
-	// 分割する個数
-	const int splitCount = 2;
-	// 基準角度
-	const float baseAngle = 300.0f;
-
-
-
-	// ショットデータを代入
-	GameData::ShotData shotData =
-	{
-		GameData::ShotType::SineCurveShot,
-		m_pos,
-		0.0f,
-		Shot::kSpeed,
-	};
-
-	// 角度リスト
-	std::vector<float> angleList = 
-		EvoLib::Calculation::AngleDivision(splitCount, baseAngle);
-	
-
-	for(auto shot: angleList)
-	{
-		shotData.angle = shot;
-
-		m_pObjectManager->SetShotCount(shotData);
-	}
-
-
 }

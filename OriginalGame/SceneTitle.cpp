@@ -2,7 +2,6 @@
 
 #include "TitleScreen.h"
 
-#include "SceneSaveDataSelect.h"
 #include "SceneMain.h"
 #include "Controller.h"
 namespace
@@ -27,8 +26,6 @@ void SceneTitle::Init()
 {
 	// フェードイン設定
 	SetFadeIn(kFadeSpeed, kFadeColor);
-
-
 
 	// タイトルスクリーンに自身のポインタを渡す
 	m_pTitleScreen->SetSceneTitle(this);
@@ -76,16 +73,18 @@ void SceneTitle::ChangeScene(const Scene& nextScene)
 	// 次のシーンを設定
 	switch (nextScene)
 	{
-	case SceneTitle::Scene::SaveDataSelect:
+	case SceneTitle::Scene::GameMain:
 
 		// セーブデータ選択シーン
-		m_nextScene = new SceneSaveDataSelect();
+		m_nextScene = new SceneMain();
 
 		break;
 	default:
 		break;
 	}
 
+	// 操作受付を無効にする
+	Controller::GetInstance()->SetAcceptInput(false);
 
 	// フェードアウト設定
 	SetFadeOut(kFadeSpeed, kFadeColor);

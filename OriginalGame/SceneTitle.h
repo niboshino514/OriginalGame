@@ -20,8 +20,8 @@ public:
 	// シーン
 	enum class Scene
 	{
-		// セーブデータ選択シーン
-		SaveDataSelect,
+		// ゲームメインシーン
+		GameMain,
 	};
 
 
@@ -30,6 +30,9 @@ public:
 	/// シーン変更
 	/// </summary>
 	void ChangeScene(const Scene& nextScene);
+
+
+	
 
 private:
 

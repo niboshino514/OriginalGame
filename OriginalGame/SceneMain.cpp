@@ -7,7 +7,7 @@
 #include "SceneTitle.h"
 #include "Sound.h"
 #include "SceneEnding.h"
-
+#include "Controller.h"
 
 namespace
 {
@@ -29,6 +29,9 @@ SceneMain::~SceneMain()
 
 void SceneMain::Init()
 {
+	// 操作受付を有効にする
+	Controller::GetInstance()->SetAcceptInput(true);
+
 	// フェードイン設定
 	SetFadeIn(kFadeSpeed, kFadeColor);
 
@@ -90,6 +93,9 @@ void SceneMain::ChangeScene(const Scene& nextScene)
 	default:
 		break;
 	}
+
+	// 操作受付を無効にする
+	Controller::GetInstance()->SetAcceptInput(false);
 
 	// フェードアウト設定
 	SetFadeOut(kFadeSpeed, kFadeColor);

@@ -178,12 +178,6 @@ public:
 	void SetGraphicHandle(const std::vector<int>& graphicHandle) { m_graphicHandle = graphicHandle; }
 
 
-	/// <summary>
-	/// ショットデータをセット
-	/// </summary>
-	/// <param name="shotData">ショットデータ</param>
-	void SetShotData(const GameData::ShotData& shotData) { m_shotData = shotData; }
-
 protected:
 
 	/// <summary>
@@ -222,8 +216,6 @@ protected:
 	// 描画の優先順位
 	DrawRank m_drawRank;
 
-	// ショットデータ
-	GameData::ShotData m_shotData;
 
 	//////////////////////
 	// グラフィック関連 //

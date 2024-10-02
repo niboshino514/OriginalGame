@@ -2,6 +2,7 @@
 #include "EvoLib.h"
 #include "Vec2.h"
 #include <tuple>
+#include <array>
 
 // シングルトン
 class GameData
@@ -104,46 +105,26 @@ public:
 	}; 
 
 
-	// ショットの種類
-	enum class ShotType
+	// スコアデータ構造体
+	struct ScoreData
 	{
-		// プレイヤーショット
-		PlayerShot,
-		// エネミーショット
-		EnemyShot,
-		// サインカーブショット
-		SineCurveShot,
-		// 反射ショット
-		ReflectionShot
+		// クリアしているかどうか
+		bool isClear = false;
+
+		// クリアタイム
+		Time clearTime = Time();
+
+		// 死亡回数
+		int deathCount = 0;
 	};
 
-	// 反射データ
-	struct Reflect
+
+	// スコア
+	struct Score
 	{
-		// 反射最大数
-		int maxCount = 2;
+		std::array<int, 8> time;		// 時間
 
-		// 反射回数
-		int count = 0;
-	};
-
-	// ショットデータ
-	struct ShotData
-	{
-		// ショットの種類
-		ShotType type = ShotType::PlayerShot;
-
-		// 座標
-		Vec2 startPos = Vec2(0.0f, 0.0f);
-
-		// ショットアングル
-		float angle = 0.0f;
-
-		// ショットスピード
-		float speed = 0.0f;
-
-		// 反射データ
-		Reflect reflect = Reflect();
+		std::array<int, 3> deathCount;	// 死亡回数
 	};
 
 
@@ -159,6 +140,32 @@ public:
 	/// セーブデータの書き込み
 	/// </summary>
 	void WriteSaveData();
+
+	/// <summary>
+	///  セーブデータ初期化
+	/// </summary>
+	void InitSaveData();
+
+	/// <summary>
+	/// スコアデータの読み込み
+	/// </summary>
+	void LoadScoreData();
+
+	/// <summary>
+	/// スコアデータの書き込み
+	/// </summary>
+	void WriteScoreData();
+
+	/// <summary>
+	/// スコアデータを設定
+	/// </summary>
+	void SetScoreData();
+
+	/// <summary>
+	/// スコアデータを返す
+	/// </summary>
+	/// <returns></returns>
+	ScoreData GetScore() { return m_scoreData; }
 
 	/// <summary>
 	/// セーブデータが初期化されているかどうかを返す
@@ -187,6 +194,13 @@ public:
 	void SetSavePointData(const int& stageNumber = 0, const Cell& cell = Cell(), const PlayerStatus& playerStatus = PlayerStatus());
 
 	/// <summary>
+	/// 新記録かどうかを返す
+	/// </summary>
+	/// <returns></returns>
+	bool IsNewRecord();
+
+
+	/// <summary>
 	/// プレイヤー座標設定
 	/// </summary>
 	/// <param name="playerPos">プレイヤー座標</param>
@@ -198,17 +212,7 @@ public:
 	/// <returns>プレイヤー座標</returns>
 	Vec2 GetPlayerPos() { return m_playerPos; }
 
-	/// <summary>
-	/// ボスエネミースポーン座標を設定
-	/// </summary>
-	/// <param name="bossEnemySpawnPos">ボスエネミースポーン座標</param>
-	void SetBossEnemySpawnPos(const Vec2& bossEnemySpawnPos) { m_bossEnemySpawnPos = bossEnemySpawnPos; }
 
-	/// <summary>
-	/// ボスエネミースポーン座標を返す
-	/// </summary>
-	/// <returns>ボスエネミースポーン座標</returns>
-	Vec2 GetBossEnemySpawnPos() { return m_bossEnemySpawnPos; }
 
 
 
@@ -269,6 +273,15 @@ public:
 	/// <returns>時間</returns>
 	Time GetTime() { return m_saveData.time; }
 
+	// 死亡回数を返す
+	int GetDeathCount() { return m_saveData.playerStatus.deathCount; }
+
+	/// <summary>
+	/// スコア計算
+	/// </summary>
+	/// <returns></returns>
+	Score CalcScore(const Time& time, const int& deathCount);
+
 private:
 
 	// セーブポイントデータ
@@ -277,13 +290,12 @@ private:
 	// プレイヤー座標
 	Vec2 m_playerPos = Vec2();
 
-	// ボスエネミースポーン座標
-	Vec2 m_bossEnemySpawnPos = Vec2();
-
 	// カメラ座標
 	Vec2 m_cameraPos = Vec2();
 
-
 	// プレイヤーが生きているかどうか
 	bool m_isPlayerAlive = true;
+
+	// スコアデータ
+	ScoreData m_scoreData = ScoreData();
 };

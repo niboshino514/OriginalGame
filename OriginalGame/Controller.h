@@ -197,7 +197,7 @@ public:
 	/// 操作を受け付けるかどうかを設定
 	/// </summary>
 	/// <param name="isAcceptInput">受付フラグ</param>
-	void SetAcceptInput(bool isAcceptInput) { m_isAcceptInput = isAcceptInput; }
+	void SetAcceptInput(const bool& isAcceptInput) { m_isAcceptInput = isAcceptInput; }
 
 	/// <summary>
 	/// コントローラー設定を返す
@@ -210,6 +210,12 @@ public:
 	/// </summary>
 	/// <param name="controllerSetting">コントローラー設定</param>
 	void SetControllerSetting(const ControllerSetting& controllerSetting) { m_controllerSetting = controllerSetting; }
+
+	/// <summary>
+	/// キーが押された瞬間かどうか
+	/// </summary>
+	/// <param name="key">キー</param>
+	bool IsTriggerKey(const int& key);
 
 private:
 

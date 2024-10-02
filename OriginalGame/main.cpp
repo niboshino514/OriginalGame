@@ -17,6 +17,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // その個所にデバッグブレークをかけてくれる
 //	_CrtSetBreakAlloc(756);
 
+	// 画面モードの設定
+	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
 
 	// 出力ログtxtを出さないようにする
 	SetOutApplicationLogValidFlag(false);
@@ -40,14 +42,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// サウンドロード
 	Sound::GetInstance()->Init();
 
-	// セーブデータロード
-	GameData::GetInstance()->LoadSaveData();
-
+	// セーブロード
+	GameData::GetInstance()->LoadSaveData();	// セーブデータの読み込み
+	GameData::GetInstance()->LoadScoreData();	// スコアデータの読み込み
 
 
 	// 最初のシーンの初期化
 	SceneManager scene;
 	scene.Init();
+
+
+
+
 
 	while (ProcessMessage() == 0)
 	{
@@ -74,9 +80,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// シーン終了
 	scene.End();
 
-	// セーブデータを書き込む
-	GameData::GetInstance()->WriteSaveData();
-
+	// セーブ書き込み
+	GameData::GetInstance()->WriteSaveData();	// セーブデータの書き込み
+	GameData::GetInstance()->WriteScoreData();	// スコアデータの書き込み
 
 	// シングルトン解放
 	{

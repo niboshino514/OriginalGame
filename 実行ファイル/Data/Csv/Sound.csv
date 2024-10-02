@@ -1,0 +1,10 @@
+ファイル名,拡張子※ . を忘れないように,音の種類(SE or BGM),最大音量の指定(最大100.0)
+デフォルト設定,.wav,SE,100
+Bgm_0,,BGM,50
+Determination,,,
+Cancel,,,
+Dead,,,
+Jump,,,
+Select,,,
+Pause,,,
+Restart,,,

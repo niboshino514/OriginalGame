@@ -3,7 +3,7 @@
 
 #include "SceneTitle.h"
 #include "SceneMain.h"
-#include "SceneOpening.h"
+#include "SceneEnding.h"
 
 #include "Pad.h"
 #include <DxLib.h>
@@ -49,6 +49,11 @@ void SceneManager::Update()
 
 	// コントローラーのアップデート処理
 	Controller::GetInstance()->Update();
+
+
+	// スクリーンタイプを変更
+	ScreenTypeChange();
+
 
 
 	SceneBase* pScene = m_pScene->Update();
@@ -100,4 +105,16 @@ void SceneManager::Draw()
 	width = static_cast<int>(Game::kScreenWidth * rate);
 	DrawBox(0, Game::kScreenHeight - 16, width, Game::kScreenHeight, 0xff0000, true);
 #endif
+}
+
+void SceneManager::ScreenTypeChange()
+{
+	// Enterでスクリーン切り替え
+	if (Controller::GetInstance()->IsTriggerKey(KEY_INPUT_RETURN))
+	{
+		// 現在のウィンドウモード（ウィンドウモードならTRUE、フルスクリーンならFALSE）
+		bool isWindowMode = GetWindowModeFlag();
+
+		ChangeWindowMode(!isWindowMode);
+	}
 }

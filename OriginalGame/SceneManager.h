@@ -16,9 +16,10 @@ public:
 	void Update();
 	void Draw();
 
+private:
 
-
-
+	// スクリーンタイプの変更
+	void ScreenTypeChange();
 
 
 private:

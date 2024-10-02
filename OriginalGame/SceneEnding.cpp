@@ -2,7 +2,7 @@
 #include "Sound.h"
 #include "SceneTitle.h"
 #include "EndingScreen.h"
-
+#include "Controller.h"
 
 namespace
 {
@@ -27,12 +27,14 @@ void SceneEnding::Init()
 	// フェードイン設定
 	SetFadeIn(kFadeSpeed, kFadeColor);
 
+	// 操作受付を有効にする
+	Controller::GetInstance()->SetAcceptInput(true);
+
 	// エンディングスクリーンに自身のポインタを渡す
 	m_pEndingScreen->SetSceneEndingPointer(this);
 
 	// 初期化処理
 	m_pEndingScreen->Init();
-
 }
 
 SceneBase* SceneEnding::Update()

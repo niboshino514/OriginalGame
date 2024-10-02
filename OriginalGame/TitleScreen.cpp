@@ -107,18 +107,18 @@ void TitleScreen::Init()
 	// セーブデータ確認
 	CheckSaveData();
 
+	// スコアデータ確認
+	CheckScoreData();
+
 	// ステートの初期化
 	StateInit();
+
+	// BGM再生
+	Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::BGM)]);
 }
 
 void TitleScreen::Update()
 {
-	// ボタンが押されたらフェードアウトを設定する
-	if (Controller::GetInstance()->IsTrigger(Controller::ControllerButton::DECIDE))
-	{
-		m_pSceneTitle->ChangeScene(SceneTitle::Scene::SaveDataSelect);
-	}
-
 	// ステートマシンの更新
 	m_pStateMachine.Update();
 }
@@ -128,15 +128,36 @@ void TitleScreen::Draw()
 	// 背景
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xa9a9a9, true);
 
-
-
 	// ステートマシンの描画
 	m_pStateMachine.Draw();
 
+
+
+	if (m_scoreData.isClear)
+	{
+		// 時間描画
+		DrawFormatString(0, 15 * 0, GetColor(255, 255, 255), "%d:%d:%d:%d",
+			m_scoreData.clearTime.hour,
+			m_scoreData.clearTime.minute,
+			m_scoreData.clearTime.second,
+			m_scoreData.clearTime.millisecond);
+
+		// 死亡回数描画
+		DrawFormatString(0, 15 * 1, GetColor(255, 255, 255), "DeathCount:%d",
+			m_scoreData.deathCount);
+
+	}
+	
 }
 
 void TitleScreen::Load()
 {
+	// サウンドの読み込み
+	{
+		Sound::GetInstance()->Load(kSoundFileName);	
+	}
+
+
 	// 選択中のグラフィック読み込み
 	{
 		// グラフィックの読み込み
@@ -234,6 +255,9 @@ void TitleScreen::StateSelectUpdate()
 {
 	// 選択処理
 	SelectProcess();
+
+	// 決定処理
+	DecideProcess();
 }
 
 void TitleScreen::StateSelectDraw()
@@ -332,6 +356,12 @@ void TitleScreen::CheckSaveData()
 
 }
 
+void TitleScreen::CheckScoreData()
+{
+	// スコアデータの読み込み
+	m_scoreData = GameData::GetInstance()->GetScore();
+}
+
 void TitleScreen::SelectProcess()
 {
 	// セレクト数
@@ -369,6 +399,55 @@ void TitleScreen::SelectProcess()
 }
 
 void TitleScreen::DecideProcess()
+{
+	// フェードインが終了していなければ、return
+	if (!m_pSceneTitle->IsFadeInEnd())
+	{
+		return;
+	}
+
+	// 決定ボタンが押されていなければ、return
+	if (!Controller::GetInstance()->IsTrigger(Controller::ControllerButton::DECIDE))
+	{
+		return;
+	}
+
+
+
+	// 選択されたものによって処理を分岐
+	switch (m_select)
+	{
+	case TitleScreen::Select::Continue:
+		// シーンを変更する
+		m_pSceneTitle->ChangeScene(SceneTitle::Scene::GameMain);
+
+		break;
+	case TitleScreen::Select::NewGame:
+		// セーブデータを初期化
+		GameData::GetInstance()->InitSaveData();
+		// シーンを変更する
+		m_pSceneTitle->ChangeScene(SceneTitle::Scene::GameMain);
+
+	
+		break;
+	case TitleScreen::Select::GameEnd:
+		
+		GameData::GetInstance()->WriteSaveData();	// セーブデータを書き込む
+		GameData::GetInstance()->WriteScoreData();	// スコアデータの書き込み
+
+		// ゲーム終了
+		DxLib_End();
+
+		break;
+	default:
+		break;
+	}
+
+	// 決定音を再生
+	Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Decision)]);
+}
+
+void TitleScreen::DrawScore()
 {
 
 }

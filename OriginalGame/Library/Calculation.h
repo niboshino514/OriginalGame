@@ -46,6 +46,9 @@ namespace EvoLib
 			Vec2 endPos = Vec2();
 		};
 
+		
+
+
 	public:
 
 

@@ -55,23 +55,17 @@
     <Filter Include="ヘッダー ファイル\titleScreen">
       <UniqueIdentifier>{76a5d1e8-77ba-408d-9fef-f6aadc44fe72}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\saveDataSelectScreen">
-      <UniqueIdentifier>{1abe729a-f74d-471a-9778-6e2ae49f53f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\saveDataSelectScreen">
-      <UniqueIdentifier>{dcacaf8c-a150-4fdc-8819-c3e2880bc97c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\message">
       <UniqueIdentifier>{95454364-be5b-4db2-bc6d-1c943dff2bca}</UniqueIdentifier>
     </Filter>
     <Filter Include="ヘッダー ファイル\message">
       <UniqueIdentifier>{52dc67bb-990b-498f-a1d5-b143f9a4e9eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\screenMain\Object\Shot">
-      <UniqueIdentifier>{1ccd2438-b77c-481c-9a96-5b325251afc2}</UniqueIdentifier>
+    <Filter Include="ソース ファイル\endingScreen">
+      <UniqueIdentifier>{1fcc2d34-2f64-4079-9d63-bc79f2631dc4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\mainScreen\Object\Shot">
-      <UniqueIdentifier>{809fe415-78cc-4b2c-b844-db98f5e3a82f}</UniqueIdentifier>
+    <Filter Include="ヘッダー ファイル\endingScreen">
+      <UniqueIdentifier>{59083dea-282c-4842-9e78-087db9d29727}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -132,9 +126,6 @@
     <ClCompile Include="MainScreen.cpp">
       <Filter>ソース ファイル\screenMain</Filter>
     </ClCompile>
-    <ClCompile Include="GameData.cpp">
-      <Filter>ソース ファイル\screenMain</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>ソース ファイル\screenMain</Filter>
     </ClCompile>
@@ -143,12 +134,6 @@
     </ClCompile>
     <ClCompile Include="TitleScreen.cpp">
       <Filter>ソース ファイル\titleScreen</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneSaveDataSelect.cpp">
-      <Filter>ソース ファイル\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="SaveDataSelectScreen.cpp">
-      <Filter>ソース ファイル\saveDataSelectScreen</Filter>
     </ClCompile>
     <ClCompile Include="Library\EvoLib.cpp">
       <Filter>ソース ファイル\library</Filter>
@@ -159,23 +144,11 @@
     <ClCompile Include="Pause.cpp">
       <Filter>ソース ファイル\screenMain</Filter>
     </ClCompile>
-    <ClCompile Include="ControllerOption.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="OpeningScreen.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Message\MessageTextLoader.cpp">
       <Filter>ソース ファイル\message</Filter>
     </ClCompile>
     <ClCompile Include="Message\MessageWindow.cpp">
       <Filter>ソース ファイル\message</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneOpening.cpp">
-      <Filter>ソース ファイル\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="BossSpawnFlagChip.cpp">
-      <Filter>ソース ファイル\screenMain\Object\MapChip</Filter>
     </ClCompile>
     <ClCompile Include="MapChipBase.cpp">
       <Filter>ソース ファイル\screenMain\Object\MapChip</Filter>
@@ -186,29 +159,20 @@
     <ClCompile Include="Sound.cpp">
       <Filter>ソース ファイル\setting</Filter>
     </ClCompile>
-    <ClCompile Include="BossEnemy.cpp">
-      <Filter>ソース ファイル\screenMain\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="ShotBase.cpp">
-      <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
-    </ClCompile>
-    <ClCompile Include="SineCurveShot.cpp">
-      <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
-    </ClCompile>
-    <ClCompile Include="ReflectionShot.cpp">
-      <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
-    </ClCompile>
-    <ClCompile Include="NormalShot.cpp">
-      <Filter>ソース ファイル\screenMain\Object\Shot</Filter>
-    </ClCompile>
     <ClCompile Include="SceneEnding.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
-    <ClCompile Include="EndingScreen.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="GameOver.cpp">
       <Filter>ソース ファイル\screenMain</Filter>
+    </ClCompile>
+    <ClCompile Include="EndingScreen.cpp">
+      <Filter>ソース ファイル\endingScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="ControllerOption.cpp">
+      <Filter>ソース ファイル\screenMain</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -278,9 +242,6 @@
     <ClInclude Include="Sort.h">
       <Filter>ヘッダー ファイル\setting</Filter>
     </ClInclude>
-    <ClInclude Include="GameData.h">
-      <Filter>ヘッダー ファイル\mainScreen</Filter>
-    </ClInclude>
     <ClInclude Include="StateMachine.h">
       <Filter>ヘッダー ファイル\setting</Filter>
     </ClInclude>
@@ -290,20 +251,11 @@
     <ClInclude Include="TitleScreen.h">
       <Filter>ヘッダー ファイル\titleScreen</Filter>
     </ClInclude>
-    <ClInclude Include="SceneSaveDataSelect.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="SaveDataSelectScreen.h">
-      <Filter>ヘッダー ファイル\saveDataSelectScreen</Filter>
-    </ClInclude>
     <ClInclude Include="Controller.h">
       <Filter>ヘッダー ファイル\setting</Filter>
     </ClInclude>
     <ClInclude Include="Pause.h">
       <Filter>ヘッダー ファイル\mainScreen</Filter>
-    </ClInclude>
-    <ClInclude Include="ControllerOption.h">
-      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Message\MessageTextLoader.h">
       <Filter>ヘッダー ファイル\message</Filter>
@@ -317,26 +269,11 @@
     <ClInclude Include="MapChipBase.h">
       <Filter>ヘッダー ファイル\mainScreen\Object\MapChip</Filter>
     </ClInclude>
-    <ClInclude Include="ShotBase.h">
-      <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
-    </ClInclude>
     <ClInclude Include="SoundOption.h">
       <Filter>ヘッダー ファイル\setting</Filter>
     </ClInclude>
     <ClInclude Include="Sound.h">
       <Filter>ヘッダー ファイル\setting</Filter>
-    </ClInclude>
-    <ClInclude Include="BossEnemy.h">
-      <Filter>ヘッダー ファイル\mainScreen\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="SineCurveShot.h">
-      <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
-    </ClInclude>
-    <ClInclude Include="ReflectionShot.h">
-      <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
-    </ClInclude>
-    <ClInclude Include="NormalShot.h">
-      <Filter>ヘッダー ファイル\mainScreen\Object\Shot</Filter>
     </ClInclude>
     <ClInclude Include="Easing.h">
       <Filter>ヘッダー ファイル\setting</Filter>
@@ -344,17 +281,17 @@
     <ClInclude Include="SceneEnding.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
-    <ClInclude Include="EndingScreen.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneOpening.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="OpeningScreen.h">
-      <Filter>ヘッダー ファイル\mainScreen</Filter>
-    </ClInclude>
     <ClInclude Include="GameOver.h">
       <Filter>ヘッダー ファイル\mainScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="EndingScreen.h">
+      <Filter>ヘッダー ファイル\endingScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="ControllerOption.h">
+      <Filter>ヘッダー ファイル\mainScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 #include <vector>
 #include "Vec2.h"
 #include "EvoLib.h"
+#include "GameData.h"
 
 template <class TState> class StateMachine;
 
@@ -76,13 +77,28 @@ private:
 	// セーブデータ確認
 	void CheckSaveData();
 
+	// スコアデータ確認
+	void CheckScoreData();
+
+
 	// 選択処理
 	void SelectProcess();
 	
 	// 決定処理
 	void DecideProcess();
 
+	// スコアの描画
+	void DrawScore();
+
 private:
+
+
+	////////////////
+	// スコア関連 //
+	////////////////
+
+
+	GameData::ScoreData m_scoreData;	// スコア
 
 	//////////////////////
 	// グラフィック関連 //

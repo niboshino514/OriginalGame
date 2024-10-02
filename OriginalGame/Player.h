@@ -126,7 +126,6 @@ private:
 	/// <param name="pos">プレイヤーの四角形情報</param>
 	void ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Square& square);
 
-
 	/// <summary>
 	/// セーブポイントの衝突処理
 	/// </summary>
@@ -179,10 +178,6 @@ private:
 	/// <param name="mapCollisionData">マップ判定データ</param>
 	void AccelerationCollision(const ObjectManager::MapCollisionData& mapCollisionData);
 
-	/// <summary>
-	/// ショット処理
-	/// </summary>
-	void Shot();
 
 private:
 

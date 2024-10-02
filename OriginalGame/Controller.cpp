@@ -163,6 +163,17 @@ bool Controller::IsTrigger(const ControllerButton& button, bool isAllController)
 	return false;
 }
 
+
+bool Controller::IsTriggerKey(const int& key)
+{
+	// ƒL[‚ª“ü—Í‚³‚ê‚½uŠÔ‚©‚Ç‚¤‚©
+    if (m_keyInputState.key[key] != 0 && m_keyInputState.count[key] == 1)
+    {
+		return true;
+    }
+    return false;
+}
+
 int Controller::GetButton(const ControllerButton& button)
 {
 
