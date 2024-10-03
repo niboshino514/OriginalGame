@@ -15,7 +15,7 @@ namespace GraphData
 	constexpr int kAlpha = 100;
 
 	// 選択されているグラフィックを左にずらす
-	const float kSelectMoveX = -10;
+	constexpr float kSelectMoveX = -10.0f;
 
 	// 選択中のグラフィックデータ
 	static const EvoLib::Load::GraphicInfo kSelectGraphInfo =
@@ -24,34 +24,45 @@ namespace GraphData
 		"Data/Graphic/Title/Select/Select.png",
 
 		// 中心座標
-		Vec2(Game::kWindowCenterX_F, Game::kWindowCenterY_F),
+		Vec2(Game::kWindowCenterX_F + 20.0f, Game::kWindowCenterY_F+80.0f),
 
 		// グラフィックスケール
-		0.6,
+		0.7,
 
 		// グラフィックの分割数
 		EvoLib::Load::DivNum(1,3),
 	};
 
 	// 選択中のグラフィックの距離
-	const Vec2 kSelectGraphDistance = Vec2(0.0f, 10.0f);
+	const Vec2 kSelectGraphDistance = Vec2(0.0f, 20.0f);
 
+
+	// タイトルグラフィックのファイル名
+	const char* const kGameTitleGraphFileName = "Data/Graphic/Title/GameTitle.png";
+	// タイトルグラフィックの位置
+	const Vec2 kGameTitleGraphPos = Vec2(Game::kWindowCenterX_F, Game::kWindowCenterY_F - 230.0f);
+	// タイトルグラフィックの拡大率
+	constexpr double kGameTitleGraphScale = 1.0;
+
+	// 背景グラフィックのファイル名
+	const char* const kBackgroundGraphFileName = "Data/Graphic/Title/Background.png";
+	// 背景の移動速度
+	constexpr float kBackgroundMoveSpeed = 2.0f;
 
 }
+
 namespace SelectTriangleGraph
 {
 	// グラフィックファイルパス
 	const char* const kFilePath = "Data/Graphic/Selection/SelectTriangle.png";
 
 	// 拡大率
-	const float kScale = 0.4f;
-
+	const float kScale = 0.6f;
 	// フレーム速度
 	const int kFrameSpeed = 1;
 
 	// 距離
-	const Vec2 kSelectDistanceValue = Vec2(-200, 0);
-
+	const Vec2 kSelectDistanceValue = Vec2(-250, 0);
 }
 
 namespace
@@ -78,13 +89,58 @@ namespace
 
 }
 
+namespace ScoreGraph_Title
+{
+	// 番号グラフィックのファイル名
+	const char* kNumberGraphFileName = "Data/Graphic/Number/Number.png";
+	// スコアグラフィックの分割数
+	const EvoLib::Load::DivNum kNumberGraphDivNum = EvoLib::Load::DivNum(10, 1);
 
+	// 仕切りグラフィックのファイル名
+	const char* const kSeparateGraphFileName = "Data/Graphic/Number/Separate.png";
+	// カウントグラフィックのファイル名
+	const char* const kCountGraphFileName = "Data/Graphic/Number/Count.png";
+
+	// クリアリトライ回数テキストグラフィックのファイル名
+	const char* const kClearRetryTextGraphFileName = "Data/Graphic/Ending/ClearRetryText.png";
+
+
+	// タイムスコアの位置
+	const Vec2 kTimeScorePos = Vec2(Game::kWindowCenterX_F , Game::kWindowCenterY_F + 300.0f);
+	// デスカウントの位置
+	const Vec2 kDeathCountPos = Vec2(Game::kWindowCenterX_F, kTimeScorePos.y +30.0f);
+
+	// グラフィック同士の間隔
+	const float kTextGraphInterval = -100.0f;
+
+	// クリアリトライ回数テキストの位置
+	const Vec2 kClearTextPos = Vec2(kTimeScorePos.x + kTextGraphInterval, kTimeScorePos.y);
+	const Vec2 kRetryTextPos = Vec2(kDeathCountPos.x + kTextGraphInterval, kDeathCountPos.y);
+	
+
+	// テキストグラフィックサイズ
+	constexpr double kTextGraphSize = 0.4;
+
+	// グラフィック同士の間隔
+	static float kGraphInterval = 0.0f;
+	// グラフィック同士の間隔の設定
+	const float kGraphIntervalSetting = -15.0f;
+
+	// グラフィックサイズ
+	constexpr double kGraphSize = 0.4;
+}
 
 TitleScreen::TitleScreen():
 	m_selectGraphInfo(),
 	m_selectTriangleGraph(0),
 	m_select(Select()),
 	m_isContinue(false),
+	m_gameTitleGraph(-1),
+	m_score(),
+	m_isClear(false),
+	m_scoreGraphData(),
+	m_backgroundGraph(-1),
+	m_currentMoveValue(0.0f),
 	m_pStateMachine(),
 	m_pSceneTitle(nullptr)
 {
@@ -97,6 +153,32 @@ TitleScreen::~TitleScreen()
 	{
 		DeleteGraph(handle);
 	}
+
+	// グラフィックの解放
+	DeleteGraph(m_selectTriangleGraph);
+
+	// グラフィックの解放
+	for (auto& handle : m_scoreGraphData.numberGraphHandle)
+	{
+		DeleteGraph(handle);
+	}
+
+	// グラフィックの解放
+	DeleteGraph(m_scoreGraphData.separateGraphHandle);
+
+	// グラフィックの解放
+	DeleteGraph(m_scoreGraphData.countGraphHandle);
+
+	// グラフィックの解放
+	for (auto& handle : m_scoreGraphData.clearRetryTextGraphHandle)
+	{
+		DeleteGraph(handle);
+	}
+
+	// グラフィックの解放
+	DeleteGraph(m_backgroundGraph);
+
+
 }
 
 void TitleScreen::Init()
@@ -126,28 +208,23 @@ void TitleScreen::Update()
 void TitleScreen::Draw()
 {
 	// 背景
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xa9a9a9, true);
+	DrawBackground();
+
+	// タイトルグラフィックの描画
+	DrawRotaGraphF(
+		GraphData::kGameTitleGraphPos.x,
+		GraphData::kGameTitleGraphPos.y,
+		GraphData::kGameTitleGraphScale,
+		0.0,
+		m_gameTitleGraph,
+		TRUE);
+
 
 	// ステートマシンの描画
 	m_pStateMachine.Draw();
-
-
-
-	if (m_scoreData.isClear)
-	{
-		// 時間描画
-		DrawFormatString(0, 15 * 0, GetColor(255, 255, 255), "%d:%d:%d:%d",
-			m_scoreData.clearTime.hour,
-			m_scoreData.clearTime.minute,
-			m_scoreData.clearTime.second,
-			m_scoreData.clearTime.millisecond);
-
-		// 死亡回数描画
-		DrawFormatString(0, 15 * 1, GetColor(255, 255, 255), "DeathCount:%d",
-			m_scoreData.deathCount);
-
-	}
 	
+	// スコアの描画
+	DrawScore();
 }
 
 void TitleScreen::Load()
@@ -193,6 +270,39 @@ void TitleScreen::Load()
 	{
 		// グラフィックロード
 		m_selectTriangleGraph = LoadGraph(SelectTriangleGraph::kFilePath);
+	}
+
+	// スコアグラフィックロード
+	{
+		m_scoreGraphData.numberGraphHandle =
+			EvoLib::Load::LoadDivGraph_EvoLib_Revision(ScoreGraph_Title::kNumberGraphFileName, ScoreGraph_Title::kNumberGraphDivNum);
+
+		m_scoreGraphData.separateGraphHandle = LoadGraph(ScoreGraph_Title::kSeparateGraphFileName);
+		m_scoreGraphData.countGraphHandle = LoadGraph(ScoreGraph_Title::kCountGraphFileName);
+
+		// クリアリトライ回数テキストグラフィックロード
+		m_scoreGraphData.clearRetryTextGraphHandle =
+			EvoLib::Load::LoadDivGraph_EvoLib_Revision(ScoreGraph_Title::kClearRetryTextGraphFileName, EvoLib::Load::DivNum(1, 2));
+
+		{
+			// グラフィックのサイズを取得
+			const Vec2 size = EvoLib::Calculation::GetGraphSize_EvoLib(m_scoreGraphData.numberGraphHandle, ScoreGraph_Title::kGraphSize);
+
+			// グラフィックの間隔を設定
+			ScoreGraph_Title::kGraphInterval = size.x + ScoreGraph_Title::kGraphIntervalSetting;
+		}
+	}
+
+	// ゲームタイトルグラフィック
+	{
+		// グラフィックの読み込み
+		m_gameTitleGraph = LoadGraph(GraphData::kGameTitleGraphFileName);
+	}
+
+	// 背景グラフィック
+	{
+		// グラフィックの読み込み
+		m_backgroundGraph = LoadGraph(GraphData::kBackgroundGraphFileName);
 	}
 }
 
@@ -359,7 +469,16 @@ void TitleScreen::CheckSaveData()
 void TitleScreen::CheckScoreData()
 {
 	// スコアデータの読み込み
-	m_scoreData = GameData::GetInstance()->GetScore();
+	const GameData::ScoreData scoreData = 
+		GameData::GetInstance()->GetScoreData();
+
+
+	m_score = GameData::GetInstance()->CalcScore
+	(scoreData.clearTime, scoreData.deathCount);
+
+	// クリアしているかどうか
+	m_isClear = scoreData.isClear;
+
 }
 
 void TitleScreen::SelectProcess()
@@ -449,5 +568,116 @@ void TitleScreen::DecideProcess()
 
 void TitleScreen::DrawScore()
 {
+	// クリアしていないならば、return
+	if (!m_isClear)
+	{
+		return;
+	}
 
+
+	// クリアリトライ回数テキストの描画
+	DrawRotaGraphF(
+		ScoreGraph_Title::kClearTextPos.x,
+		ScoreGraph_Title::kClearTextPos.y,
+		ScoreGraph_Title::kTextGraphSize,
+		0.0,
+		m_scoreGraphData.clearRetryTextGraphHandle[0],
+		TRUE);
+
+
+	// クリアリトライ回数テキストの描画
+	DrawRotaGraphF(
+		ScoreGraph_Title::kRetryTextPos.x,
+		ScoreGraph_Title::kRetryTextPos.y,
+		ScoreGraph_Title::kTextGraphSize,
+		0.0,
+		m_scoreGraphData.clearRetryTextGraphHandle[1],
+		TRUE);
+
+
+	// 時間スコア
+	{
+		// 時間スコアの描画
+		const int loopNum = static_cast<int>(m_score.time.size());
+
+		int count = 0;
+
+		for (int i = 0; i < loopNum; i++)
+		{
+			if (i != 0 && i % 2 == 0)
+			{
+				const float x = ScoreGraph_Title::kTimeScorePos.x + ((i + count) * ScoreGraph_Title::kGraphInterval);
+
+				DrawRotaGraphF(
+					x,
+					ScoreGraph_Title::kTimeScorePos.y,
+					ScoreGraph_Title::kGraphSize,
+					0.0,
+					m_scoreGraphData.separateGraphHandle,
+					TRUE);
+
+				count++;
+			}
+
+			const float x = ScoreGraph_Title::kTimeScorePos.x + ((i + count) * ScoreGraph_Title::kGraphInterval);
+
+			DrawRotaGraphF(
+				x,
+				ScoreGraph_Title::kTimeScorePos.y,
+				ScoreGraph_Title::kGraphSize,
+				0.0,
+				m_scoreGraphData.numberGraphHandle[m_score.time[i]],
+				TRUE);
+		}
+	}
+
+	// デスカウント
+	{
+		// デスカウントの描画
+		const int loopNum = static_cast<int>(m_score.deathCount.size());
+
+		for (int i = 0; i < loopNum; i++)
+		{
+
+
+			const float x = ScoreGraph_Title::kDeathCountPos.x + (i * ScoreGraph_Title::kGraphInterval);
+
+			DrawRotaGraphF(
+				x,
+				ScoreGraph_Title::kDeathCountPos.y,
+				ScoreGraph_Title::kGraphSize,
+				0.0,
+				m_scoreGraphData.numberGraphHandle[m_score.deathCount[i]],
+				TRUE);
+		}
+
+		float x = ScoreGraph_Title::kDeathCountPos.x + (loopNum * ScoreGraph_Title::kGraphInterval);
+		x += 5.0f;
+
+		DrawRotaGraphF(
+			x,
+			ScoreGraph_Title::kDeathCountPos.y,
+			ScoreGraph_Title::kGraphSize,
+			0.0,
+			m_scoreGraphData.countGraphHandle,
+			TRUE);
+	}
+}
+
+void TitleScreen::DrawBackground()
+{
+	m_currentMoveValue += GraphData::kBackgroundMoveSpeed;
+
+	if (m_currentMoveValue >= Game::kScreenWidth)
+	{
+		m_currentMoveValue = 0.0f;
+	}
+
+	EvoLib::Draw::SimpleLoopBackground(
+		m_backgroundGraph,
+		m_currentMoveValue,
+		GraphData::kBackgroundMoveSpeed,
+		Vec2(Game::kScreenWidth, Game::kScreenHeight),
+		true,
+		EvoLib::Draw::LoopDirection::Right);
 }

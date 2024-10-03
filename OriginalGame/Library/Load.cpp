@@ -35,6 +35,9 @@ EvoLib::Load::DivGraphInfo_Old_Type EvoLib::Load::LoadDivGraph_EvoLib(const char
     {
         graphic = LoadGraph(filePath);
         GetGraphSize(graphic, &wide, &height);
+
+		// グラフィックの削除
+        DeleteGraph(graphic);
     }
 
 
@@ -98,6 +101,9 @@ std::vector<int> EvoLib::Load::LoadDivGraph_EvoLib_Revision(const char* filePath
     {
         graphic = LoadGraph(filePath);
         GetGraphSize(graphic, &wide, &height);
+
+		// グラフィックの削除
+        DeleteGraph(graphic);
     }
 
 
@@ -122,14 +128,6 @@ std::vector<int> EvoLib::Load::LoadDivGraph_EvoLib_Revision(const char* filePath
             // グラフィックを代入
             graphHandle.push_back(handle[i]);
         }
-
-
-        
-
-
-
-
-
         // メモリの開放
         delete[] handle;
     }

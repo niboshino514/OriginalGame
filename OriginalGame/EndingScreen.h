@@ -4,6 +4,7 @@
 #include "GameData.h"
 
 class SceneEnding;
+class EffectManager;
 
 class EndingScreen
 {
@@ -85,5 +86,9 @@ private:
 
 	// シーンエンディングポインタ
 	SceneEnding* m_pSceneEnding;
+
+	// エフェクトマネージャー
+	std::shared_ptr<EffectManager> m_pEffectManager;
+
 };
 

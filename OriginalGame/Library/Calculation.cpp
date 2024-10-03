@@ -66,39 +66,26 @@ int EvoLib::Calculation::SelectLoopNumber(const int& minNumber, const int& maxNu
 
 Vec2 EvoLib::Calculation::GetGraphSize_EvoLib(std::vector<int> graphHandle, const double& graphMagnificationRate)
 {
-    const int graph = graphHandle[0];
-
     int wide = 0;       // グラフィックの横幅
     int height = 0;     // グラフィックの縦幅
 
     // プレイヤーのグラフィックサイズを取得
     {
-        GetGraphSize(graph, &wide, &height);
+        GetGraphSize(graphHandle[0], &wide, &height);
     }
-
-
-    
+   
     Vec2 graphSize = Vec2();
 
     graphSize.x = static_cast<float>(wide * graphMagnificationRate);
     graphSize.y = static_cast<float>(height * graphMagnificationRate);
 
-
-
     return graphSize;
 }
-
-
-
-
-
 
 std::vector<Vec2> EvoLib::Calculation::GraphEqualization(const Vec2& graphSize, const Vec2& basePos, const int& num, const Vec2& graphInterval, const bool& isHorizontalSort)
 {
     // 座標リスト
     std::vector<Vec2> posList;
-
-
 
     Vec2 posWidth = Vec2();
     
@@ -123,7 +110,6 @@ std::vector<Vec2> EvoLib::Calculation::GraphEqualization(const Vec2& graphSize, 
 
         posList.push_back(pos);
     }
-
 
     return posList;
 }

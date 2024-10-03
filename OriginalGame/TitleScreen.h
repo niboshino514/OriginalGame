@@ -90,25 +90,55 @@ private:
 	// スコアの描画
 	void DrawScore();
 
+	// 背景の描画
+	void DrawBackground();
+
 private:
+
+
+	// スコアグラフィックデータ
+	struct ScoreGraphData
+	{
+		// 番号グラフ
+		std::vector<int> numberGraphHandle;
+
+		// 仕切りグラフ
+		int separateGraphHandle = -1;
+
+		// 回数のグラフィック
+		int countGraphHandle = -1;
+
+		// クリアリトライ回数テキストグラフィック
+		std::vector<int> clearRetryTextGraphHandle;
+	};
+
+
 
 
 	////////////////
 	// スコア関連 //
 	////////////////
 
+	GameData::Score m_score;	// スコア
 
-	GameData::ScoreData m_scoreData;	// スコア
+	bool m_isClear;				// クリアしているかどうか
 
 	//////////////////////
 	// グラフィック関連 //
 	//////////////////////
+
+	ScoreGraphData m_scoreGraphData;	// スコアグラフィックデータ
 
 	// 選択グラフィックハンドル
 	EvoLib::Load::DivGraphInfo m_selectGraphInfo;
 
 	// セレクト三角形グラフィック
 	int m_selectTriangleGraph;
+
+	int m_gameTitleGraph;	// ゲームタイトルグラフィック
+
+	int m_backgroundGraph;	// 背景グラフィック
+	float m_currentMoveValue;	// 現在の移動量
 
 	//////////////
 	// 選択関連 //

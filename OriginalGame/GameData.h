@@ -124,7 +124,7 @@ public:
 	{
 		std::array<int, 8> time;		// 時間
 
-		std::array<int, 3> deathCount;	// 死亡回数
+		std::array<int, 4> deathCount;	// 死亡回数
 	};
 
 
@@ -165,7 +165,7 @@ public:
 	/// スコアデータを返す
 	/// </summary>
 	/// <returns></returns>
-	ScoreData GetScore() { return m_scoreData; }
+	ScoreData GetScoreData() { return m_scoreData; }
 
 	/// <summary>
 	/// セーブデータが初期化されているかどうかを返す
@@ -180,9 +180,9 @@ public:
 	void SetSaveData(const SaveData& savePointData) { m_saveData = savePointData; }
 
 	/// <summary>
-	/// セーブポイントデータを返す
+	/// セーブデータを返す
 	/// </summary>
-	/// <returns>セーブポイントデータ</returns>
+	/// <returns>セーブデータ</returns>
 	SaveData GetSaveData() { return m_saveData; }
 
 	/// <summary>

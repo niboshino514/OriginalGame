@@ -22,7 +22,7 @@ SceneManager::~SceneManager()
 
 void SceneManager::Init()
 {
-	m_pScene = new SceneMain;
+	m_pScene = new SceneEnding;
 	m_pScene->Init();
 }
 
@@ -53,8 +53,6 @@ void SceneManager::Update()
 
 	// スクリーンタイプを変更
 	ScreenTypeChange();
-
-
 
 	SceneBase* pScene = m_pScene->Update();
 	if (pScene != m_pScene)

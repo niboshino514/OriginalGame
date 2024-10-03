@@ -55,6 +55,47 @@ namespace TalkData
 	const std::string kDataFilePath = "Data/Csv/Talk/TalkData_1.csv";
 }
 
+namespace ScoreGraph_GameMain
+{
+	// 番号グラフィックのファイル名
+	const char* kNumberGraphFileName = "Data/Graphic/Number/Number.png";
+	// スコアグラフィックの分割数
+	const EvoLib::Load::DivNum kNumberGraphDivNum = EvoLib::Load::DivNum(10, 1);
+
+	// 仕切りグラフィックのファイル名
+	const char* const kSeparateGraphFileName = "Data/Graphic/Number/Separate.png";
+	// カウントグラフィックのファイル名
+	const char* const kCountGraphFileName = "Data/Graphic/Number/Count.png";
+
+	// クリアリトライ回数テキストグラフィックのファイル名
+	const char* const kClearRetryTextGraphFileName = "Data/Graphic/GameMain/CountText.png";
+
+
+	// タイムスコアの位置
+	const Vec2 kTimeScorePos = Vec2(150.0f, 20.0f);
+	// デスカウントの位置
+	const Vec2 kDeathCountPos = Vec2(kTimeScorePos.x, kTimeScorePos.y + 30.0f);
+
+	// グラフィック同士の間隔
+	const float kTextGraphInterval = -80.0f;
+
+	// クリアリトライ回数テキストの位置
+	const Vec2 kClearTextPos = Vec2(kTimeScorePos.x + kTextGraphInterval, kTimeScorePos.y);
+	const Vec2 kRetryTextPos = Vec2(kDeathCountPos.x + kTextGraphInterval, kDeathCountPos.y);
+
+
+	// テキストグラフィックサイズ
+	constexpr double kTextGraphSize = 0.4;
+
+	// グラフィック同士の間隔
+	static float kGraphInterval = 0.0f;
+	// グラフィック同士の間隔の設定
+	const float kGraphIntervalSetting = -15.0f;
+
+	// グラフィックサイズ
+	constexpr double kGraphSize = 0.4;
+}
+
 ObjectManager::ObjectManager() :
 	m_object(),
 	m_mapInfoData(),
@@ -62,6 +103,7 @@ ObjectManager::ObjectManager() :
 	m_testMapGraph(),
 	m_pStateMachine(),
 	m_playerGraphHandle(),
+	m_scoreGraphData(),
 	m_pPlatinumLoader(std::make_shared<PlatinumLoader>()),
 	m_pCamera(std::make_shared<Camera>()),
 	m_pPause(std::make_shared<Pause>()),
@@ -79,6 +121,30 @@ ObjectManager::~ObjectManager()
 	}
 
 	for (auto& graph : m_playerGraphHandle)
+	{
+		DeleteGraph(graph);
+	}
+	m_mapInfoData.mapCollisionData.clear();
+
+	m_object.clear();
+
+	m_pPlatinumLoader.reset();
+
+	m_pCamera.reset();
+
+	m_pPause.reset();
+
+	m_pOpeningMessageWindow.reset();
+
+	m_pEndTalkMessageWindow.reset();
+
+	m_pGameOver.reset();
+
+	m_pMainScreen.reset();
+
+	DeleteGraph(m_scoreGraphData.countGraphHandle);
+	DeleteGraph(m_scoreGraphData.separateGraphHandle);
+	for(auto& graph : m_scoreGraphData.clearRetryTextGraphHandle)
 	{
 		DeleteGraph(graph);
 	}
@@ -111,17 +177,11 @@ void ObjectManager::Draw()
 	// マップ描画
 	TestMapDraw();
 
-	// 時間取得
-	Time time = GameData::GetInstance()->GetTime();
-	// 時間描画
-	DrawFormatString(0, 15*0, GetColor(255, 255, 255), "%d:%d:%d:%d", time.hour, time.minute, time.second, time.millisecond);
-	// 死亡回数取得
-	int deathCount = GameData::GetInstance()->GetPlayerStatus().deathCount;
-	// 死亡回数描画
-	DrawFormatString(0, 15*1, GetColor(255, 255, 255), "DeathCount:%d", deathCount);
-
 	// ステートマシンの描画
 	m_pStateMachine.Draw();
+
+	// セーブスコア描画
+	DrawSaveScore();
 }
 
 void ObjectManager::ChangeScene(const SceneMain::Scene& nextScene)
@@ -381,6 +441,27 @@ void ObjectManager::Load()
 	// サウンドロード
 	{
 		Sound::GetInstance()->Load(kSoundFileName,false);
+	}
+
+	// スコアグラフィックロード
+	{
+		m_scoreGraphData.numberGraphHandle =
+			EvoLib::Load::LoadDivGraph_EvoLib_Revision(ScoreGraph_GameMain::kNumberGraphFileName, ScoreGraph_GameMain::kNumberGraphDivNum);
+
+		m_scoreGraphData.separateGraphHandle = LoadGraph(ScoreGraph_GameMain::kSeparateGraphFileName);
+		m_scoreGraphData.countGraphHandle = LoadGraph(ScoreGraph_GameMain::kCountGraphFileName);
+
+		// クリアリトライ回数テキストグラフィックロード
+		m_scoreGraphData.clearRetryTextGraphHandle =
+			EvoLib::Load::LoadDivGraph_EvoLib_Revision(ScoreGraph_GameMain::kClearRetryTextGraphFileName, EvoLib::Load::DivNum(1, 2));
+
+		{
+			// グラフィックのサイズを取得
+			const Vec2 size = EvoLib::Calculation::GetGraphSize_EvoLib(m_scoreGraphData.numberGraphHandle, ScoreGraph_GameMain::kGraphSize);
+
+			// グラフィックの間隔を設定
+			ScoreGraph_GameMain::kGraphInterval = size.x + ScoreGraph_GameMain::kGraphIntervalSetting;
+		}
 	}
 }
 
@@ -1165,4 +1246,103 @@ void ObjectManager::TestMapDraw()
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND,255);
 
+}
+
+void ObjectManager::DrawSaveScore()
+{
+	// 現在のタイムを取得
+	const Time currentTime = GameData::GetInstance()->GetTime();
+
+	// 現在の死亡回数を取得
+	const int currentDeathCount = GameData::GetInstance()->GetDeathCount();
+	
+	const GameData::Score saveScore = GameData::GetInstance()->CalcScore(currentTime, currentDeathCount);
+
+	// クリアリトライ回数テキストの描画
+	DrawRotaGraphF(
+		ScoreGraph_GameMain::kClearTextPos.x,
+		ScoreGraph_GameMain::kClearTextPos.y,
+		ScoreGraph_GameMain::kTextGraphSize,
+		0.0,
+		m_scoreGraphData.clearRetryTextGraphHandle[0],
+		TRUE);
+
+
+	// クリアリトライ回数テキストの描画
+	DrawRotaGraphF(
+		ScoreGraph_GameMain::kRetryTextPos.x,
+		ScoreGraph_GameMain::kRetryTextPos.y,
+		ScoreGraph_GameMain::kTextGraphSize,
+		0.0,
+		m_scoreGraphData.clearRetryTextGraphHandle[1],
+		TRUE);
+
+
+	// 時間スコア
+	{
+		// 時間スコアの描画
+		const int loopNum = static_cast<int>(saveScore.time.size());
+
+		int count = 0;
+
+		for (int i = 0; i < loopNum; i++)
+		{
+			if (i != 0 && i % 2 == 0)
+			{
+				const float x = ScoreGraph_GameMain::kTimeScorePos.x + ((i + count) * ScoreGraph_GameMain::kGraphInterval);
+
+				DrawRotaGraphF(
+					x,
+					ScoreGraph_GameMain::kTimeScorePos.y,
+					ScoreGraph_GameMain::kGraphSize,
+					0.0,
+					m_scoreGraphData.separateGraphHandle,
+					TRUE);
+
+				count++;
+			}
+
+			const float x = ScoreGraph_GameMain::kTimeScorePos.x + ((i + count) * ScoreGraph_GameMain::kGraphInterval);
+
+			DrawRotaGraphF(
+				x,
+				ScoreGraph_GameMain::kTimeScorePos.y,
+				ScoreGraph_GameMain::kGraphSize,
+				0.0,
+				m_scoreGraphData.numberGraphHandle[saveScore.time[i]],
+				TRUE);
+		}
+	}
+
+	// デスカウント
+	{
+		// デスカウントの描画
+		const int loopNum = static_cast<int>(saveScore.deathCount.size());
+
+		for (int i = 0; i < loopNum; i++)
+		{
+
+
+			const float x = ScoreGraph_GameMain::kDeathCountPos.x + (i * ScoreGraph_GameMain::kGraphInterval);
+
+			DrawRotaGraphF(
+				x,
+				ScoreGraph_GameMain::kDeathCountPos.y,
+				ScoreGraph_GameMain::kGraphSize,
+				0.0,
+				m_scoreGraphData.numberGraphHandle[saveScore.deathCount[i]],
+				TRUE);
+		}
+
+		float x = ScoreGraph_GameMain::kDeathCountPos.x + (loopNum * ScoreGraph_GameMain::kGraphInterval);
+		x += 5.0f;
+
+		DrawRotaGraphF(
+			x,
+			ScoreGraph_GameMain::kDeathCountPos.y,
+			ScoreGraph_GameMain::kGraphSize,
+			0.0,
+			m_scoreGraphData.countGraphHandle,
+			TRUE);
+	}
 }

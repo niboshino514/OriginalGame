@@ -3,6 +3,7 @@
 #include "Controller.h"
 #include "game.h"
 #include "GameData.h"
+#include "EffectManager.h"
 
 namespace Graph
 {
@@ -67,7 +68,6 @@ namespace ScoreGraph
 	constexpr double kNewRecordGraphSize = 0.5;
 
 
-
 	// テキストグラフィックサイズ
 	constexpr double kTextGraphSize = 1.0;
 
@@ -89,7 +89,8 @@ EndingScreen::EndingScreen() :
 	m_score(),
 	m_gameClearGraphSineCuve(),
 	m_gameClearGraphSineCurveValue(0.0f),
-	m_pSceneEnding(nullptr)
+	m_pSceneEnding(nullptr),
+	m_pEffectManager(std::make_shared<EffectManager>())
 {
 }
 
@@ -133,6 +134,8 @@ void EndingScreen::Init()
 	{
 		// 新記録の場合、セーブデータを更新
 		GameData::GetInstance()->SetScoreData();
+
+		GameData::GetInstance()->WriteScoreData();
 	}
 
 
@@ -140,6 +143,9 @@ void EndingScreen::Init()
 		CalcScore(
 			GameData::GetInstance()->GetTime(),
 			GameData::GetInstance()->GetDeathCount());
+
+	// エフェクトマネージャーの初期化
+	m_pEffectManager->Init();
 }
 
 void EndingScreen::Update()
@@ -152,6 +158,9 @@ void EndingScreen::Update()
 	{
 		m_pSceneEnding->ChangeScene(SceneEnding::Scene::Title);
 	}
+
+	// エフェクトマネージャーの更新
+	m_pEffectManager->Update();
 }
 
 void EndingScreen::Draw()
@@ -179,6 +188,9 @@ void EndingScreen::Draw()
 		0.0,
 		m_thanksGraphHandle,
 		TRUE);
+
+	// エフェクトマネージャーの描画
+	m_pEffectManager->Draw();
 }
 
 void EndingScreen::Load()
@@ -258,9 +270,6 @@ void EndingScreen::DrawScore()
 			m_newRecordGraphHandle,
 			TRUE);
 
-
-
-
 		// 赤色に変更
 		SetDrawBright(255, 0, 0);
 	}
@@ -337,6 +346,4 @@ void EndingScreen::DrawScore()
 
 	// 色を元に戻す
 	SetDrawBright(255, 255, 255);
-
-
 }

@@ -301,10 +301,10 @@ void Player::StateNormalExit()
 		// 死亡回数カウントアップ
 		m_playerStatus.deathCount++;
 
-		// プレイヤーの死亡回数が999を超えたら999にする
-		if (m_playerStatus.deathCount > 999)
+		// プレイヤーの死亡回数が9999を超えたら999にする
+		if (m_playerStatus.deathCount > 9999)
 		{
-			m_playerStatus.deathCount = 999;
+			m_playerStatus.deathCount = 9999;
 		}
 
 		// 死亡回数を設定

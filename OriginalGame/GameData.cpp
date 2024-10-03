@@ -224,18 +224,24 @@ GameData::Score GameData::CalcScore(const Time& time, const int& deathCount)
 	{
 		// ˆê‚ÌˆÊ
 		{
-			score.deathCount[2] = deathCount % 10;
+			score.deathCount[3] = deathCount % 10;
 		}
 
 		// \‚ÌˆÊ
 		{
-			score.deathCount[1] = (deathCount / 10) % 10;
+			score.deathCount[2] = (deathCount / 10) % 10;
 		}
 
 		// •S‚ÌˆÊ
 		{
-			score.deathCount[0] = (deathCount / 100) % 10;
+			score.deathCount[1] = (deathCount / 100) % 10;
 		}
+
+		// ç‚ÌˆÊ
+		{
+			score.deathCount[0] = (deathCount / 1000) % 10;
+		}
+
 	}
 
 

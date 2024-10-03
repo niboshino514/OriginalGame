@@ -381,7 +381,29 @@ private:
 	/// </summary>
 	void TestMapDraw();
 
+	/// <summary>
+	/// セーブスコア描画
+	/// </summary>
+	void DrawSaveScore();
+
+
 private:
+
+	// スコアグラフィックデータ
+	struct ScoreGraphData
+	{
+		// 番号グラフ
+		std::vector<int> numberGraphHandle;
+
+		// 仕切りグラフ
+		int separateGraphHandle = -1;
+
+		// 回数のグラフィック
+		int countGraphHandle = -1;
+
+		// クリアリトライ回数テキストグラフィック
+		std::vector<int> clearRetryTextGraphHandle;
+	};
 
 	// オブジェクト
 	std::vector<std::shared_ptr<ObjectBase>>m_object;
@@ -401,6 +423,9 @@ private:
 
 	// プレイヤーグラフィックハンドル
 	std::vector<int>m_playerGraphHandle;
+
+	// スコアグラフィックデータ
+	ScoreGraphData m_scoreGraphData;	
 
 	//////////////////
 	// ステート関連 //

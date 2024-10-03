@@ -82,7 +82,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// セーブ書き込み
 	GameData::GetInstance()->WriteSaveData();	// セーブデータの書き込み
-	GameData::GetInstance()->WriteScoreData();	// スコアデータの書き込み
 
 	// シングルトン解放
 	{
