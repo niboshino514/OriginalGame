@@ -12,6 +12,18 @@ namespace
 	static const std::string kScoreDataFileName = "Data/Save/ScoreData.dat";
 }
 
+void GameData::SaveNextStageFirstCell(const Cell& cell, const int stageNumber)
+{
+	m_saveData.cell = cell;
+
+	m_saveData.playerStatus.moveSpeed = MoveSpeed::Normal;
+	m_saveData.playerStatus.jumpType = JumpType::Second;
+	m_saveData.playerStatus.jumpPower = JumpPower::Normal;
+	m_saveData.playerStatus.moveSpeed = MoveSpeed::Normal;
+
+	m_saveData.stageNumber = stageNumber;
+}
+
 void GameData::LoadSaveData()
 {
 	// ファイルが存在するかどうかを確認し、存在しない場合は新規作成

@@ -75,7 +75,8 @@ public:
 		SaveData,		// セーブデータ
 		Respawn,		// リスポーン
 		NextStage,		// 次のステージ
-		PreviouseStage	// 前のステージ
+		PreviouseStage,	// 前のステージ
+		Reload,			// リロード
 	};
 
 
@@ -364,7 +365,7 @@ private:
 	bool IsCellCheckOutOfRange(const Cell& cell);
 
 
-	/// <summary>d
+	/// <summary>
 	/// オブジェクト更新
 	/// </summary>
 	/// <param name="isStopPlayer">プレイヤーを止めるかどうか</param>
@@ -417,6 +418,9 @@ private:
 	// マップグラフィック
 	std::vector<int>m_testMapGraph;
 
+
+	bool m_isMapCreate;
+
 	//////////////////////
 	// グラフィック関連 //
 	//////////////////////
@@ -426,6 +430,18 @@ private:
 
 	// スコアグラフィックデータ
 	ScoreGraphData m_scoreGraphData;	
+
+	// 死亡エフェクト
+	std::vector<int>m_diedEffectGraph;
+	// 復活エフェクト
+	std::vector<int>m_revivalEffectGraph;
+
+	// 背景グラフィックハンドル
+	int m_backgroundGraphHandle;
+
+	// セーブグラフィックハンドル
+	std::vector<int>m_saveGraphHandle;
+
 
 	//////////////////
 	// ステート関連 //

@@ -29,10 +29,7 @@ public:
 		Player,					// プレイヤー
 
 		TransparentBlockChip,	// 透明ブロックチップ
-		BossSpawnFlagChip,		// ボススポーンフラグチップ
-		BossEnemy,				// ボスエネミー
-
-		PlayerShot,				// プレイヤーショット
+		SaveChip,				// セーブチップ
 	};
 
 
@@ -88,8 +85,17 @@ public:
 		int stopNo = 0;
 	};
 
-
-
+	// プレイヤーエフェクトデータ
+	struct PlayerEffectData
+	{
+		// ハンドル
+		std::vector<int>handle;
+	
+		// フレームカウント
+		int frameCount = 0;
+		// アニメーション番号
+		int animeNo = 0;
+	};
 
 
 public:
@@ -177,6 +183,16 @@ public:
 	/// <param name="graphicHandle">グラフィックハンドル</param>
 	void SetGraphicHandle(const std::vector<int>& graphicHandle) { m_graphicHandle = graphicHandle; }
 
+	/// <summary>
+	/// エフェクトハンドルをセット
+	/// </summary>
+	/// <param name="diedEffect">死亡エフェクト</param>
+	/// <param name="revivalEffect">復活エフェクト</param>
+	void SetEffectGraphicHandle(const std::vector<int>& diedEffect, const std::vector<int>& revivalEffect)
+	{
+		m_diedEffectData.handle = diedEffect;
+		m_revivalEffectData.handle = revivalEffect;
+	}
 
 protected:
 
@@ -187,7 +203,6 @@ protected:
 	/// <param name="animationRange">アニメーション範囲</param>
 	/// <returns>アニメーション番号</returns>
 	int AnimationNamberUpdate(const AnimationDetails& animationDetails, const AnimationRange& animationRange);
-
 
 protected:
 
@@ -234,6 +249,13 @@ protected:
 	// アニメーション範囲
 	AnimationRange m_animationRange;
 	
+	// プレイヤー死亡エフェクトデータ
+	PlayerEffectData m_diedEffectData;
+	// プレイヤー復活エフェクトデータ
+	PlayerEffectData m_revivalEffectData;
+
+
+
 	////////////////////
 	// クラスポインタ //
 	////////////////////

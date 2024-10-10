@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <Vec2.h>
-
+#include <Sound.h>
 
 
 class SoundOption
@@ -53,9 +53,12 @@ private:
 	void DrawSoundBgmVolume();
 	// サウンドSEボリュームの描画
 	void DrawSoundSeVolume();
-
-
-
+	
+	/// <summary>
+	/// サウンドボリュームの設定
+	/// </summary>
+	/// <param name="soundType">サウンドボリューム</param>
+	void SetSoundVolume(const Sound::SoundType& soundType);
 
 private:
 

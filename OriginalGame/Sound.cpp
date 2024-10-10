@@ -14,13 +14,36 @@ namespace
 	// サウンドの最大値
 	const int kSoundMaxValue = 255;
 
+	// サウンド音量設定データファイルパス
+	const std::string kSoundVolumeSettingFilePath = "Data/Setting/SoundVolumeSetting.dat";
+
+
+}
+
+void Sound::LoadSoundVolumeSetting()
+{
+	// ファイルが存在するかどうかを確認し、存在しない場合は新規作成
+	if (!EvoLib::File::IsFileExist(kSoundVolumeSettingFilePath))
+	{
+		// サウンド音量設定を書き込み
+		EvoLib::File::WriteBinaryFile<SoundVolume>(kSoundVolumeSettingFilePath, m_soundPercentVolume);
+
+		return;
+	}
+
+	// datファイルの読み込み
+	EvoLib::File::ReadBinaryFile<SoundVolume>(kSoundVolumeSettingFilePath, m_soundPercentVolume);
+}
+
+void Sound::WriteSoundVolumeSetting()
+{
+	// サウンド音量設定を書き込み
+	EvoLib::File::WriteBinaryFile<SoundVolume>(kSoundVolumeSettingFilePath, m_soundPercentVolume);
 }
 
 void Sound::Init()
 {
 
-	// サウンドの初期化
-	m_soundPercentVolume = SoundVolume();
 
 	// サウンドデータの読み込み
 	const std::vector<std::vector<std::string>> loadData = 
@@ -66,7 +89,6 @@ void Sound::Init()
 		// 最大ボリュームをボリュームに代入
 		defoultData.soundVolume = defoultData.maxVolume;
 
-		// ボリュームを設定ボリュームに代入
 		defoultData.settingSoundVolume = defoultData.soundVolume;
 
 		// ハンドルの初期化
@@ -155,8 +177,16 @@ void Sound::Init()
 			// 最大ボリュームをボリュームに代入
 			tempData.soundVolume = tempData.maxVolume;
 
+
 			// ボリュームを設定ボリュームに代入
-			tempData.settingSoundVolume = tempData.soundVolume;
+			if (tempData.soundType == SoundType::SE)
+			{
+				tempData.settingSoundVolume = EvoLib::Convert::ConvertFromPercentToValue(tempData.soundVolume, static_cast<float>(m_soundPercentVolume.se));
+			}
+			else
+			{
+				tempData.settingSoundVolume = EvoLib::Convert::ConvertFromPercentToValue(tempData.soundVolume, static_cast<float>(m_soundPercentVolume.bgm));
+			}
 
 			// ハンドルの初期化
 			tempData.handle = -1;
@@ -295,7 +325,7 @@ void Sound::SetSoundVolume(const SoundType& soundType, const int& soundPercentVo
 	// サウンドの読み込み
 	for (auto& data : m_soundData)
 	{
-		// サウンドタイプが異なる場合、c:ontinueする
+		// サウンドタイプが異なる場合、continueする
 		if (data.second.soundType != soundType)
 		{
 			continue;

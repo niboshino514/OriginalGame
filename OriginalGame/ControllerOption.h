@@ -109,5 +109,8 @@ private:
 
 	// セレクト三角形グラフィック
 	int m_selectTriangleGraph;
+
+	// コントローラー説明グラフィック
+	std::vector<int> m_controllerExplanationGraph;
 };
 

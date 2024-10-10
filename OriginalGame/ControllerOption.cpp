@@ -116,6 +116,13 @@ namespace
 
 	// 透明度
 	const int kAlpha = 100;
+
+	// コントローラーグラフィックファイルパス
+	const char* const kControllerGraphFilePath = "Data/Graphic/ControllerOption/Controller.png";
+	// コントローラーグラフィックの分割数
+	const EvoLib::Load::DivNum kControllerGraphDivNum = { 1, 4 };
+	// コントローラーグラフィックの座標
+	const Vec2 kControllerGraphPos = Vec2(Game::kWindowCenterX, Game::kWindowCenterY + 150);
 }
 
 
@@ -129,7 +136,8 @@ ControllerOption::ControllerOption():
 	m_controllerSettingGraph(),
 	m_windowNameGraph(),
 	m_backGraph(),
-	m_selectTriangleGraph()
+	m_selectTriangleGraph(),
+	m_controllerExplanationGraph()
 {
 }
 
@@ -156,6 +164,13 @@ ControllerOption::~ControllerOption()
 		DeleteGraph(handle);
 	}
 	DeleteGraph(m_selectTriangleGraph);
+	for(auto& graph : m_controllerSettingGraph)
+	{
+		for(auto& handle : graph.handle)
+		{
+			DeleteGraph(handle);
+		}
+	}
 }
 
 void ControllerOption::Init()
@@ -301,6 +316,12 @@ void ControllerOption::Load()
 
 	// 選択三角形のグラフィックのロード
 	m_selectTriangleGraph = LoadGraph(SelectTriangleGraph::kFilePath);
+
+	// コントローラー説明グラフィックのロード
+	{
+		// グラフィックロード
+		m_controllerExplanationGraph = EvoLib::Load::LoadDivGraph_EvoLib_Revision(kControllerGraphFilePath, kControllerGraphDivNum);
+	}
 }
 
 void ControllerOption::UpdateSettingItem()
@@ -599,10 +620,6 @@ void ControllerOption::DrawControllerSetting()
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, Window::kAlpha);
 		}
 
-		
-		
-
-
 		// グラフィックの描画
 		DrawRotaGraphF(
 			m_controllerSettingGraph[i].pos[0].x, 
@@ -619,23 +636,53 @@ void ControllerOption::DrawControllerSetting()
 
 void ControllerOption::DrawControllerExplanation()
 {
-	int const width = 600;
-	int const height = 280;
+	// 枠描画
+	{
+		int const width = 780;
+		int const height = 270;
 
-	int const setPosX = 0;
-	int const setPosY = 150;
-
-
-	int const leftTopX = (Game::kWindowCenterX - width / 2) + setPosX;
-	int const leftTopY = (Game::kWindowCenterY - height / 2) + setPosY;
-
-	int const rightBottomX = (Game::kWindowCenterX + width / 2) + setPosX;
-	int const rightBottomY = (Game::kWindowCenterY + height / 2) + setPosY;
+		int const setPosX = 0;
+		int const setPosY = 150;
 
 
+		int const leftTopX = (Game::kWindowCenterX - width / 2) + setPosX;
+		int const leftTopY = (Game::kWindowCenterY - height / 2) + setPosY;
+
+		int const rightBottomX = (Game::kWindowCenterX + width / 2) + setPosX;
+		int const rightBottomY = (Game::kWindowCenterY + height / 2) + setPosY;
+
+		DrawBox(leftTopX, leftTopY, rightBottomX, rightBottomY, 0xffffff, false);
+	}
 
 
-	DrawBox(leftTopX, leftTopY, rightBottomX, rightBottomY, 0xffffff, false);
+	// コントローラー説明の描画
+	{
+		
+		int graphNum = 0;
 
+		// コントローラータイプによって描画する画像を変える
+		if (m_controllerSetting.controllerType != Controller::ControllerType::KEYBOARD)
+		{
+			switch (m_controllerSetting.padType)
+			{
+				case Controller::PadType::XBOX:
+					graphNum = 1;
+					break;
 
+				case Controller::PadType::DUALSHOCK:
+					graphNum = 2;
+					break;
+
+				case Controller::PadType::SWITCH_PRO:
+					graphNum = 3;
+					break;
+			default:
+
+				graphNum = 0;
+				break;
+			}
+		}
+		// コントローラー説明の描画
+		DrawRotaGraphF(kControllerGraphPos.x, kControllerGraphPos.y, 0.9, 0.0, m_controllerExplanationGraph[graphNum], TRUE);
+	}
 }

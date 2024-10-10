@@ -40,19 +40,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 	// サウンドロード
+	Sound::GetInstance()->LoadSoundVolumeSetting();
 	Sound::GetInstance()->Init();
 
 	// セーブロード
 	GameData::GetInstance()->LoadSaveData();	// セーブデータの読み込み
 	GameData::GetInstance()->LoadScoreData();	// スコアデータの読み込み
 
+	// コントローラー設定読み込み
+	Controller::GetInstance()->LoadControllerSetting();
+
+	
 
 	// 最初のシーンの初期化
 	SceneManager scene;
 	scene.Init();
-
-
-
 
 
 	while (ProcessMessage() == 0)
@@ -82,6 +84,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// セーブ書き込み
 	GameData::GetInstance()->WriteSaveData();	// セーブデータの書き込み
+
+	// コントローラー設定書き込み
+	Controller::GetInstance()->WriteControllerSetting();
+
+	// サウンド書き込み
+	Sound::GetInstance()->WriteSoundVolumeSetting();
 
 	// シングルトン解放
 	{

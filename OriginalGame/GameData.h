@@ -130,6 +130,9 @@ public:
 
 public:
 
+	// 次のステージに進んだ時の最初のセルをセーブ
+	void SaveNextStageFirstCell(const Cell& cell,const int stageNumber);
+
 
 	/// <summary>
 	/// セーブデータの読み込み

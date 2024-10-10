@@ -134,6 +134,11 @@ SoundOption::~SoundOption()
 
 void SoundOption::Init()
 {
+	int test = Sound::GetInstance()->GetSoundVolume().bgm;
+
+
+
+
 	// サウンドボリュームの初期化
 	const int bgmVolume = static_cast<int>(EvoLib::Convert::ConvertFromPercentToValue(kSoundVolumeMax, static_cast<float>(Sound::GetInstance()->GetSoundVolume().bgm)));
 	const int seVolume = static_cast<int>(EvoLib::Convert::ConvertFromPercentToValue(kSoundVolumeMax, static_cast<float>(Sound::GetInstance()->GetSoundVolume().se)));
@@ -141,6 +146,11 @@ void SoundOption::Init()
 
 	m_soundVolume.bgmVolume = bgmVolume;
 	m_soundVolume.seVolume = seVolume;
+
+	m_soundVolume.bgmVolume = 5;
+	m_soundVolume.seVolume = 5;
+
+
 
 
 	// グラフィックのロード
@@ -188,7 +198,7 @@ void SoundOption::Draw()
 
 void SoundOption::InitSettingItem()
 {
-	// 設定項目の初期化
+	// 設定項目の初期化hai
 	m_settingItemSelect = SettingItemSenect::BGM;
 
 	// ウィンドウを閉じるかどうか
@@ -317,11 +327,8 @@ void SoundOption::UpdateSoundBgmVolume()
 		}
 
 		// 音量のパーセンテージを求める
-		const int soundPercentageVolume = EvoLib::Convert::PercentageRate(static_cast<float>(kSoundVolumeMax), static_cast<float>(m_soundVolume.bgmVolume));
+		SetSoundVolume(Sound::SoundType::BGM);
 
-		// 音量の更新
-		Sound::GetInstance()->SetSoundVolume(Sound::SoundType::BGM, soundPercentageVolume);
-		
 		// 選択音を再生
 		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Select)]);
 	}
@@ -333,17 +340,12 @@ void SoundOption::UpdateSoundBgmVolume()
 
 		if(m_soundVolume.bgmVolume < 0)
 		{
-			m_soundVolume.bgmVolume = kSoundVolumeMax;
+			m_soundVolume.bgmVolume = kSoundVolumeMax - 1;
 		}
 
 
-
 		// 音量のパーセンテージを求める
-		const int soundPercentageVolume = EvoLib::Convert::PercentageRate(static_cast<float>(kSoundVolumeMax), static_cast<float>(m_soundVolume.bgmVolume));
-
-		// 音量の更新
-		Sound::GetInstance()->SetSoundVolume(Sound::SoundType::BGM, soundPercentageVolume);
-	
+		SetSoundVolume(Sound::SoundType::BGM);
 		// 選択音を再生
 		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Select)]);
 	}
@@ -369,11 +371,7 @@ void SoundOption::UpdateSoundSeVolume()
 		}
 
 		// 音量のパーセンテージを求める
-		const int soundPercentageVolume = EvoLib::Convert::PercentageRate(static_cast<float>(kSoundVolumeMax), static_cast<float>(m_soundVolume.seVolume));
-
-		// 音量の更新
-		Sound::GetInstance()->SetSoundVolume(Sound::SoundType::SE, soundPercentageVolume);
-
+		SetSoundVolume(Sound::SoundType::SE);
 		// 選択音を再生
 		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Select)]);
 	}
@@ -384,15 +382,11 @@ void SoundOption::UpdateSoundSeVolume()
 
 		if(m_soundVolume.seVolume < 0)
 		{
-			m_soundVolume.seVolume = kSoundVolumeMax;
+			m_soundVolume.seVolume = kSoundVolumeMax - 1;
 		}
 
 		// 音量のパーセンテージを求める
-		const int soundPercentageVolume = EvoLib::Convert::PercentageRate(static_cast<float>(kSoundVolumeMax), static_cast<float>(m_soundVolume.seVolume));
-
-		// 音量の更新
-		Sound::GetInstance()->SetSoundVolume(Sound::SoundType::SE, soundPercentageVolume);
-
+		SetSoundVolume(Sound::SoundType::SE);
 		// 選択音を再生
 		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Select)]);
 	}
@@ -595,5 +589,30 @@ void SoundOption::DrawSoundSeVolume()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	// 色を元に戻す
 	SetDrawBright(255, 255, 255);
+
+}
+
+void SoundOption::SetSoundVolume(const Sound::SoundType& soundType)
+{
+	int percent = 20;
+
+	// 音量のパーセンテージを求める
+	int soundPercentageVolume = 0;
+
+
+	if(soundType == Sound::SoundType::BGM)
+	{
+		soundPercentageVolume = (percent * m_soundVolume.bgmVolume);
+
+		// BGMの音量を設定
+		Sound::GetInstance()->SetSoundVolume(Sound::SoundType::BGM, soundPercentageVolume);
+	}
+	else 
+	{
+		soundPercentageVolume = (percent * m_soundVolume.seVolume);
+
+		// SEの音量を設定
+		Sound::GetInstance()->SetSoundVolume(Sound::SoundType::SE, soundPercentageVolume);
+	}
 
 }

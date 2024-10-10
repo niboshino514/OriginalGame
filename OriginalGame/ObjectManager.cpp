@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "game.h"
 #include "TransparentBlockChip.h"
-#include "BossSpawnFlagChip.h"
+#include "SaveChip.h"
 #include "Pause.h"
 #include "MainScreen.h"
 #include "Sound.h"
@@ -94,6 +94,40 @@ namespace ScoreGraph_GameMain
 
 	// グラフィックサイズ
 	constexpr double kGraphSize = 0.4;
+
+	// スコアグラフィックの半径サイズ
+	const float kScoreGraphRadius = 120.0f;
+
+	// プレイヤー半径サイズ
+	const float kPlayerRadius = 180.0f;
+}
+
+namespace PlayerEffectGraph
+{
+	// 死亡エフェクトグラフィックのファイル名
+	const char* const kDiedEffectGraphFileName = "Data/Graphic/GameMain/Effect/DiedEffect.png";
+	// 死亡エフェクトグラフィックの分割数
+	const EvoLib::Load::DivNum kDiedEffectDivNum = EvoLib::Load::DivNum(10, 8);
+
+	// 復活エフェクトグラフィックのファイル名
+	const char* const kRevivalEffectGraphFileName = "Data/Graphic/GameMain/Effect/RevivalEffect.png";
+	// 復活エフェクトグラフィックの分割数
+	const EvoLib::Load::DivNum kRevivalEffectDivNum = EvoLib::Load::DivNum(5, 5);
+}
+
+namespace BackGroundGraph
+{
+	// 背景グラフィックのファイル名
+	const char* const kBackGroundGraphFileName = "Data/Graphic/GameMain/BackGround.png";
+}
+
+namespace MapChipGraph
+{
+	// セーブマップチップグラフィックのファイル名
+	const char* const kSaveMapChipGraphFileName = "Data/Graphic/GameMain/MapChip/SaveMapChip.png";
+	// セーブマップチップグラフィックの分割数
+	const EvoLib::Load::DivNum kSaveMapChipDivNum = EvoLib::Load::DivNum(2, 1);
+
 }
 
 ObjectManager::ObjectManager() :
@@ -104,6 +138,11 @@ ObjectManager::ObjectManager() :
 	m_pStateMachine(),
 	m_playerGraphHandle(),
 	m_scoreGraphData(),
+	m_diedEffectGraph(),
+	m_revivalEffectGraph(),
+	m_backgroundGraphHandle(-1),
+	m_isMapCreate(false),
+	m_saveGraphHandle(),
 	m_pPlatinumLoader(std::make_shared<PlatinumLoader>()),
 	m_pCamera(std::make_shared<Camera>()),
 	m_pPause(std::make_shared<Pause>()),
@@ -148,6 +187,23 @@ ObjectManager::~ObjectManager()
 	{
 		DeleteGraph(graph);
 	}
+
+	for (auto& graph : m_diedEffectGraph)
+	{
+		DeleteGraph(graph);
+	}
+
+	for (auto& graph : m_revivalEffectGraph)
+	{
+		DeleteGraph(graph);
+	}
+
+	DeleteGraph(m_backgroundGraphHandle);
+
+	for (auto& graph : m_saveGraphHandle)
+	{
+		DeleteGraph(graph);
+	}
 }
 
 void ObjectManager::Init()
@@ -171,6 +227,14 @@ void ObjectManager::Update()
 
 void ObjectManager::Draw()
 {
+	// 背景描画
+	EvoLib::Draw::DrawSimpleBackground(
+		m_backgroundGraphHandle,
+		Vec2(Game::kScreenWidth_F, Game::kScreenHeight_F),
+		false);
+
+
+
 	// オブジェクト描画
 	ObjectDraw();
 	
@@ -303,6 +367,8 @@ void ObjectManager::StateSettingInit()
 	// BGM再生
 	Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::BGM)]);
 
+
+
 	// ステートを変更
 	SetState(state);
 }
@@ -346,14 +412,16 @@ void ObjectManager::StateOpeningExit()
 
 void ObjectManager::StateNormalUpdate()
 {
+	// オブジェクト削除
+	ObjectErase();
+
 	// オブジェクト更新
 	ObjectUpdate();
 
+
+
 	// スクリーン内かどうかを調べる
 	FieldCheck();
-
-	// オブジェクト削除
-	ObjectErase();
 	
 	// 時間計測
 	GameData::GetInstance()->TimeCount();
@@ -367,8 +435,6 @@ void ObjectManager::StateNormalDraw()
 
 void ObjectManager::StateEndTalkEnter()
 {
-
-	//m_pEndTalkMessageWindow->ResetData();
 }
 
 void ObjectManager::StateEndTalkUpdate()
@@ -463,6 +529,32 @@ void ObjectManager::Load()
 			ScoreGraph_GameMain::kGraphInterval = size.x + ScoreGraph_GameMain::kGraphIntervalSetting;
 		}
 	}
+
+	// エフェクトグラフィックロード
+	{
+		m_diedEffectGraph = EvoLib::Load::
+			LoadDivGraph_EvoLib_Revision(
+				PlayerEffectGraph::kDiedEffectGraphFileName, 
+				PlayerEffectGraph::kDiedEffectDivNum);
+
+		m_revivalEffectGraph = EvoLib::Load::
+			LoadDivGraph_EvoLib_Revision(
+				PlayerEffectGraph::kRevivalEffectGraphFileName, 
+				PlayerEffectGraph::kRevivalEffectDivNum);
+	}
+
+	// 背景グラフィックロード
+	{
+		m_backgroundGraphHandle = LoadGraph(BackGroundGraph::kBackGroundGraphFileName);
+	}
+
+	// セーブグラフィックロード
+	{
+		m_saveGraphHandle = EvoLib::Load::
+			LoadDivGraph_EvoLib_Revision(
+				MapChipGraph::kSaveMapChipGraphFileName, 
+				MapChipGraph::kSaveMapChipDivNum);
+	}
 }
 
 void ObjectManager::PlayerCreate(const Vec2& pos)
@@ -482,12 +574,20 @@ void ObjectManager::PlayerCreate(const Vec2& pos)
 	// グラフィックハンドルを代入
 	m_object.back()->SetGraphicHandle(m_playerGraphHandle);
 
+	// エフェクトハンドルを代入
+	m_object.back()->SetEffectGraphicHandle
+	(m_diedEffectGraph, m_revivalEffectGraph);
+
 	// 初期化処理
 	m_object.back()->Init();
 }
 
 void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& mapData, const MapSwitchType& mapSwitchType)
 {
+
+	// マップ生成フラグ
+	m_isMapCreate = true;
+
 	// マップデータ
 	std::vector<std::vector<MapCollisionData>>mapCollisionData(
 		m_mapInfoData.mapChip.mapWidth, 
@@ -526,6 +626,17 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 		{
 			// マップチップタイプに変換
 			const ChipType mapChipType = ChipType(mapData[x][y]);
+
+
+			if (mapChipType == ChipType::NextPos &&
+				mapSwitchType == MapSwitchType::NextStage)
+			{
+				GameData::GetInstance()->SaveNextStageFirstCell(Cell(x, y), m_mapInfoData.mapNumber);
+
+			}
+
+
+
 
 			// チップの数をカウントする
 			{
@@ -614,13 +725,28 @@ void ObjectManager::MapCollisionDataCreate(const std::vector<std::vector<int>>& 
 					// プレイヤー生成フラグ
 					isPlayerCreate = true;
 				}
+
+				// プレイヤー生成
+				if(mapSwitchType == MapSwitchType::Reload)
+				{
+					if (mapChipType == ChipType::NextPos ||
+						mapChipType == ChipType::SpawnPos)
+					{
+						// キャラクター生成
+						PlayerCreate(EvoLib::Convert::CellToPos(Cell(x, y), m_mapInfoData.mapChip.chipSize));
+
+						// プレイヤー生成フラグ
+						isPlayerCreate = true;
+					}
+				}
 			}
 
 			// マップチップ生成
 			{
 				// チップ生成フラグ
 				const bool isCreateChip =
-					mapCollisionData[x][y].chipType == ChipType::TransparentBlock;
+					mapCollisionData[x][y].chipType == ChipType::TransparentBlock ||
+					mapCollisionData[x][y].chipType == ChipType::Save;
 
 				// チップ生成
 				if (isCreateChip)
@@ -820,22 +946,31 @@ void ObjectManager::ObjectErase()
 
 void ObjectManager::StageMove(const MapSwitchType& mapSwitchType)
 {
+	// ステージ移動タイプを代入
+	MapSwitchType tempMapSwitchType = mapSwitchType;
+
+
+
 	// 次のステージに移動するかどうかのフラグからステージナンバーを増やすか決める
-	if (mapSwitchType == MapSwitchType::NextStage)
+	if (tempMapSwitchType == MapSwitchType::NextStage)
 	{
 		// ステージナンバーの数字を増やす
 		m_mapInfoData.mapNumber++;
 	}
-	else if(mapSwitchType == MapSwitchType::PreviouseStage)
+	else if(tempMapSwitchType == MapSwitchType::PreviouseStage)
 	{
 		// ステージナンバーの数字を減らす;
  		m_mapInfoData.mapNumber--;
 	}
-	else if (mapSwitchType == MapSwitchType::Respawn)
+	else if (tempMapSwitchType == MapSwitchType::Respawn)
 	{
 		// セーブポイントデータのステージナンバーをステージナンバーの数字に代入
 		m_mapInfoData.mapNumber = GameData::GetInstance()->GetSaveData().stageNumber;
 	}
+	else if(tempMapSwitchType == MapSwitchType::Reload)
+	{
+	}
+
 
 
 	// 要素削除
@@ -857,7 +992,7 @@ void ObjectManager::StageMove(const MapSwitchType& mapSwitchType)
 	m_mapInfoData.mapChip = m_pPlatinumLoader->GetMapChip();
 
 	// マップ生成
-	MapCollisionDataCreate(mapData[mapLayer].mapData, mapSwitchType);
+	MapCollisionDataCreate(mapData[mapLayer].mapData, tempMapSwitchType);
 }
 
 
@@ -882,15 +1017,6 @@ std::tuple<bool, Vec2>  ObjectManager::GetSavePointPos()
 {
 	// セーブポイントデータを取得
 	const GameData::SaveData savePointData = GameData::GetInstance()->GetSaveData();
-
-	// ボスを削除する
-	for (auto& object : m_object)
-	{
-		if (object->GetObjectID() == ObjectBase::ObjectID::BossEnemy)
-		{
-			object->SetIsExlist(false);
-		}
-	}
 
 	// セーブポイントデータのステージナンバーと現在のステージナンバーが異なる場合、マップ生成を行う
 	if (savePointData.stageNumber != m_mapInfoData.mapNumber)
@@ -993,6 +1119,15 @@ void ObjectManager::MapChipCreate(const MapCollisionData& mapCollisionData)
 		m_object.push_back(std::make_shared<TransparentBlockChip>());
 	}
 
+	if(mapCollisionData.chipType == ChipType::Save)
+	{
+		// マップチップ生成
+		m_object.push_back(std::make_shared<SaveChip>());
+
+		// グラフィックハンドルを代入
+		m_object.back()->SetGraphicHandle(m_saveGraphHandle);
+	}
+
 	// 描画ランクを代入
 	m_object.back()->SetDrawRank(ObjectBase::DrawRank::Rank_2);
 
@@ -1028,15 +1163,23 @@ bool ObjectManager::IsCellCheckOutOfRange(const Cell& cell)
 void ObjectManager::ObjectUpdate(const bool isStopPlayer)
 {
 
-	for(auto& object : m_object)
+	for (auto& object : m_object)
 	{
-		// プレイヤーの更新を止める
+		if (m_isMapCreate)
+		{
+			continue;
+		}
+
+
+
 		if (isStopPlayer && object->GetObjectID() == ObjectBase::ObjectID::Player)
 		{
 			continue;
 		}
 		object->Update();
 	}
+
+	m_isMapCreate = false;
 }
 
 void ObjectManager::ObjectDraw()
@@ -1231,7 +1374,8 @@ void ObjectManager::TestMapDraw()
 				continue;
 			}
 
-			if (m_mapInfoData.mapCollisionData[x][y].chipType == ChipType::TransparentBlock)
+			if (m_mapInfoData.mapCollisionData[x][y].chipType == ChipType::TransparentBlock||
+				m_mapInfoData.mapCollisionData[x][y].chipType == ChipType::Save)
 			{
 				continue;
 			}
@@ -1250,6 +1394,22 @@ void ObjectManager::TestMapDraw()
 
 void ObjectManager::DrawSaveScore()
 {
+
+	const Circle playerCircle = Circle(GameData::GetInstance()->GetPlayerPos(), ScoreGraph_GameMain::kPlayerRadius);
+	const Circle scoreCircle = Circle(ScoreGraph_GameMain::kClearTextPos, ScoreGraph_GameMain::kScoreGraphRadius);
+
+
+	// プレイヤーの半径とスコアの半径の衝突判定
+	if(EvoLib::Collision::IsCircleToCircle(playerCircle,scoreCircle))
+	{ 
+		// 半透明描画
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+	}
+
+
+
+
+
 	// 現在のタイムを取得
 	const Time currentTime = GameData::GetInstance()->GetTime();
 
@@ -1345,4 +1505,7 @@ void ObjectManager::DrawSaveScore()
 			m_scoreGraphData.countGraphHandle,
 			TRUE);
 	}
+
+	// 透明度を元に戻す
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }

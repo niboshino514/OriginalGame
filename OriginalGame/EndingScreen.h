@@ -68,6 +68,8 @@ private:
 
 	int m_newRecordGraphHandle;	// ニューレコード画像ハンドル
 
+	int m_charaGraphHandle;	// キャラクター画像ハンドル
+
 	////////////////
 	// スコア関連 //
 	////////////////

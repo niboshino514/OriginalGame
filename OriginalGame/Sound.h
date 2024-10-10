@@ -75,6 +75,13 @@ private:
 	};
 
 public:
+
+	// サウンド音量設定読み込み
+	void LoadSoundVolumeSetting();
+	// サウンド音量設定書き込み
+	void WriteSoundVolumeSetting();
+
+
 	// 初期処理
 	void Init();
 

@@ -8,9 +8,15 @@
 namespace Graph
 {
 	// ゲームクリア画像
-	const char* kGameClearGraphFileName = "Data/Graphic/Ending/GameClear.png";
+	const char* const kGameClearGraphFileName = "Data/Graphic/Ending/GameClear.png";
 	// ゲームクリア画像の位置
 	const Vec2 kGameClearGraphPos = Vec2(Game::kWindowCenterX_F, Game::kWindowCenterY_F - 290.0f);
+
+	// キャラクターグラフィックのファイル名
+	const char* const kCharaGraphFileName = "Data/Graphic/Ending/Marisa.png";
+	// キャラクターグラフィックの位置
+	const Vec2 kCharaGraphPos = Vec2(1180.0f, 500.0f);
+
 }
 
 namespace SineCurve
@@ -46,9 +52,9 @@ namespace ScoreGraph
 
 
 	// タイムスコアの位置
-	const Vec2 kTimeScorePos = Vec2(Game::kWindowCenterX_F + 40.0f, Game::kWindowCenterY_F - 70.0f);
+	const Vec2 kTimeScorePos = Vec2(530, Game::kWindowCenterY_F - 70.0f);
 	// デスカウントの位置
-	const Vec2 kDeathCountPos = Vec2(Game::kWindowCenterX_F + 40.0f, Game::kWindowCenterY_F + 100.0f);
+	const Vec2 kDeathCountPos = Vec2(kTimeScorePos.x, Game::kWindowCenterY_F + 100.0f);
 
 	// グラフィック同士の感覚
 	const float kTextGraphInterval = -250.0f;
@@ -110,6 +116,7 @@ EndingScreen::~EndingScreen()
 	}
 	DeleteGraph(m_thanksGraphHandle);
 	DeleteGraph(m_newRecordGraphHandle);
+	DeleteGraph(m_charaGraphHandle);
 }
 
 void EndingScreen::Init()
@@ -122,7 +129,6 @@ void EndingScreen::Init()
 	m_gameClearGraphSineCuve.sineCurrentFrame = 0;
 	m_gameClearGraphSineCuve.sineMaxFrame = SineCurve::kMaxFrame;
 	m_gameClearGraphSineCuve.sineMaxValue = SineCurve::kMaxSineCurveValue;
-
 
 	// 新記録かどうかの判定
 	{
@@ -167,6 +173,17 @@ void EndingScreen::Draw()
 {	
 	// 背景
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xa9a9a9, true);
+
+
+	// キャラクターの描画
+	DrawRotaGraphF(
+		Graph::kCharaGraphPos.x,
+		Graph::kCharaGraphPos.y,
+		1.0,
+		0.0,
+		m_charaGraphHandle,
+		TRUE);
+
 
 	// ゲームクリア画像
 	DrawRotaGraphF(
@@ -225,7 +242,8 @@ void EndingScreen::Load()
 		m_newRecordGraphHandle = LoadGraph(ScoreGraph::kNewRecordGraphFileName);
 	}
 
-
+	// キャラクターグラフィックロード
+	m_charaGraphHandle = LoadGraph(Graph::kCharaGraphFileName);
 }
 
 void EndingScreen::UpdateSineCurve()

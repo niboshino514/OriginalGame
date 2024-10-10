@@ -506,9 +506,6 @@ void Pause::PauseSelectDecision()
 
 		break;
 	}
-
-	
-
 }
 
 void Pause::BackTitleSelectUpdate()

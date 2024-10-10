@@ -186,6 +186,9 @@
     <ClCompile Include="EffectManager.cpp">
       <Filter>ソース ファイル\endingScreen\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="SaveChip.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneManager.h">
@@ -310,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="Effect.h">
       <Filter>ヘッダー ファイル\endingScreen\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveChip.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

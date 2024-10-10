@@ -1,4 +1,6 @@
 #include "Controller.h"
+#include "EvoLib.h"
+
 // シングルトン
 Controller* Controller::m_pInstance = nullptr;
 
@@ -6,6 +8,10 @@ namespace
 {
     // ログのサイズ
     const int kLogSize = 16;
+
+    // コントローラー設定データファイル名
+    const std::string kControllerSettingFileName = "Data/Setting/ControllerSetting.dat";
+
 }
 
 Controller::Controller()
@@ -30,6 +36,32 @@ Controller::Controller()
 
     // 入力受付フラグ
     m_isAcceptInput = true;
+}
+
+void Controller::LoadControllerSetting()
+{
+    // ファイルが存在するかどうかを確認し、存在しない場合は新規作成
+    if (!EvoLib::File::IsFileExist(kControllerSettingFileName))
+	{
+        // コントローラー設定を書き込み
+        m_controllerSetting.autoSwitch = Controller::AutoSwitch::ON;
+        m_controllerSetting.padType = Controller::PadType::XBOX;
+        m_controllerSetting.controllerType = Controller::ControllerType::CONTROLLER;
+
+		// コントローラー設定を書き込み
+		EvoLib::File::WriteBinaryFile<ControllerSetting>(kControllerSettingFileName, m_controllerSetting);
+
+		return;
+	}
+
+    // datファイルの読み込み
+    EvoLib::File::ReadBinaryFile<ControllerSetting>(kControllerSettingFileName, m_controllerSetting);
+}
+
+void Controller::WriteControllerSetting()
+{
+    // コントローラー設定を書き込み
+	EvoLib::File::WriteBinaryFile<ControllerSetting>(kControllerSettingFileName, m_controllerSetting);
 }
 
 void Controller::Update()

@@ -18,6 +18,9 @@ namespace
 
 	// サイズ
 	const Vec2 kSize(20.0f, 30.0f);
+	// 判定サイズ
+	const Vec2 kCollisionSize(18.0f, 28.0f);
+
 
 	// 氷の摩擦力
 	constexpr float kFrictionIce = 0.98f;
@@ -102,6 +105,21 @@ namespace Shot
 	constexpr float kSpeed = 10.0f;
 }
 
+namespace Effect
+{
+	// 死亡エフェクトのスピード
+	constexpr int kDiedEffectSpeed = 1;
+	// 復活エフェクトのスピード
+	constexpr int kResurrectionEffectSpeed = 1;
+
+
+	// 死亡エフェクトサイズ
+	const double kDiedEffectSize = 1.0;
+
+	// 復活エフェクトサイズ
+	const double kResurrectionEffectSize = 0.2;
+}
+
 
 Player::Player() :
 	m_moveRect(),
@@ -130,6 +148,27 @@ void Player::Init()
 
 	// ステートマシンの初期化
 	StateInit();
+
+
+	// プレイヤーステータスの初期化
+	{
+	
+		m_playerStatus.gravityDirection = Direction::Bottom;
+		m_playerStatus.moveSpeed = GameData::MoveSpeed::Normal;
+		m_playerStatus.jumpPower = GameData::JumpPower::Normal;
+		m_playerStatus.jumpType = GameData::JumpType::Second;
+
+
+		// 重力方向変更
+		ChangeGravityDirection(m_playerStatus.gravityDirection);
+	}
+
+
+
+
+
+	const int maxAnimeNo = static_cast<int>(m_revivalEffectData.handle.size()) - 1;
+	m_revivalEffectData.animeNo = maxAnimeNo;
 }
 
 void Player::Update()
@@ -139,12 +178,13 @@ void Player::Update()
 
 	// リスポーン
 	Respawn();
+
+	// マップリロード
+	MapReload();
 }
 
 void Player::Draw()
 {
-	
-
 	// ステートマシンの描画
 	m_pStateMachine.Draw();
 }
@@ -166,7 +206,12 @@ void Player::StateInit()
 	}
 	// 死亡ステート
 	{
-		m_pStateMachine.AddState(State::Dead, dummy, dummy, dummy, dummy);
+		auto enter = [this]() { StateDeadEnter(); };
+		auto update = [this]() { StateDeadUpdate(); };
+		auto draw = [this]() { StateDeadDraw(); };
+		auto exit = [this]() { StateDeadExit(); };
+
+		m_pStateMachine.AddState(State::Dead, enter, update, draw, exit);
 	}
 
 	// 初期ステートを設定
@@ -179,11 +224,15 @@ void Player::StateNormalEnter()
 	// プレイヤーが生きているかどうかを設定
 	GameData::GetInstance()->SetIsPlayerAlive(true);
 
+
+
+	
 	// プレイヤーステータスを取得
 	m_playerStatus = GameData::GetInstance()->GetPlayerStatus();
 
 	// 重力方向変更
 	ChangeGravityDirection(m_playerStatus.gravityDirection);
+
 
 	// アイスブロックフラグをfalseにする
 	m_isIceBlock = false;
@@ -228,6 +277,9 @@ void Player::StateNormalUpdate()
 
 	// アニメーション処理
 	Animation();
+
+	// 復活エフェクト更新
+	RevivalEffectUpdate();
 }
 
 void Player::StateNormalDraw()
@@ -254,7 +306,8 @@ void Player::StateNormalDraw()
 		m_graphicHandle[m_animationDetails.number], true, isReverse);
 
 
-
+	// 復活エフェクト更新
+	RevivalEffectDraw();
 
 	// デバッグ描画
 #if(false)
@@ -310,6 +363,63 @@ void Player::StateNormalExit()
 		// 死亡回数を設定
 		GameData::GetInstance()->SetDeathCount(m_playerStatus.deathCount);
 	}
+
+	
+}
+
+void Player::StateDeadEnter()
+{
+	// プレイヤーエフェクトのフレームカウントを初期化
+	m_diedEffectData.frameCount = 0;
+
+	// プレイヤーエフェクトのアニメーション番号を初期化
+	m_diedEffectData.animeNo = 0;
+
+}
+
+void Player::StateDeadUpdate()
+{
+
+	// プレイヤーエフェクトのフレームカウントを加算
+	m_diedEffectData.frameCount++;
+
+	const int maxAnimeNo = static_cast<int>(m_diedEffectData.handle.size()) - 1;
+
+
+	if(m_diedEffectData.frameCount >= Effect::kDiedEffectSpeed)
+	{
+		m_diedEffectData.frameCount = 0;
+
+		// アニメーション番号を更新
+		m_diedEffectData.animeNo++;
+
+		// アニメーション番号が最大値を超えたら0にする
+		if (m_diedEffectData.animeNo >= maxAnimeNo)
+		{
+			m_diedEffectData.animeNo = maxAnimeNo;
+		}
+	}
+}
+
+void Player::StateDeadDraw()
+{
+	// オフセット値を取得
+	const Vec2 offset = GameData::GetInstance()->GetCameraPos();
+
+	Vec2 pos = m_pos + offset;
+	pos += Graph::kCharacterDrawAdjustment[static_cast<int>(m_playerStatus.gravityDirection)].adjustmentPos;
+
+
+
+	DrawRotaGraphF
+	(pos.x, pos.y,
+		Effect::kDiedEffectSize, 
+		0.0, 
+		m_diedEffectData.handle[m_diedEffectData.animeNo], true, false);
+}
+
+void Player::StateDeadExit()
+{
 }
 
 
@@ -332,10 +442,30 @@ void Player::Respawn()
 		if (!isChangeStage)
 		{
 			m_pStateMachine.SetState(State::Normal);
+
+			// セーブからプレイヤーのステータスを取得
+			m_playerStatus = GameData::GetInstance()->GetPlayerStatus();
 		}
 
 		// リスタート音を再生
 		Sound::GetInstance()->Play(kSoundFileName[static_cast<int>(SoundName::Restart)]);
+		
+		// フレームカウントを初期化
+		m_revivalEffectData.frameCount = 0;
+
+		// アニメーション番号を初期化
+		m_revivalEffectData.animeNo = 0;
+
+		// ジャンプ力を初期化
+		m_jumpInfo.fallSpeed = 0.0f;
+	}
+}
+
+void Player::MapReload()
+{
+	if(Controller::GetInstance()->IsTriggerKey(KEY_INPUT_P))
+	{
+		m_pObjectManager->StageMove(ObjectManager::MapSwitchType::Reload);
 	}
 }
 
@@ -597,7 +727,6 @@ void Player::Jump()
 			m_vec.x = kMaxDir;
 		}
 	}
-
 }
 
 void Player::Collision()
@@ -863,8 +992,10 @@ void Player::MapChipCollision(const Vec2& pos)
 	const int mapHeight = static_cast<int>(mapCollisionData[0].size());
 
 
+	
+
 	// 座標を四角形情報に変換
-	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
+	const Square mapSquare = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, m_size));
 
 
 	for (int y = 0; y < mapHeight; y++)
@@ -878,7 +1009,7 @@ void Player::MapChipCollision(const Vec2& pos)
 			}
 
 			// 四角形同士の当たり判定
-			if (!EvoLib::Collision::IsSquareToSquare(mapCollisionData[x][y].square, square))
+			if (!EvoLib::Collision::IsSquareToSquare(mapCollisionData[x][y].square, mapSquare))
 			{
 				continue;
 			}
@@ -893,14 +1024,6 @@ void Player::MapChipCollision(const Vec2& pos)
 				mapCollisionData[x][y].chipType == ObjectManager::ChipType::NextStage ||
 				mapCollisionData[x][y].chipType == ObjectManager::ChipType::PreviouseStage;
 
-
-			// 障害物の当たり判定を行うかどうか
-			const bool isObstacleCollision =
-				mapCollisionData[x][y].chipType == ObjectManager::ChipType::TopNeedle ||
-				mapCollisionData[x][y].chipType == ObjectManager::ChipType::BottomNeedle ||
-				mapCollisionData[x][y].chipType == ObjectManager::ChipType::LeftNeedle ||
-				mapCollisionData[x][y].chipType == ObjectManager::ChipType::RightNeedle ||
-				mapCollisionData[x][y].chipType == ObjectManager::ChipType::DiedBlock;
 
 
 			// 重力方向を変更するかどうか
@@ -955,13 +1078,6 @@ void Player::MapChipCollision(const Vec2& pos)
 			{
 				// マップチップの当たり判定
 				MapMove(mapCollisionData[x][y]);
-			}
-			
-			// 障害物の当たり判定を行うかどうか
-			if (isObstacleCollision)
-			{
-				// 障害物の当たり判定
-				ObstacleCollision(mapCollisionData[x][y], square);
 			}
 
 			// 重力方向を変更するかどうか
@@ -1020,6 +1136,52 @@ void Player::MapChipCollision(const Vec2& pos)
 			}
 		}
 	}
+
+
+
+	// 座標を四角形情報に変換
+	const Square square = EvoLib::Convert::RectToSquare(EvoLib::Convert::PosToRect(pos, kCollisionSize));
+
+
+	for (int y = 0; y < mapHeight; y++)
+	{
+		for (int x = 0; x < mapWidth; x++)
+		{
+			//マップ判定データがプレイヤーの判定範囲外の場合、次のループに移る
+			if (!mapCollisionData[x][y].playerRangeFlag)
+			{
+				continue;
+			}
+
+			// 四角形同士の当たり判定
+			if (!EvoLib::Collision::IsSquareToSquare(mapCollisionData[x][y].square, square))
+			{
+				continue;
+			}
+
+			// 障害物の当たり判定を行うかどうか
+			const bool isObstacleCollision =
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::TopNeedle ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::BottomNeedle ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::LeftNeedle ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::RightNeedle ||
+				mapCollisionData[x][y].chipType == ObjectManager::ChipType::DiedBlock;
+
+			// 障害物の当たり判定を行うかどうか
+			if (isObstacleCollision)
+			{
+				// 障害物の当たり判定
+				ObstacleCollision(mapCollisionData[x][y], mapSquare);
+			}
+
+			// 存在しない場合、ループを抜ける
+			if (!m_isExlist)
+			{
+				return;
+			}
+		}
+	}
+
 }
 
 void Player::ObstacleCollision(const ObjectManager::MapCollisionData& mapCollisionData, const Square& square)
@@ -1054,7 +1216,7 @@ void Player::MapMove(const ObjectManager::MapCollisionData& mapCollisionData)
 {
 
 	// プレイヤーステータス代入
-	GameData::GetInstance()->SetPlayerStatus(m_playerStatus);
+	//GameData::GetInstance()->SetPlayerStatus(m_playerStatus);
 
 	// 次のステージに進む
 	if (mapCollisionData.chipType == ObjectManager::ChipType::NextStage)
@@ -1190,4 +1352,54 @@ void Player::AccelerationCollision(const ObjectManager::MapCollisionData& mapCol
 	{
 		m_playerStatus.moveSpeed = GameData::MoveSpeed::Slow;
 	}
+}
+
+void Player::RevivalEffectUpdate()
+{
+	const int maxAnimeNo = static_cast<int>(m_revivalEffectData.handle.size()) - 1;
+
+	if(m_revivalEffectData.animeNo >= maxAnimeNo)
+	{
+		return;
+	}
+
+	m_revivalEffectData.frameCount++;
+
+	if (m_revivalEffectData.frameCount >= Effect::kResurrectionEffectSpeed)
+	{
+		m_revivalEffectData.frameCount = 0;
+
+		// アニメーション番号を更新
+		m_revivalEffectData.animeNo++;
+
+		
+		if (m_revivalEffectData.animeNo >= maxAnimeNo)
+		{
+			m_revivalEffectData.animeNo = maxAnimeNo;
+		}
+	}
+}
+
+void Player::RevivalEffectDraw()
+{
+	const int maxAnimeNo = static_cast<int>(m_revivalEffectData.handle.size()) - 1;
+
+	if(m_revivalEffectData.animeNo >= maxAnimeNo)
+	{
+		return;
+	}
+
+	// オフセット値を取得
+	const Vec2 offset = GameData::GetInstance()->GetCameraPos();
+
+	Vec2 pos = m_pos + offset;
+	pos += Graph::kCharacterDrawAdjustment[static_cast<int>(m_playerStatus.gravityDirection)].adjustmentPos;
+
+
+
+
+	// エフェクトの描画
+	DrawRotaGraphF
+	(pos.x, pos.y, 
+		Effect::kResurrectionEffectSize, 0.0, m_revivalEffectData.handle[m_revivalEffectData.animeNo], true);
 }

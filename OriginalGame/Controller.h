@@ -160,10 +160,10 @@ private:
 	const std::unordered_map<ControllerButton, int> switchProMapping =
 	{
 		{ControllerButton::DECIDE, PAD_INPUT_2},
-		{ControllerButton::CANCEL, PAD_INPUT_3},
+		{ControllerButton::CANCEL, PAD_INPUT_1},
 
 		{ControllerButton::JUMP, PAD_INPUT_2},
-		{ControllerButton::RESPAWN, PAD_INPUT_4},
+		{ControllerButton::RESPAWN, PAD_INPUT_3},
 
 		{ControllerButton::PAUSE, PAD_INPUT_10},
 
@@ -177,6 +177,11 @@ private:
 
 public:
 
+	// コントローラー設定をロード
+	void LoadControllerSetting();
+
+	// コントローラー設定の書き込み
+	void WriteControllerSetting();
 
 
 	// コントローラーの入力状態更新

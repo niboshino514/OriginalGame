@@ -72,7 +72,11 @@ private:
 	void StateNormalDraw();
 	void StateNormalExit();
 
-	
+	// 死亡ステート処理
+	void StateDeadEnter();
+	void StateDeadUpdate();
+	void StateDeadDraw();
+	void StateDeadExit();
 
 
 
@@ -80,6 +84,12 @@ private:
 	/// リスポーン
 	/// </summary>
 	void Respawn();
+
+	/// <summary>
+	/// マップリロード
+	/// </summary>
+	void MapReload();
+
 
 	/// <summary>
 	/// 移動
@@ -178,7 +188,15 @@ private:
 	/// <param name="mapCollisionData">マップ判定データ</param>
 	void AccelerationCollision(const ObjectManager::MapCollisionData& mapCollisionData);
 
+	/// <summary>
+	/// 復活エフェクト更新
+	/// </summary>
+	void RevivalEffectUpdate();
 
+	/// <summary>
+	/// 復活エフェクト描画
+	/// </summary>
+	void RevivalEffectDraw();
 private:
 
 	//////////////

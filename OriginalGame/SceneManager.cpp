@@ -22,7 +22,7 @@ SceneManager::~SceneManager()
 
 void SceneManager::Init()
 {
-	m_pScene = new SceneEnding;
+	m_pScene = new SceneMain;
 	m_pScene->Init();
 }
 

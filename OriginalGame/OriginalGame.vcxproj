@@ -171,6 +171,7 @@
     <ClCompile Include="Pause.cpp" />
     <ClCompile Include="PlatinumLoader.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SaveChip.cpp" />
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneEnding.cpp" />
     <ClCompile Include="SceneMain.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="Pause.h" />
     <ClInclude Include="PlatinumLoader.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SaveChip.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneEnding.h" />
     <ClInclude Include="SceneMain.h" />
